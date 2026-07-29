@@ -13,6 +13,7 @@ import ScrollProgress from './components/ScrollProgress'
 
 export default function App() {
   useEffect(() => {
+    document.documentElement.dataset.siteRelease = '4'
     document.title = 'TJL Tecnologia | Sites, Sistemas, Automações e Manutenção em Bilac'
     const setMeta = (name: string, content: string, prop = false) => {
       const attr = prop ? 'property' : 'name'
