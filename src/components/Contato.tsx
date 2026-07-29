@@ -37,7 +37,7 @@ export default function Contato() {
     if (!fields.mensagem.trim()) next.mensagem = "Mensagem é obrigatória."
     setErrors(next)
     if (Object.keys(next).length) return
-    const message = `Olá! Tenho interesse nos serviços da TJL Tecnologia.\n\nNome: ${fields.nome}${fields.empresa ? `\nEmpresa: ${fields.empresa}` : ""}\nTelefone: ${fields.telefone}\nServiço de interesse: ${fields.servico}\n\n${fields.mensagem}`
+    const message = `Olá! Tenho interesse nos serviços da TJL Solutions.\n\nNome: ${fields.nome}${fields.empresa ? `\nEmpresa: ${fields.empresa}` : ""}\nTelefone: ${fields.telefone}\nServiço de interesse: ${fields.servico}\n\n${fields.mensagem}`
     window.open(`https://wa.me/${team[selected].phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer")
     setSent(true)
   }

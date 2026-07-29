@@ -27,7 +27,7 @@ export default function Hero() {
       <div className="hero-layout">
         <div className="hero-copy">
           <div className="hero-kicker"><i /> Ecossistema digital · Bilac, SP</div>
-          <p className="hero-brand">TJL Tecnologia</p>
+          <p className="hero-brand">TJL Solutions</p>
           <h1>Tecnologia que <span>transforma ideias</span> em soluções.</h1>
           <p className="hero-description">
             Desenvolvemos sites, sistemas e automações, além de cuidar da manutenção de computadores,

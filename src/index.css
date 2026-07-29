@@ -88,7 +88,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .control-nav a:hover, .control-nav a.active { color: white; }
 .control-nav a.active::after { transform: scaleX(1); }
 .control-cta { display: flex; align-items: center; gap: 8px; padding: 13px 16px; background: var(--cyan); color: #021018; font: 600 11px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; transition: .25s; }
-.control-cta:hover { background: white; box-shadow: 0 0 30px rgba(34,211,238,.3); }
+.control-cta:hover { background: #f5fbff; color: #021018; box-shadow: 0 0 30px rgba(34,211,238,.3); }
 .control-actions { display: flex; align-items: center; gap: 8px; }
 .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 11px; border: 1px solid var(--line); background: rgba(8,20,32,.64); color: var(--white); cursor: pointer; font: 500 9px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; transition: border-color .2s, background .2s, color .2s; }
 .theme-toggle:hover { border-color: var(--line-hot); background: rgba(34,211,238,.1); }
@@ -118,7 +118,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .hero-actions { display: flex; gap: 12px; }
 .btn-signal, .btn-line { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 50px; padding: 0 20px; text-transform: uppercase; letter-spacing: .08em; font: 600 11px var(--font-mono); transition: .3s var(--ease); }
 .btn-signal { background: var(--cyan); color: #021017; box-shadow: 0 0 0 rgba(34,211,238,0); }
-.btn-signal:hover { transform: translateY(-3px); background: white; box-shadow: 0 14px 35px rgba(34,211,238,.18); }
+.btn-signal:hover { transform: translateY(-3px); background: #f5fbff; color: #021017; box-shadow: 0 14px 35px rgba(34,211,238,.18); }
 .btn-line { border: 1px solid rgba(125,211,252,.26); background: rgba(6,14,24,.45); color: #c5e9fa; }
 .btn-line:hover { border-color: var(--cyan); background: rgba(34,211,238,.08); }
 .hero-metrics { display: flex; gap: 36px; margin-top: 44px; }
@@ -333,6 +333,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .map-strip-content small { color: var(--cyan); font: 8px var(--font-mono); letter-spacing: .15em; }.map-strip-content h2 { margin: 9px 0; font: 600 1.75rem var(--font-display); }.map-strip-content p { margin: 0; color: #668397; font-size: .8rem; }
 .map-data { display: flex; flex-direction: column; gap: 7px; }.map-data span { display: flex; justify-content: space-between; gap: 20px; color: #456478; font: 7px var(--font-mono); }.map-data em { color: #90afbf; font-style: normal; }
 .map-strip-content > a { display: flex; align-items: center; gap: 9px; padding: 14px 18px; border: 1px solid var(--line-hot); font: 9px var(--font-mono); }
+.map-strip-content > a:hover { border-color: var(--cyan); background: rgba(34,211,238,.1); color: var(--white); }
 .embedded-map { position: relative; min-height: 430px; overflow: hidden; border: 1px solid var(--line-hot); background: #06101a; box-shadow: 0 28px 70px rgba(0,0,0,.24); }
 .embedded-map::before { content: "MAPA / TJL BASE 01"; position: absolute; z-index: 2; top: 12px; left: 12px; padding: 8px 10px; background: rgba(3,8,14,.84); color: #bdefff; pointer-events: none; font: 8px var(--font-mono); letter-spacing: .12em; }
 .embedded-map iframe { display: block; width: 100%; height: 430px; border: 0; }
@@ -342,6 +343,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .map-placeholder span { max-width: 520px; color: #7190a2; font-size: .8rem; line-height: 1.6; }
 
 footer { background: #02060b !important; }
+.footer-nav-link:hover { color: #f5fbff; }
 .card-tech { border: 1px solid var(--line) !important; background: rgba(5,13,22,.7) !important; }
 .btn-primary { display: inline-flex; align-items: center; gap: 8px; border: 0; background: var(--cyan); color: #031017; padding: 12px 16px; font: 600 10px var(--font-mono); }
 .btn-outline { display: inline-flex; border: 1px solid var(--line-hot); background: transparent; color: white; padding: 12px 16px; }
@@ -464,5 +466,11 @@ footer { background: #02060b !important; }
 [data-theme="light"] .request-field select option { background: white; }
 [data-theme="light"] .location-terminal { background: rgba(255,255,255,.78); }
 [data-theme="light"] footer { background: #dce9ee !important; color: #102d3b; }
+[data-theme="light"] footer .text-slate-400,
+[data-theme="light"] footer .text-slate-300 { color: #496675; }
+[data-theme="light"] footer .text-slate-500,
+[data-theme="light"] footer .text-slate-600 { color: #5f7784; }
+[data-theme="light"] .footer-nav-link:hover { color: #006f95; }
+[data-theme="light"] .map-strip-content > a:hover { color: #063147; }
 [data-theme="light"] .mobile-command { background: rgba(241,248,250,.98); }
 [data-theme="light"] ::selection { color: #fff; }

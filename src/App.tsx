@@ -15,17 +15,17 @@ import AmbientExperience from "./components/AmbientExperience"
 
 export default function App() {
   useEffect(() => {
-    document.documentElement.dataset.siteRelease = '6'
-    document.title = 'TJL Tecnologia | Sites, Sistemas, Automações e Manutenção em Bilac'
+    document.documentElement.dataset.siteRelease = '7'
+    document.title = 'TJL Solutions | Sites, Sistemas, Automações e Manutenção em Bilac'
     const setMeta = (name: string, content: string, prop = false) => {
       const attr = prop ? 'property' : 'name'
       let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el) }
       el.content = content
     }
-    setMeta('description', 'A TJL Tecnologia desenvolve sites, sistemas e automações, além de oferecer manutenção de computadores em Bilac, São Paulo. Conheça o TJL Charge.')
+    setMeta('description', 'A TJL Solutions desenvolve sites, sistemas e automações, além de oferecer manutenção de computadores em Bilac, São Paulo. Conheça o TJL Charge.')
     setMeta('keywords', 'empresa de tecnologia Bilac, desenvolvimento de sites Bilac, manutenção computadores Bilac, TJL Charge, automação empresas')
-    setMeta('og:title', 'TJL Tecnologia | Sites, Sistemas, Automações e Manutenção em Bilac', true)
+    setMeta('og:title', 'TJL Solutions | Sites, Sistemas, Automações e Manutenção em Bilac', true)
     setMeta('og:description', 'Soluções digitais completas para empresas em Bilac, SP.', true)
     setMeta('og:type', 'website', true)
   }, [])

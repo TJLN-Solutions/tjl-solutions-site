@@ -7,14 +7,14 @@ export default function Footer() {
       <div className="content-shell">
         <div className="grid gap-12 md:grid-cols-[1.2fr_.8fr_1fr] pb-12">
           <div>
-            <div className="control-logo mb-5"><span className="control-logo-mark">T</span><span>TJL <b>TECNOLOGIA</b></span></div>
+            <div className="control-logo mb-5"><span className="control-logo-mark">T</span><span>TJL <b>SOLUTIONS</b></span></div>
             <p className="max-w-sm text-sm leading-7 text-slate-400">Tecnologia, inovação e soluções personalizadas para movimentar o seu negócio.</p>
             <p className="mt-5 flex items-center gap-2 text-xs text-slate-500"><MapPin size={14} className="text-cyan-400"/> Rua XV de Novembro, 283 — Bilac, SP</p>
           </div>
           <div>
             <p className="terminal-label mb-5">MAPA DO SISTEMA</p>
             <div className="grid gap-3">
-              {navLinks.map((link) => <a key={link.href} href={link.href} className="group flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"><span className="font-mono text-[8px] text-cyan-500">{link.short}</span>{link.label}<ArrowUpRight size={12} className="opacity-0 transition group-hover:opacity-100"/></a>)}
+              {navLinks.map((link) => <a key={link.href} href={link.href} className="footer-nav-link group flex items-center gap-2 text-sm text-slate-400 transition"><span className="font-mono text-[8px] text-cyan-500">{link.short}</span>{link.label}<ArrowUpRight size={12} className="opacity-0 transition group-hover:opacity-100"/></a>)}
             </div>
           </div>
           <div>
@@ -25,7 +25,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-col justify-between gap-3 border-t border-sky-300/10 pt-7 text-[10px] tracking-widest text-slate-600 sm:flex-row">
-          <p>© {new Date().getFullYear()} TJL TECNOLOGIA · TODOS OS DIREITOS RESERVADOS</p>
+          <p>© {new Date().getFullYear()} TJL SOLUTIONS · TODOS OS DIREITOS RESERVADOS</p>
           <p>SISTEMA DESENVOLVIDO PELA TJL</p>
         </div>
       </div>

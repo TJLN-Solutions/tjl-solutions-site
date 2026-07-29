@@ -34,9 +34,9 @@ export default function Navbar() {
   return (
     <>
       <header className={`control-bar ${scrolled ? "is-compact" : ""}`}>
-        <a href="#inicio" className="control-logo" aria-label="TJL Tecnologia — início">
+        <a href="#inicio" className="control-logo" aria-label="TJL Solutions — início">
           <span className="control-logo-mark">T</span>
-          <span>TJL <b>TECNOLOGIA</b></span>
+          <span>TJL <b>SOLUTIONS</b></span>
         </a>
 
         <nav className="control-nav" aria-label="Navegação principal">
