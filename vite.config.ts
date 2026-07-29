@@ -48,17 +48,49 @@ function sitesStaticWorker(): Plugin {
   return {
     name: 'sites-static-worker',
     apply: 'build',
-    generateBundle() {
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      const htmlAsset = bundle['index.html']
+      if (!htmlAsset || htmlAsset.type !== 'asset' || typeof htmlAsset.source !== 'string') {
+        this.error('Unable to find the generated index.html for Sites.')
+      }
+
+      let html = htmlAsset.source
+      for (const [fileName, output] of Object.entries(bundle)) {
+        if (output.type === 'asset' && fileName.endsWith('.css')) {
+          const css = typeof output.source === 'string'
+            ? output.source
+            : new TextDecoder().decode(output.source)
+          html = html.replace(
+            new RegExp(`<link[^>]+href=["']/${fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*>`),
+            `<style>${css}</style>`,
+          )
+        }
+
+        if (output.type === 'chunk' && fileName.endsWith('.js') && output.isEntry) {
+          const safeCode = output.code.replace(/<\/script/gi, '<\\/script')
+          html = html.replace(
+            new RegExp(`<script[^>]+src=["']/${fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*></script>`),
+            `<script type="module">${safeCode}</script>`,
+          )
+        }
+      }
+
       this.emitFile({
         type: 'asset',
         fileName: 'server/index.js',
-        source: `export default {
-  async fetch(request, env) {
-    const response = await env.ASSETS.fetch(request)
-    if (response.status !== 404) return response
-    const url = new URL(request.url)
-    url.pathname = "/"
-    return env.ASSETS.fetch(new Request(url, request))
+        source: `const html = ${JSON.stringify(html)};
+export default {
+  async fetch(request) {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return new Response("Method not allowed", { status: 405 })
+    }
+    return new Response(request.method === "HEAD" ? null : html, {
+      headers: {
+        "content-type": "text/html; charset=UTF-8",
+        "cache-control": "public, max-age=300",
+      },
+    })
   },
 }
 `,
