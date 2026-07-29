@@ -1,0 +1,10 @@
+{
+  "description": "Streamlines tasks by executing specific user instructions from attachments, enhancing productivity and simplifying workflow management.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
