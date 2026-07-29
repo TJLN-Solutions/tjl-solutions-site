@@ -4,7 +4,18 @@ export default function AmbientExperience() {
   const glowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return
+    const device = navigator as Navigator & {
+      deviceMemory?: number
+      connection?: { saveData?: boolean }
+    }
+    const lite =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      device.connection?.saveData === true ||
+      (device.hardwareConcurrency > 0 && device.hardwareConcurrency <= 4) ||
+      (device.deviceMemory !== undefined && device.deviceMemory <= 4)
+    document.documentElement.classList.toggle("performance-lite", lite)
+
+    if (lite || !window.matchMedia("(pointer: fine)").matches) return
     let frame = 0
     const onMove = (event: PointerEvent) => {
       cancelAnimationFrame(frame)

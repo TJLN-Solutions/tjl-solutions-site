@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Menu, X, ArrowUpRight } from "lucide-react"
 import { navLinks } from "../data"
+import ThemeToggle from "./ThemeToggle"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -46,7 +47,10 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <a href="#contato" className="control-cta">Abrir canal <ArrowUpRight size={15} /></a>
+        <div className="control-actions">
+          <ThemeToggle />
+          <a href="#contato" className="control-cta">Abrir canal <ArrowUpRight size={15} /></a>
+        </div>
         <button
           type="button"
           className="control-menu-button"
@@ -66,6 +70,7 @@ export default function Navbar() {
             <span>{link.short}</span><strong>{link.label}</strong><ArrowUpRight />
           </a>
         ))}
+        <ThemeToggle />
         <div className="mobile-command-status"><i /> Sistema online · Bilac, SP</div>
       </aside>
 
