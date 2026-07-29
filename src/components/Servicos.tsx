@@ -1,139 +1,76 @@
-import { Globe, Monitor, Cpu, ArrowRight } from 'lucide-react'
+import { useState } from "react"
+import { ArrowUpRight, Check, Code2, Cpu, Globe2, Monitor, Network, ScanLine } from "lucide-react"
+import { services } from "../data"
+import SectionHeader from "./SectionHeader"
 
-type Service = {
-  icon: typeof Globe
-  title: string
-  desc: string
-  items: string[]
-  whatsapp: string
+function ServiceVisual({ type }: { type: string }) {
+  if (type === "sites") return (
+    <div className="service-visual browser-visual">
+      <div className="browser-bar"><i /><i /><i /><span>tjl.digital/project</span></div>
+      <div className="browser-layout"><aside /><main><span /><strong /><div><i /><i /><i /></div></main></div>
+      <Code2 className="visual-icon" /><small>RESPONSIVE / ONLINE</small>
+    </div>
+  )
+  if (type === "hardware") return (
+    <div className="service-visual hardware-visual">
+      <div className="hardware-core"><Cpu /><span className="scan" /></div>
+      <div className="hardware-stat stat-a"><small>CPU</small><strong>38%</strong></div>
+      <div className="hardware-stat stat-b"><small>RAM</small><strong>64%</strong></div>
+      <div className="hardware-stat stat-c"><small>SSD</small><strong>OK</strong></div>
+      <ScanLine className="visual-icon" /><small>DIAGNÓSTICO EM TEMPO REAL</small>
+    </div>
+  )
+  return (
+    <div className="service-visual automation-visual">
+      <div className="auto-node n1"><span>ENTRADA</span></div><div className="auto-node n2"><span>PROCESSO</span></div>
+      <div className="auto-node n3"><span>AÇÃO</span></div><div className="auto-node n4"><span>RESULTADO</span></div>
+      <svg viewBox="0 0 500 280"><path d="M95 65 C180 65 160 140 250 140 S320 220 405 220 M95 65 C150 65 185 210 250 210 S345 65 405 65" /></svg>
+      <Network className="visual-icon" /><small>WORKFLOW / 04 NÓS ATIVOS</small>
+    </div>
+  )
 }
 
-const services: Service[] = [
-  {
-    icon: Globe,
-    title: 'Desenvolvimento de sites',
-    desc: 'Criação de sites modernos, responsivos e profissionais para empresas, lojas, escritórios, prestadores de serviços e portfólios.',
-    items: [
-      'Sites institucionais',
-      'Landing pages',
-      'Portfólios profissionais',
-      'Catálogos digitais',
-      'Integração com WhatsApp',
-      'Formulários de contato',
-      'Hospedagem e publicação',
-    ],
-    whatsapp: 'Olá! Gostaria de solicitar um orçamento para desenvolvimento de site.',
-  },
-  {
-    icon: Monitor,
-    title: 'Manutenção de hardware',
-    desc: 'Serviços de manutenção, diagnóstico e melhoria de computadores e notebooks.',
-    items: [
-      'Formatação e instalação de sistemas',
-      'Limpeza interna',
-      'Troca de componentes',
-      'Instalação de SSD e memória RAM',
-      'Diagnóstico de problemas',
-      'Otimização de computadores',
-      'Backup e recuperação de arquivos',
-    ],
-    whatsapp: 'Olá! Gostaria de solicitar um orçamento para manutenção de hardware.',
-  },
-  {
-    icon: Cpu,
-    title: 'Desenvolvimento de automações',
-    desc: 'Criação de automações personalizadas para reduzir tarefas manuais, organizar processos e melhorar a produtividade.',
-    items: [
-      'Automação de cobranças',
-      'Integração entre sistemas',
-      'Envio automático de mensagens',
-      'Organização de dados',
-      'Automatização de tarefas administrativas',
-      'Fluxos personalizados para empresas',
-    ],
-    whatsapp: 'Olá! Gostaria de solicitar um orçamento para desenvolvimento de automação.',
-  },
-]
-
 export default function Servicos() {
+  const [active, setActive] = useState(0)
+  const service = services[active]
   return (
-    <section
-      id="servicos"
-      className="py-28 relative"
-      style={{
-        background: 'radial-gradient(ellipse at 70% 30%, rgba(3,105,161,0.1) 0%, transparent 60%), #020814',
-      }}
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.3), transparent)' }}
-      />
-
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <div
-            className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded"
-            style={{ color: '#0ea5e9', background: 'rgba(14,165,233,0.1)', fontFamily: "'Exo 2', sans-serif" }}
-          >
-            O que fazemos
+    <section id="servicos" className="experience-section services-section">
+      <div className="section-track" aria-hidden="true"><span>04</span></div>
+      <div className="content-shell">
+        <SectionHeader index="04" eyebrow="Soluções modulares" title="Escolha uma frente. Veja o sistema responder." description="Projetos personalizados de acordo com as necessidades de cada cliente." />
+        <div className="services-console">
+          <div className="service-selector" role="tablist" aria-label="Serviços da TJL">
+            {services.map((item, index) => (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={active === index}
+                key={item.id}
+                className={active === index ? "active" : ""}
+                onClick={() => setActive(index)}
+                onMouseEnter={() => setActive(index)}
+              >
+                <span>{item.id}</span><div><strong>{item.title}</strong><small>{item.short}</small></div><ArrowUpRight />
+              </button>
+            ))}
           </div>
-          <h2 className="section-title mb-4">Serviços oferecidos</h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'rgba(226,240,255,0.65)' }}>
-            Soluções personalizadas de acordo com as necessidades de cada cliente.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {services.map(({ icon: Icon, title, desc, items, whatsapp }) => (
-            <div key={title} className="card-tech p-7 flex flex-col">
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-6"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(3,105,161,0.6), rgba(14,165,233,0.2))',
-                  border: '1px solid rgba(14,165,233,0.3)',
-                  boxShadow: '0 0 20px rgba(14,165,233,0.1)',
-                }}
-              >
-                <Icon size={24} style={{ color: '#0ea5e9' }} />
+          <div className="service-detail" role="tabpanel">
+            <div className="service-detail-copy">
+              <div className="terminal-label">MODULE / {service.id}</div>
+              <h3>{service.title}</h3>
+              <p>{service.desc}</p>
+              <div className="service-benefits">
+                {service.items.map((item) => <span key={item}><Check />{item}</span>)}
               </div>
-
-              <h3
-                className="font-bold text-lg mb-3"
-                style={{ fontFamily: "'Exo 2', sans-serif", color: 'white' }}
-              >
-                {title}
-              </h3>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'rgba(226,240,255,0.65)' }}>
-                {desc}
-              </p>
-
-              <ul className="space-y-2 mb-6 flex-1">
-                {items.map(item => (
-                  <li key={item} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(226,240,255,0.7)' }}>
-                    <span
-                      className="w-1.5 h-1.5 rounded-full shrink-0"
-                      style={{ background: '#0ea5e9' }}
-                    />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto pt-5 border-t" style={{ borderColor: 'rgba(14,165,233,0.15)' }}>
-                <p className="text-xs mb-4" style={{ color: 'rgba(226,240,255,0.4)', fontFamily: "'Exo 2', sans-serif" }}>
-                  Valor a ser negociado
-                </p>
-                <a
-                  href={`https://wa.me/5518996460473?text=${encodeURIComponent(whatsapp)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary w-full justify-center text-sm py-2.5"
-                >
-                  Solicitar orçamento <ArrowRight size={14} />
+              <div className="service-bottom">
+                <span><small>INVESTIMENTO</small>Valor a ser negociado</span>
+                <a href={`https://wa.me/5518996460473?text=${encodeURIComponent(service.whatsapp)}`} target="_blank" rel="noopener noreferrer">
+                  Solicitar orçamento <ArrowUpRight />
                 </a>
               </div>
             </div>
-          ))}
+            <ServiceVisual type={service.key} />
+          </div>
         </div>
       </div>
     </section>

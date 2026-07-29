@@ -2,6 +2,7 @@ import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
 
 import siteConfiguration from './.figma/make/site.json'
 
@@ -56,7 +57,7 @@ function sitesStaticWorker(): Plugin {
       }
 
       const html = htmlAsset.source
-      const assets: Record<string, { body: string; type: string }> = {}
+      const assets: Record<string, { body: string; type: string; base64?: boolean }> = {}
       for (const [fileName, output] of Object.entries(bundle)) {
         if (output.type === 'asset' && fileName.endsWith('.css')) {
           const css = typeof output.source === 'string'
@@ -67,6 +68,32 @@ function sitesStaticWorker(): Plugin {
 
         if (output.type === 'chunk' && fileName.endsWith('.js') && output.isEntry) {
           assets[`/${fileName}`] = { body: output.code, type: 'text/javascript; charset=UTF-8' }
+        }
+
+        if (output.type === 'asset' && !fileName.endsWith('.css') && fileName !== 'index.html' && fileName !== 'server/index.js') {
+          const types: Record<string, string> = {
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.webp': 'image/webp',
+            '.svg': 'image/svg+xml',
+            '.txt': 'text/plain; charset=UTF-8',
+          }
+          const extension = fileName.slice(fileName.lastIndexOf('.')).toLowerCase()
+          const binary = typeof output.source !== 'string'
+          assets[`/${fileName}`] = {
+            body: binary ? Buffer.from(output.source).toString('base64') : output.source as string,
+            type: types[extension] ?? 'application/octet-stream',
+            base64: binary,
+          }
+        }
+      }
+      const socialCard = path.resolve(__dirname, 'public/og.png')
+      if (existsSync(socialCard)) {
+        assets['/og.png'] = {
+          body: readFileSync(socialCard).toString('base64'),
+          type: 'image/png',
+          base64: true,
         }
       }
 
@@ -83,7 +110,10 @@ export default {
     const path = new URL(request.url).pathname
     const asset = assets[path]
     if (asset) {
-      return new Response(request.method === "HEAD" ? null : asset.body, {
+      const body = asset.base64
+        ? Uint8Array.from(atob(asset.body), character => character.charCodeAt(0))
+        : asset.body
+      return new Response(request.method === "HEAD" ? null : body, {
         headers: {
           "content-type": asset.type,
           "cache-control": "public, max-age=31536000, immutable",

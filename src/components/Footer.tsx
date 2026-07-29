@@ -1,136 +1,32 @@
-import { Zap, MapPin, MessageCircle, ArrowRight } from 'lucide-react'
-
-const navLinks = [
-  { label: 'Início', href: '#inicio' },
-  { label: 'Sobre a TJL', href: '#sobre' },
-  { label: 'Sistemas', href: '#sistemas' },
-  { label: 'Serviços', href: '#servicos' },
-  { label: 'Contato', href: '#contato' },
-]
-
-const team = [
-  { name: 'Apollo', phone: '5518996460473', display: '+55 18 99646-473' },
-  { name: 'Leonardo', phone: '5518996311838', display: '+55 18 99631-1838' },
-  { name: 'Thiago', phone: '5518996980211', display: '+55 18 99698-0211' },
-]
-
-const BASE_MSG = encodeURIComponent('Olá! Encontrei o contato pelo site da TJL e gostaria de conhecer melhor os serviços da empresa.')
+import { ArrowUpRight, MapPin, MessageCircle } from "lucide-react"
+import { baseMessage, navLinks, team } from "../data"
 
 export default function Footer() {
-  const year = new Date().getFullYear()
-
   return (
-    <footer
-      className="relative pt-16 pb-8"
-      style={{
-        background: 'linear-gradient(180deg, #020814 0%, #020c1a 100%)',
-        borderTop: '1px solid rgba(14,165,233,0.15)',
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className="w-8 h-8 rounded flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #0369a1, #0ea5e9)', boxShadow: '0 0 12px rgba(14,165,233,0.4)' }}
-              >
-                <Zap size={15} fill="white" color="white" />
-              </div>
-              <span
-                className="font-extrabold text-base tracking-wider"
-                style={{ fontFamily: "'Exo 2', sans-serif", color: 'white' }}
-              >
-                TJL <span style={{ color: '#0ea5e9' }}>Tecnologia</span>
-              </span>
-            </div>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(226,240,255,0.55)' }}>
-              Tecnologia, inovação e soluções para o seu negócio.
-            </p>
-            <div className="flex items-start gap-2 text-xs" style={{ color: 'rgba(226,240,255,0.45)' }}>
-              <MapPin size={12} className="mt-0.5 shrink-0" style={{ color: '#0ea5e9' }} />
-              Rua XV de Novembro, 283 — Bilac, SP
+    <footer className="pt-16 pb-8 border-t border-sky-300/10">
+      <div className="content-shell">
+        <div className="grid gap-12 md:grid-cols-[1.2fr_.8fr_1fr] pb-12">
+          <div>
+            <div className="control-logo mb-5"><span className="control-logo-mark">T</span><span>TJL <b>TECNOLOGIA</b></span></div>
+            <p className="max-w-sm text-sm leading-7 text-slate-400">Tecnologia, inovação e soluções personalizadas para movimentar o seu negócio.</p>
+            <p className="mt-5 flex items-center gap-2 text-xs text-slate-500"><MapPin size={14} className="text-cyan-400"/> Rua XV de Novembro, 283 — Bilac, SP</p>
+          </div>
+          <div>
+            <p className="terminal-label mb-5">MAPA DO SISTEMA</p>
+            <div className="grid gap-3">
+              {navLinks.map((link) => <a key={link.href} href={link.href} className="group flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"><span className="font-mono text-[8px] text-cyan-500">{link.short}</span>{link.label}<ArrowUpRight size={12} className="opacity-0 transition group-hover:opacity-100"/></a>)}
             </div>
           </div>
-
-          {/* Nav */}
           <div>
-            <p
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: '#0ea5e9', fontFamily: "'Exo 2', sans-serif" }}
-            >
-              Navegação
-            </p>
-            <ul className="space-y-2">
-              {navLinks.map(link => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="flex items-center gap-1 text-sm no-underline transition-colors duration-200 hover:text-white"
-                    style={{ color: 'rgba(226,240,255,0.55)' }}
-                  >
-                    <ArrowRight size={11} style={{ color: '#0ea5e9' }} />
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Team */}
-          <div>
-            <p
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: '#0ea5e9', fontFamily: "'Exo 2', sans-serif" }}
-            >
-              Nossa equipe
-            </p>
-            <ul className="space-y-4">
-              {team.map(({ name, phone, display }) => (
-                <li key={name}>
-                  <p className="text-sm font-medium mb-1" style={{ color: 'rgba(226,240,255,0.8)', fontFamily: "'Exo 2', sans-serif" }}>
-                    {name}
-                  </p>
-                  <p className="text-xs mb-1.5" style={{ color: 'rgba(226,240,255,0.45)' }}>{display}</p>
-                  <a
-                    href={`https://wa.me/${phone}?text=${BASE_MSG}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs no-underline transition-colors"
-                    style={{ color: '#0ea5e9' }}
-                  >
-                    <MessageCircle size={11} /> WhatsApp
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* CTA */}
-          <div>
-            <p
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: '#0ea5e9', fontFamily: "'Exo 2', sans-serif" }}
-            >
-              Comece agora
-            </p>
-            <p className="text-sm mb-5" style={{ color: 'rgba(226,240,255,0.55)' }}>
-              Pronto para modernizar seu negócio com tecnologia?
-            </p>
-            <a href="#contato" className="btn-primary text-sm py-2.5 w-full justify-center">
-              Solicitar orçamento
-            </a>
+            <p className="terminal-label mb-5">CANAIS DIRETOS</p>
+            <div className="grid gap-4">
+              {team.map((member) => <a key={member.name} href={`https://wa.me/${member.phone}?text=${encodeURIComponent(baseMessage)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between border-b border-sky-300/10 pb-3 text-sm text-slate-300"><span>{member.name}<small className="ml-2 text-[9px] text-slate-600">{member.display}</small></span><MessageCircle size={14} className="text-cyan-400"/></a>)}
+            </div>
           </div>
         </div>
-
-        {/* Bottom */}
-        <div
-          className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
-          style={{ borderTop: '1px solid rgba(14,165,233,0.1)', color: 'rgba(226,240,255,0.35)' }}
-        >
-          <p>© {year} TJL Tecnologia. Todos os direitos reservados.</p>
-          <p>Desenvolvido pela TJL Tecnologia</p>
+        <div className="flex flex-col justify-between gap-3 border-t border-sky-300/10 pt-7 text-[10px] tracking-widest text-slate-600 sm:flex-row">
+          <p>© {new Date().getFullYear()} TJL TECNOLOGIA · TODOS OS DIREITOS RESERVADOS</p>
+          <p>SISTEMA DESENVOLVIDO PELA TJL</p>
         </div>
       </div>
     </footer>

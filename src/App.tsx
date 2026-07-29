@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect } from "react"
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Sobre from './components/Sobre'
@@ -10,10 +10,12 @@ import Localizacao from './components/Localizacao'
 import Footer from './components/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
 import ScrollProgress from './components/ScrollProgress'
+import LoadingExperience from "./components/LoadingExperience"
+import AmbientExperience from "./components/AmbientExperience"
 
 export default function App() {
   useEffect(() => {
-    document.documentElement.dataset.siteRelease = '4'
+    document.documentElement.dataset.siteRelease = '5'
     document.title = 'TJL Tecnologia | Sites, Sistemas, Automações e Manutenção em Bilac'
     const setMeta = (name: string, content: string, prop = false) => {
       const attr = prop ? 'property' : 'name'
@@ -30,6 +32,8 @@ export default function App() {
 
   return (
     <>
+      <LoadingExperience />
+      <AmbientExperience />
       <ScrollProgress />
       <Navbar />
       <main id="conteudo">

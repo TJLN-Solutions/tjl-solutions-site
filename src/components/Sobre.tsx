@@ -1,104 +1,60 @@
-import { MapPin, ExternalLink, Code, Wrench, Cpu, Users } from 'lucide-react'
+import { ArrowUpRight, Code2, Cpu, MapPin, Radar, Users, Wrench } from "lucide-react"
+import SectionHeader from "./SectionHeader"
 
-const highlights = [
-  { icon: Code, label: 'Desenvolvimento', desc: 'Sites, sistemas e aplicações digitais' },
-  { icon: Wrench, label: 'Manutenção', desc: 'Hardware, computadores e notebooks' },
-  { icon: Cpu, label: 'Automações', desc: 'Processos inteligentes e integrados' },
-  { icon: Users, label: 'Suporte', desc: 'Atendimento próximo e personalizado' },
+const flow = [
+  { icon: Code2, code: "DEV.01", title: "Desenvolvimento", text: "Sites, sistemas e aplicações digitais" },
+  { icon: Wrench, code: "LAB.02", title: "Manutenção", text: "Hardware, computadores e notebooks" },
+  { icon: Cpu, code: "AUTO.03", title: "Automações", text: "Processos inteligentes e integrados" },
+  { icon: Users, code: "HUB.04", title: "Suporte", text: "Atendimento próximo e personalizado" },
 ]
 
 export default function Sobre() {
   return (
-    <section
-      id="sobre"
-      className="py-28 relative"
-      style={{
-        background: 'radial-gradient(ellipse at 80% 50%, rgba(3,105,161,0.1) 0%, transparent 60%), #020814',
-      }}
-    >
-      {/* Divider top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.3), transparent)' }}
-      />
+    <section id="sobre" className="experience-section about-section">
+      <div className="section-track" aria-hidden="true"><span>02</span></div>
+      <div className="content-shell">
+        <SectionHeader
+          index="02"
+          eyebrow="Centro de operações"
+          title="Tecnologia, inovação e atendimento próximo."
+          description="A TJL conecta diferentes frentes para transformar necessidades reais em soluções modernas, funcionais e acessíveis."
+        />
 
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left: text */}
-          <div>
-            <div
-              className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded"
-              style={{ color: '#0ea5e9', background: 'rgba(14,165,233,0.1)', fontFamily: "'Exo 2', sans-serif" }}
-            >
-              Quem somos
-            </div>
-            <h2 className="section-title mb-6">
-              Tecnologia, inovação e atendimento próximo
-            </h2>
-            <p className="mb-5 leading-relaxed" style={{ color: 'rgba(226,240,255,0.75)' }}>
-              A TJL Tecnologia é uma empresa especializada no desenvolvimento de soluções digitais e serviços de tecnologia. Trabalhamos com criação de sites, manutenção de computadores, desenvolvimento de sistemas e automações personalizadas para empresas e profissionais.
+        <div className="about-grid">
+          <div className="about-story">
+            <div className="terminal-label">TJL / MANIFESTO</div>
+            <p>
+              Somos uma empresa especializada no desenvolvimento de soluções digitais e serviços de tecnologia.
+              Trabalhamos com criação de sites, manutenção de computadores, desenvolvimento de sistemas e automações
+              personalizadas para empresas e profissionais.
             </p>
-            <p className="mb-10 leading-relaxed" style={{ color: 'rgba(226,240,255,0.75)' }}>
-              Nosso objetivo é entender as necessidades de cada cliente e desenvolver soluções modernas, funcionais e acessíveis, sempre com atendimento próximo e personalizado.
+            <p>
+              Entendemos cada contexto antes de projetar. O resultado é tecnologia <strong>sob medida</strong>,
+              acompanhada por pessoas que permanecem próximas em todas as etapas.
             </p>
-
-            {/* Location card */}
-            <div
-              className="glass-light rounded-xl p-6 glow-border"
-              style={{ border: '1px solid rgba(14,165,233,0.2)' }}
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(14,165,233,0.15)', border: '1px solid rgba(14,165,233,0.3)' }}
-                >
-                  <MapPin size={20} style={{ color: '#0ea5e9' }} />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-sm mb-1" style={{ color: '#7dd3fc', fontFamily: "'Exo 2', sans-serif" }}>
-                    Visite nossa loja
-                  </p>
-                  <p className="text-sm mb-3" style={{ color: 'rgba(226,240,255,0.7)' }}>
-                    Rua XV de Novembro, 283 — Bilac, São Paulo
-                  </p>
-                  <a
-                    href="https://maps.google.com/?q=Rua+XV+de+Novembro,+283,+Bilac,+São+Paulo"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary text-sm py-2 px-4"
-                  >
-                    Ver localização <ExternalLink size={13} />
-                  </a>
-                </div>
-              </div>
-            </div>
+            <div className="about-pulse"><i /><span>Necessidade</span><b /><span>Estratégia</span><b /><span>Solução</span></div>
           </div>
 
-          {/* Right: highlights grid */}
-          <div className="grid grid-cols-2 gap-4">
-            {highlights.map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="card-tech p-6">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(3,105,161,0.5), rgba(14,165,233,0.2))',
-                    border: '1px solid rgba(14,165,233,0.3)',
-                  }}
-                >
-                  <Icon size={22} style={{ color: '#0ea5e9' }} />
-                </div>
-                <h3
-                  className="font-bold text-base mb-2"
-                  style={{ fontFamily: "'Exo 2', sans-serif", color: 'white' }}
-                >
-                  {label}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(226,240,255,0.6)' }}>
-                  {desc}
-                </p>
-              </div>
+          <div className="about-flow">
+            <div className="flow-spine" />
+            {flow.map(({ icon: Icon, code, title, text }, index) => (
+              <article key={code} className="flow-module" style={{ "--delay": `${index * 90}ms` } as React.CSSProperties}>
+                <span className="flow-code">{code}</span>
+                <Icon />
+                <div><h3>{title}</h3><p>{text}</p></div>
+              </article>
             ))}
           </div>
+        </div>
+
+        <div className="location-terminal">
+          <div className="location-radar"><Radar /><span /><i /></div>
+          <div><small>CIDADE</small><strong>Bilac · São Paulo</strong></div>
+          <div><small>COORDENADA LOCAL</small><strong>Rua XV de Novembro, 283</strong></div>
+          <div><small>ATENDIMENTO</small><strong className="status-online"><i /> Presencial disponível</strong></div>
+          <a href="https://maps.google.com/?q=Rua+XV+de+Novembro,+283,+Bilac,+São+Paulo" target="_blank" rel="noopener noreferrer">
+            <MapPin /> Abrir localização <ArrowUpRight />
+          </a>
         </div>
       </div>
     </section>

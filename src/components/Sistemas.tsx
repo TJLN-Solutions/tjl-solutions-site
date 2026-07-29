@@ -1,165 +1,79 @@
-import { CreditCard, CheckCircle2, Clock, Sparkles } from 'lucide-react'
+import { ArrowUpRight, Bell, Check, Clock3, CreditCard, MessageCircle, Users } from "lucide-react"
+import SectionHeader from "./SectionHeader"
 
-const features = [
-  'Cadastro e gerenciamento de clientes',
-  'Controle de mensalidades e parcelamentos',
-  'Acompanhamento de cobranças',
-  'Histórico de pagamentos',
-  'Lembretes automáticos',
-  'Painel de gestão simples e moderno',
-  'Relatórios financeiros',
-  'Controle de cobranças em atraso',
-]
-
-const whatsappMsg = encodeURIComponent('Olá! Tenho interesse em saber mais sobre o TJL Charge.')
+const process = ["Cobrança criada", "Lembrete enviado", "Cliente notificado", "Pagamento identificado", "Status atualizado"]
 
 export default function Sistemas() {
+  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o TJL Charge.")
   return (
-    <section
-      id="sistemas"
-      className="py-28 relative"
-      style={{
-        background: 'radial-gradient(ellipse at 20% 50%, rgba(3,105,161,0.12) 0%, transparent 60%), #020814',
-      }}
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.3), transparent)' }}
-      />
+    <section id="sistemas" className="experience-section charge-section">
+      <div className="section-track" aria-hidden="true"><span>03</span></div>
+      <div className="content-shell">
+        <SectionHeader
+          index="03"
+          eyebrow="Produto em desenvolvimento"
+          title="TJL Charge"
+          description="Cobranças automáticas, organização financeira e mais controle para o seu negócio."
+        />
 
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div
-            className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded"
-            style={{ color: '#0ea5e9', background: 'rgba(14,165,233,0.1)', fontFamily: "'Exo 2', sans-serif" }}
-          >
-            Inovação própria
+        <div className="charge-stage">
+          <div className="charge-copy">
+            <div className="launch-badge"><i /> Lançamento em breve</div>
+            <p>
+              Sistema criado para empresas, comércios e profissionais que trabalham com mensalidades,
+              crediários ou parcelamentos próprios.
+            </p>
+            <p>
+              Organize clientes, acompanhe pagamentos, automatize lembretes e controle cobranças em atraso
+              em uma experiência simples e moderna.
+            </p>
+            <ul>
+              <li><Check /> Cadastro e gerenciamento de clientes</li>
+              <li><Check /> Controle de mensalidades e parcelamentos</li>
+              <li><Check /> Histórico e relatórios financeiros</li>
+              <li><Check /> Mensagens e lembretes automáticos</li>
+            </ul>
+            <a className="btn-signal" href={`https://wa.me/5518996460473?text=${whatsapp}`} target="_blank" rel="noopener noreferrer">
+              Tenho interesse <ArrowUpRight />
+            </a>
           </div>
-          <h2 className="section-title mb-4">Sistemas desenvolvidos pela TJL</h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'rgba(226,240,255,0.65)' }}>
-            Soluções criadas para facilitar a gestão e automatizar processos do seu negócio.
-          </p>
-        </div>
 
-        {/* TJL Charge card */}
-        <div
-          className="relative rounded-2xl p-8 lg:p-12 overflow-hidden max-w-5xl mx-auto"
-          style={{
-            background: 'linear-gradient(135deg, rgba(4,13,30,0.95) 0%, rgba(3,40,80,0.5) 100%)',
-            border: '1px solid rgba(14,165,233,0.5)',
-            boxShadow: '0 0 60px rgba(14,165,233,0.15), inset 0 0 60px rgba(14,165,233,0.03)',
-          }}
-        >
-          {/* Glow corners */}
-          <div
-            className="absolute top-0 left-0 w-40 h-40 pointer-events-none"
-            aria-hidden="true"
-            style={{
-              background: 'radial-gradient(circle, rgba(14,165,233,0.2) 0%, transparent 70%)',
-              transform: 'translate(-30%, -30%)',
-            }}
-          />
-          <div
-            className="absolute bottom-0 right-0 w-40 h-40 pointer-events-none"
-            aria-hidden="true"
-            style={{
-              background: 'radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%)',
-              transform: 'translate(30%, 30%)',
-            }}
-          />
-
-          {/* Top edge glow */}
-          <div
-            className="absolute top-0 left-10 right-10 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, #0ea5e9, transparent)' }}
-          />
-
-          <div className="relative grid lg:grid-cols-5 gap-10 items-start">
-            {/* Left: info */}
-            <div className="lg:col-span-3">
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, #0369a1, #0ea5e9)',
-                    boxShadow: '0 0 24px rgba(14,165,233,0.5)',
-                  }}
-                >
-                  <CreditCard size={26} color="white" />
-                </div>
-                <div>
-                  <h3
-                    className="font-extrabold text-2xl"
-                    style={{ fontFamily: "'Exo 2', sans-serif", color: 'white' }}
-                  >
-                    TJL Charge
-                  </h3>
-                  <p className="text-xs" style={{ color: '#7dd3fc', fontFamily: "'Exo 2', sans-serif" }}>
-                    Sistema de Cobrança Automática
-                  </p>
-                </div>
-                {/* Badge */}
-                <div
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ml-auto lg:ml-0"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(14,165,233,0.25), rgba(14,165,233,0.1))',
-                    border: '1px solid rgba(14,165,233,0.6)',
-                    color: '#7dd3fc',
-                    fontFamily: "'Exo 2', sans-serif",
-                    animation: 'pulse-glow 3s infinite',
-                  }}
-                >
-                  <Clock size={12} />
-                  Lançamento em breve
-                </div>
+          <div className="charge-dashboard" aria-label="Demonstração visual do painel TJL Charge">
+            <div className="dash-top">
+              <div><span className="dash-logo">T</span><strong>TJL Charge</strong></div>
+              <div className="dash-live"><i /> SINCRONIZADO</div>
+            </div>
+            <div className="dash-metrics">
+              <article><CreditCard /><span>Total de cobranças</span><strong>R$ 28.450</strong><small>+12,8% no mês</small></article>
+              <article><Check /><span>Pagamentos recebidos</span><strong>R$ 21.820</strong><small>76,7% confirmado</small></article>
+              <article><Clock3 /><span>Pendentes</span><strong>R$ 6.630</strong><small>18 cobranças</small></article>
+            </div>
+            <div className="dash-main">
+              <div className="dash-chart">
+                <div className="dash-card-title"><span>Fluxo financeiro</span><small>Últimos 7 meses</small></div>
+                <svg viewBox="0 0 520 170" role="img" aria-label="Gráfico demonstrativo de crescimento financeiro">
+                  <defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#22d3ee" stopOpacity=".35"/><stop offset="1" stopColor="#22d3ee" stopOpacity="0"/></linearGradient></defs>
+                  <path className="chart-area" d="M10 145 C70 130 85 100 145 112 S225 70 275 88 S355 28 410 50 S470 18 510 20 L510 165 L10 165Z" />
+                  <path className="chart-line" d="M10 145 C70 130 85 100 145 112 S225 70 275 88 S355 28 410 50 S470 18 510 20" />
+                </svg>
+                <div className="chart-labels"><span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span><span>JUL</span></div>
               </div>
-
-              <p className="mb-3 leading-relaxed" style={{ color: 'rgba(226,240,255,0.75)' }}>
-                O TJL Charge é um sistema de cobrança automática desenvolvido para empresas, comércios e profissionais que trabalham com mensalidades, crediários ou parcelamentos próprios.
-              </p>
-              <p className="mb-8 leading-relaxed" style={{ color: 'rgba(226,240,255,0.75)' }}>
-                A plataforma permitirá organizar clientes, controlar cobranças, acompanhar pagamentos e automatizar o envio de lembretes, trazendo mais praticidade, controle e eficiência para o negócio.
-              </p>
-
-              <a
-                href={`https://wa.me/5518996460473?text=${whatsappMsg}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary"
-              >
-                <Sparkles size={16} />
-                Tenho interesse
-              </a>
-            </div>
-
-            {/* Right: features */}
-            <div className="lg:col-span-2">
-              <p
-                className="text-xs font-semibold uppercase tracking-widest mb-4"
-                style={{ color: '#0ea5e9', fontFamily: "'Exo 2', sans-serif" }}
-              >
-                Recursos previstos
-              </p>
-              <ul className="space-y-3">
-                {features.map(f => (
-                  <li key={f} className="flex items-start gap-3 text-sm" style={{ color: 'rgba(226,240,255,0.8)' }}>
-                    <CheckCircle2 size={15} className="mt-0.5 shrink-0" style={{ color: '#0ea5e9' }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+              <div className="dash-activity">
+                <div className="dash-card-title"><span>Atividade</span><Bell /></div>
+                <div><i className="green" /><p><strong>Pagamento identificado</strong><small>Clínica Horizonte · agora</small></p></div>
+                <div><i /><p><strong>Lembrete enviado</strong><small>Mercado Central · 4 min</small></p></div>
+                <div><i className="violet" /><p><strong>Novo cliente</strong><small>Studio 13 · 18 min</small></p></div>
+                <div className="dash-people"><Users /><span>128 clientes</span><MessageCircle /><span>47 mensagens</span></div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Placeholder for future systems */}
-        <p
-          className="text-center mt-10 text-sm"
-          style={{ color: 'rgba(226,240,255,0.3)', fontFamily: "'Exo 2', sans-serif", letterSpacing: '0.05em' }}
-        >
-          Novos sistemas em desenvolvimento · Em breve
-        </p>
+        <div className="charge-process">
+          {process.map((item, index) => (
+            <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><i /><p>{item}</p></div>
+          ))}
+        </div>
       </div>
     </section>
   )

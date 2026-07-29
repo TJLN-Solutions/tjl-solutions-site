@@ -1,10 +1,15 @@
 {
-  "description": "Streamlines tasks by executing specific user instructions from attachments, enhancing productivity and simplifying workflow management.",
+  "title": "TJL Tecnologia | Sites, Sistemas e Automações",
+  "description": "Soluções digitais, sites, sistemas, automações e manutenção de computadores em Bilac, SP.",
+  "language": "pt-BR",
+  "openGraph": {
+    "image": "/og.png"
+  },
   "robots": {
-    "index": false
+    "index": true
   },
   "accessibility": {
-    "addBypassLinks": false,
+    "addBypassLinks": true,
     "ignoreReducedMotion": false
   }
 }
