@@ -55,24 +55,18 @@ function sitesStaticWorker(): Plugin {
         this.error('Unable to find the generated index.html for Sites.')
       }
 
-      let html = htmlAsset.source
+      const html = htmlAsset.source
+      const assets: Record<string, { body: string; type: string }> = {}
       for (const [fileName, output] of Object.entries(bundle)) {
         if (output.type === 'asset' && fileName.endsWith('.css')) {
           const css = typeof output.source === 'string'
             ? output.source
             : new TextDecoder().decode(output.source)
-          html = html.replace(
-            new RegExp(`<link[^>]+href=["']/${fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*>`),
-            `<style>${css}</style>`,
-          )
+          assets[`/${fileName}`] = { body: css, type: 'text/css; charset=UTF-8' }
         }
 
         if (output.type === 'chunk' && fileName.endsWith('.js') && output.isEntry) {
-          const safeCode = output.code.replace(/<\/script/gi, '<\\/script')
-          html = html.replace(
-            new RegExp(`<script[^>]+src=["']/${fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'][^>]*></script>`),
-            `<script type="module">${safeCode}</script>`,
-          )
+          assets[`/${fileName}`] = { body: output.code, type: 'text/javascript; charset=UTF-8' }
         }
       }
 
@@ -80,10 +74,21 @@ function sitesStaticWorker(): Plugin {
         type: 'asset',
         fileName: 'server/index.js',
         source: `const html = ${JSON.stringify(html)};
+const assets = ${JSON.stringify(assets)};
 export default {
   async fetch(request) {
     if (request.method !== "GET" && request.method !== "HEAD") {
       return new Response("Method not allowed", { status: 405 })
+    }
+    const path = new URL(request.url).pathname
+    const asset = assets[path]
+    if (asset) {
+      return new Response(request.method === "HEAD" ? null : asset.body, {
+        headers: {
+          "content-type": asset.type,
+          "cache-control": "public, max-age=31536000, immutable",
+        },
+      })
     }
     return new Response(request.method === "HEAD" ? null : html, {
       headers: {
