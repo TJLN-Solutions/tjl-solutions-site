@@ -7,11 +7,28 @@ export const navLinks = [
   { label: "Contato", href: "#contato", short: "06" },
 ]
 
-export const team = [
-  { name: "Apollo", phone: "5518996460473", display: "+55 18 99646-473" },
-  { name: "Leonardo", phone: "5518996311838", display: "+55 18 99631-1838" },
-  { name: "Thiago", phone: "5518996980211", display: "+55 18 99698-0211" },
-]
+/**
+ * Formata um celular brasileiro (55 + DDD + 9 dígitos) para exibição.
+ * O texto exibido é sempre derivado do número discado — nunca digitado à
+ * mão — para que os dois não possam divergir.
+ */
+export const formatPhoneBR = (phone: string) =>
+  phone.replace(/^55(\d{2})(\d{5})(\d{4})$/, "+55 $1 $2-$3")
+
+export const whatsappUrl = (phone: string, message: string) =>
+  `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+
+export type TeamMember = { name: string; phone: string; display: string }
+
+export const team: TeamMember[] = [
+  { name: "Apollo", phone: "5518996464731" },
+  { name: "Leonardo", phone: "5518996311838" },
+  { name: "Thiago", phone: "5518996980211" },
+  { name: "Nicolas", phone: "5518996148839" },
+].map((member) => ({ ...member, display: formatPhoneBR(member.phone) }))
+
+/** Contato padrão dos CTAs que não deixam o visitante escolher com quem falar. */
+export const primaryPhone = team[0].phone
 
 export const baseMessage =
   "Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa."

@@ -1,5 +1,5 @@
 import { ArrowUpRight, MapPin, MessageCircle } from "lucide-react"
-import { baseMessage, navLinks, team } from "../data"
+import { baseMessage, navLinks, team, whatsappUrl } from "../data"
 
 export default function Footer() {
   return (
@@ -20,7 +20,7 @@ export default function Footer() {
           <div>
             <p className="terminal-label mb-5">CANAIS DIRETOS</p>
             <div className="grid gap-4">
-              {team.map((member) => <a key={member.name} href={`https://wa.me/${member.phone}?text=${encodeURIComponent(baseMessage)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between border-b footer-rule pb-3 text-sm footer-strong"><span>{member.name}<small className="ml-2 text-[9px] footer-meta">{member.display}</small></span><MessageCircle size={14} className="footer-icon"/></a>)}
+              {team.map((member) => <a key={member.name} href={whatsappUrl(member.phone, baseMessage)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between border-b footer-rule pb-3 text-sm footer-strong"><span>{member.name}<small className="ml-2 text-[9px] footer-meta">{member.display}</small></span><MessageCircle size={14} className="footer-icon"/></a>)}
             </div>
           </div>
         </div>
