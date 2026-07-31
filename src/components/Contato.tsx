@@ -1,9 +1,11 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
-import { AlertCircle, ArrowUpRight, CheckCircle2, MessageCircle, Phone, Radio } from "lucide-react"
-import { baseMessage, team, whatsappUrl } from "../data"
+import { AlertCircle, ArrowUpRight, CheckCircle2, Code2, MessageCircle, Phone, Radio, Wrench } from "lucide-react"
+import { areas, baseMessage, serviceOptions, team, teamByArea, whatsappUrl, type ServiceArea } from "../data"
 import SectionHeader from "./SectionHeader"
 
-const serviceOptions = ["Desenvolvimento de site", "Manutenção de hardware", "Desenvolvimento de automação", "BASE4 Charge", "Outro"]
+const areaIcon: Record<ServiceArea, typeof Wrench> = { hardware: Wrench, software: Code2 }
+const areaKeys = Object.keys(areas) as ServiceArea[]
+
 type Fields = { nome: string; empresa: string; telefone: string; servico: string; mensagem: string }
 type Errors = Partial<Record<keyof Fields, string>>
 const emptyFields: Fields = { nome: "", empresa: "", telefone: "", servico: "", mensagem: "" }
@@ -27,6 +29,13 @@ export default function Contato() {
     setErrors((current) => ({ ...current, [key]: undefined }))
   }
 
+  // Avisa quando o serviço escolhido é atendido por uma frente diferente da
+  // do contato selecionado — evita que o pedido chegue a quem não cuida dele.
+  const chosenService = serviceOptions.find((item) => item.label === fields.servico)
+  const wrongArea =
+    chosenService?.area && chosenService.area !== team[selected].area ? chosenService.area : null
+  const suggested = wrongArea ? teamByArea(wrongArea)[0] : null
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const next: Errors = {}
@@ -49,19 +58,32 @@ export default function Contato() {
         <SectionHeader index="06" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
         <div className="contact-center">
           <div className="contact-operators">
-            <div className="terminal-label">OPERADORES DISPONÍVEIS / {String(team.length).padStart(2, "0")}</div>
-            {team.map((member, index) => (
-              <button
-                type="button"
-                key={member.name}
-                className={selected === index ? "active" : ""}
-                onClick={() => setSelected(index)}
-              >
-                <span className="operator-avatar">{member.name[0]}</span>
-                <span><small>OPERADOR {String(index + 1).padStart(2, "0")}</small><strong>{member.name}</strong><em><Phone />{member.display}</em></span>
-                <i /><Radio />
-              </button>
-            ))}
+            <div className="terminal-label">ATENDIMENTO POR ÁREA / {String(team.length).padStart(2, "0")}</div>
+
+            {areaKeys.map((key) => {
+              const Icon = areaIcon[key]
+              return (
+                <div className="operator-group" key={key} role="group" aria-labelledby={`area-${key}`}>
+                  <p className="operator-group-title" id={`area-${key}`}><Icon aria-hidden="true" />{areas[key].label}</p>
+                  <p className="operator-group-desc">{areas[key].desc}</p>
+                  {teamByArea(key).map((member) => {
+                    const index = team.indexOf(member)
+                    return (
+                      <button
+                        type="button"
+                        key={member.name}
+                        className={`operator ${selected === index ? "active" : ""}`}
+                        onClick={() => setSelected(index)}
+                      >
+                        <span className="operator-avatar">{member.name[0]}</span>
+                        <span><small>{areas[member.area].short}</small><strong>{member.name}</strong><em><Phone />{member.display}</em></span>
+                        <i /><Radio />
+                      </button>
+                    )
+                  })}
+                </div>
+              )
+            })}
             <a
               className="operator-connect"
               href={whatsappUrl(team[selected].phone, baseMessage)}
@@ -70,7 +92,10 @@ export default function Contato() {
             >
               <MessageCircle /> Conectar com {team[selected].name} <ArrowUpRight />
             </a>
-            <div className="connection-status"><span><i /> Canal selecionado</span><strong>{team[selected].display}</strong></div>
+            <div className="connection-status">
+              <span><i /> {areas[team[selected].area].label}</span>
+              <strong>{team[selected].display}</strong>
+            </div>
           </div>
 
           <div className="project-request">
@@ -90,9 +115,25 @@ export default function Contato() {
                   <Field label="Empresa"><input id="empresa" value={fields.empresa} onChange={set("empresa")} autoComplete="organization" placeholder="Nome da empresa" /></Field>
                   <Field label="Telefone ou WhatsApp *" error={errors.telefone}><input id="telefone" value={fields.telefone} onChange={set("telefone")} inputMode="tel" autoComplete="tel" placeholder="(xx) xxxxx-xxxx" /></Field>
                   <Field label="Serviço de interesse *" error={errors.servico}>
-                    <select id="servico" value={fields.servico} onChange={set("servico")}><option value="">Selecione um serviço</option>{serviceOptions.map((item) => <option key={item}>{item}</option>)}</select>
+                    <select id="servico" value={fields.servico} onChange={set("servico")}><option value="">Selecione um serviço</option>{serviceOptions.map((item) => <option key={item.label}>{item.label}</option>)}</select>
                   </Field>
                 </div>
+                {wrongArea && suggested && (
+                  <p className="request-route" role="status">
+                    <AlertCircle aria-hidden="true" />
+                    {/* "fica com" evita concordância de gênero: o nome do serviço
+                        é variável ("Manutenção" é feminino, "Desenvolvimento" não). */}
+                    <span>
+                      <strong>{fields.servico}</strong> fica com a frente{" "}
+                      {areas[wrongArea].label}. {team[selected].name} cuida de{" "}
+                      {areas[team[selected].area].label}.
+                    </span>
+                    <button type="button" onClick={() => setSelected(team.indexOf(suggested))}>
+                      Falar com {suggested.name}
+                    </button>
+                  </p>
+                )}
+
                 <Field label="Mensagem *" error={errors.mensagem}><textarea id="mensagem" value={fields.mensagem} onChange={set("mensagem")} rows={5} placeholder="Descreva o que você precisa..." /></Field>
                 <button type="submit" className="request-submit"><span>Enviar solicitação para {team[selected].name}</span><MessageCircle /></button>
               </form>
