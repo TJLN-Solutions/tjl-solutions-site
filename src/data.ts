@@ -18,17 +18,57 @@ export const formatPhoneBR = (phone: string) =>
 export const whatsappUrl = (phone: string, message: string) =>
   `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
 
-export type TeamMember = { name: string; phone: string; display: string }
+/**
+ * A equipe atende por duas frentes distintas. Quem procura conserto de
+ * máquina e quem procura desenvolvimento fala com pessoas diferentes, então
+ * a área precisa estar visível antes de o visitante escolher um contato.
+ */
+export type ServiceArea = "hardware" | "software"
 
-export const team: TeamMember[] = [
-  { name: "Apollo", phone: "5518996464731" },
-  { name: "Leonardo", phone: "5518996311838" },
-  { name: "Thiago", phone: "5518996980211" },
-  { name: "Nicolas", phone: "5518996148839" },
-].map((member) => ({ ...member, display: formatPhoneBR(member.phone) }))
+export const areas: Record<ServiceArea, { label: string; short: string; desc: string }> = {
+  hardware: {
+    label: "Loja física · Hardware",
+    short: "Hardware e atendimento presencial",
+    desc: "Manutenção, conserto e montagem de computadores e notebooks, com atendimento na loja.",
+  },
+  software: {
+    label: "Sistemas e software",
+    short: "Sistemas, sites e automações",
+    desc: "Sites, sistemas sob medida, automações e o BASE4 Charge — os produtos desenvolvidos pela empresa.",
+  },
+}
+
+export type TeamMember = { name: string; phone: string; display: string; area: ServiceArea }
+
+const roster: Omit<TeamMember, "display">[] = [
+  { name: "Apollo", phone: "5518996464731", area: "hardware" },
+  { name: "Leonardo", phone: "5518996311838", area: "hardware" },
+  { name: "Thiago", phone: "5518996980211", area: "software" },
+  { name: "Nicolas", phone: "5518996148839", area: "software" },
+]
+
+export const team: TeamMember[] = roster.map((member) => ({
+  ...member,
+  display: formatPhoneBR(member.phone),
+}))
+
+export const teamByArea = (area: ServiceArea) => team.filter((member) => member.area === area)
 
 /** Contato padrão dos CTAs que não deixam o visitante escolher com quem falar. */
 export const primaryPhone = team[0].phone
+
+/**
+ * Cada serviço aponta para a área que o atende, para que o formulário possa
+ * avisar quando o contato selecionado não for de quem cuida daquele assunto.
+ * `null` = sem área definida, não há o que avisar.
+ */
+export const serviceOptions: { label: string; area: ServiceArea | null }[] = [
+  { label: "Desenvolvimento de site", area: "software" },
+  { label: "Manutenção de hardware", area: "hardware" },
+  { label: "Desenvolvimento de automação", area: "software" },
+  { label: "BASE4 Charge", area: "software" },
+  { label: "Outro", area: null },
+]
 
 export const baseMessage =
   "Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa."
