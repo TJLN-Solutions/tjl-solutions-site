@@ -11,9 +11,9 @@ const modules = [
 export default function Diferenciais() {
   return (
     <section id="diferenciais" className="experience-section modules-section">
-      <div className="section-track" aria-hidden="true"><span>05</span></div>
+      <div className="section-track" aria-hidden="true"><span>15</span></div>
       <div className="content-shell">
-        <SectionHeader index="05" eyebrow="Arquitetura humana" title="Quatro módulos. Uma forma própria de trabalhar." />
+        <SectionHeader index="15" eyebrow="Arquitetura humana" title="Quatro módulos. Uma forma própria de trabalhar." />
         <div className="technology-modules">
           <svg viewBox="0 0 1000 350" aria-hidden="true"><path d="M120 175 H880 M250 175 V70 M500 175 V280 M750 175 V70" /></svg>
           {modules.map(({ id, icon: Icon, title, desc }, index) => (

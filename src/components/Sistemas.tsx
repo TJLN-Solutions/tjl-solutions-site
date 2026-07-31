@@ -8,10 +8,10 @@ export default function Sistemas() {
   const chargeLink = whatsappUrl(primaryPhone, "Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
   return (
     <section id="sistemas" className="experience-section charge-section">
-      <div className="section-track" aria-hidden="true"><span>03</span></div>
+      <div className="section-track" aria-hidden="true"><span>06</span></div>
       <div className="content-shell">
         <SectionHeader
-          index="03"
+          index="06"
           eyebrow="Produto em desenvolvimento"
           title="BASE4 Charge"
           description="Cobranças automáticas, organização financeira e mais controle para o seu negócio."

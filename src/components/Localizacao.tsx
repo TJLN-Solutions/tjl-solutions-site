@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
-import { ArrowUpRight, MapPin, MapPinned } from "lucide-react"
+import { ArrowUpRight, Clock, MapPin, MapPinned } from "lucide-react"
+import { horarios } from "../data"
 
 /**
  * Coordenadas conferidas contra o endereço no Google Maps. Os valores
@@ -61,6 +62,20 @@ export default function Localizacao() {
             <span>STATUS<em>ABERTO PARA VISITAS</em></span>
           </div>
           <a href={mapsUrl} target="_blank" rel="noopener noreferrer">Traçar rota <ArrowUpRight /></a>
+        </div>
+
+        {/* Horário de atendimento: quem procura a loja física precisa saber
+            se vale sair de casa agora, antes de olhar o mapa. */}
+        <div className="hours-block is-inline">
+          <h3><Clock aria-hidden="true" />Horário de atendimento</h3>
+          <dl className="hours-list">
+            {horarios.map((item) => (
+              <div key={item.dia}>
+                <dt>{item.dia}</dt>
+                <dd className={item.fechado ? "is-closed" : undefined}>{item.hora}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
         <div className="embedded-map" ref={mapRef}>

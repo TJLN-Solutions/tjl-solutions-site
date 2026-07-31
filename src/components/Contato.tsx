@@ -60,9 +60,9 @@ export default function Contato() {
 
   return (
     <section id="contato" className="experience-section contact-section">
-      <div className="section-track" aria-hidden="true"><span>06</span></div>
+      <div className="section-track" aria-hidden="true"><span>18</span></div>
       <div className="content-shell">
-        <SectionHeader index="06" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
+        <SectionHeader index="18" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
         <div className="contact-center">
           <div className="contact-operators">
             <div className="terminal-label">ATENDIMENTO POR ÁREA / {String(team.length).padStart(2, "0")}</div>

@@ -1,5 +1,6 @@
 import { ArrowUpRight, Code2, Cpu, MapPin, Radar, Users, Wrench } from "lucide-react"
 import SectionHeader from "./SectionHeader"
+import useInView from "../hooks/useInView"
 
 const flow = [
   { icon: Code2, code: "DEV.01", title: "Desenvolvimento", text: "Sites, sistemas e aplicações digitais" },
@@ -9,18 +10,24 @@ const flow = [
 ]
 
 export default function Sobre() {
+  // Dois observadores: o miolo e a faixa de localização entram em momentos
+  // diferentes porque estão separados por uma boa distância na página.
+  const [gridRef, gridInView] = useInView<HTMLDivElement>()
+  const [stripRef, stripInView] = useInView<HTMLDivElement>()
+
   return (
     <section id="sobre" className="experience-section about-section">
-      <div className="section-track" aria-hidden="true"><span>02</span></div>
+      <div className="section-track" aria-hidden="true"><span>04</span></div>
       <div className="content-shell">
         <SectionHeader
-          index="02"
+          index="04"
           eyebrow="Centro de operações"
           title="Tecnologia, inovação e atendimento próximo."
           description="A BASE4 conecta diferentes frentes para transformar necessidades reais em soluções modernas, funcionais e acessíveis."
         />
 
-        <div className="about-grid">
+        {/* rv-sides: o manifesto vem da esquerda, o fluxo da direita */}
+        <div ref={gridRef} className={`about-grid rv rv-sides ${gridInView ? "is-in" : ""}`}>
           <div className="about-story">
             <div className="terminal-label">BASE4 / MANIFESTO</div>
             <p>
@@ -47,7 +54,7 @@ export default function Sobre() {
           </div>
         </div>
 
-        <div className="location-terminal">
+        <div ref={stripRef} className={`location-terminal rv ${stripInView ? "is-in" : ""}`}>
           <div className="location-radar"><Radar /><span /><i /></div>
           <div><small>CIDADE</small><strong>Bilac · São Paulo</strong></div>
           <div><small>COORDENADA LOCAL</small><strong>Rua XV de Novembro, 283</strong></div>

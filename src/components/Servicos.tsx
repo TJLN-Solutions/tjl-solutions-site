@@ -35,9 +35,9 @@ export default function Servicos() {
   const service = services[active]
   return (
     <section id="servicos" className="experience-section services-section">
-      <div className="section-track" aria-hidden="true"><span>04</span></div>
+      <div className="section-track" aria-hidden="true"><span>07</span></div>
       <div className="content-shell">
-        <SectionHeader index="04" eyebrow="Soluções modulares" title="Escolha uma frente. Veja o sistema responder." description="Projetos personalizados de acordo com as necessidades de cada cliente." />
+        <SectionHeader index="07" eyebrow="Soluções modulares" title="Escolha uma frente. Veja o sistema responder." description="Projetos personalizados de acordo com as necessidades de cada cliente." />
         <div className="services-console">
           <div className="service-selector" role="tablist" aria-label="Serviços da BASE4">
             {services.map((item, index) => (

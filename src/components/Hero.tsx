@@ -28,7 +28,14 @@ export default function Hero() {
         <div className="hero-copy">
           <div className="hero-kicker"><i /> Ecossistema digital · Bilac, SP</div>
           <p className="hero-brand">BASE4 SYSTEMS</p>
-          <h1>Tecnologia que <span>transforma ideias</span> em soluções.</h1>
+          {/* Uma linha por span para que entrem escalonadas. O contorno vale
+              só para a linha do meio, por isso vem por classe e não pelo
+              seletor de elemento. */}
+          <h1>
+            <span className="hero-line">Tecnologia que</span>
+            <span className="hero-line is-outline">transforma ideias</span>
+            <span className="hero-line">em soluções.</span>
+          </h1>
           <p className="hero-description">
             Desenvolvemos sites, sistemas e automações, além de cuidar da manutenção de computadores,
             conectando estratégia e tecnologia para movimentar negócios.
