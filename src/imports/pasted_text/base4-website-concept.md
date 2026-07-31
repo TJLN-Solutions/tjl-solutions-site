@@ -296,7 +296,7 @@ Crie três cards de contato separados.
 
 Telefone e WhatsApp:
 
-**+55 18 99646-473**
+**+55 18 99646-4731**
 
 Botão:
 

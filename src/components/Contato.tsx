@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { AlertCircle, ArrowUpRight, CheckCircle2, MessageCircle, Phone, Radio } from "lucide-react"
-import { baseMessage, team } from "../data"
+import { baseMessage, team, whatsappUrl } from "../data"
 import SectionHeader from "./SectionHeader"
 
 const serviceOptions = ["Desenvolvimento de site", "Manutenção de hardware", "Desenvolvimento de automação", "BASE4 Charge", "Outro"]
@@ -38,7 +38,7 @@ export default function Contato() {
     setErrors(next)
     if (Object.keys(next).length) return
     const message = `Olá! Tenho interesse nos serviços da BASE4 SYSTEMS.\n\nNome: ${fields.nome}${fields.empresa ? `\nEmpresa: ${fields.empresa}` : ""}\nTelefone: ${fields.telefone}\nServiço de interesse: ${fields.servico}\n\n${fields.mensagem}`
-    window.open(`https://wa.me/${team[selected].phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer")
+    window.open(whatsappUrl(team[selected].phone, message), "_blank", "noopener,noreferrer")
     setSent(true)
   }
 
@@ -49,7 +49,7 @@ export default function Contato() {
         <SectionHeader index="06" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
         <div className="contact-center">
           <div className="contact-operators">
-            <div className="terminal-label">OPERADORES DISPONÍVEIS / 03</div>
+            <div className="terminal-label">OPERADORES DISPONÍVEIS / {String(team.length).padStart(2, "0")}</div>
             {team.map((member, index) => (
               <button
                 type="button"
@@ -64,7 +64,7 @@ export default function Contato() {
             ))}
             <a
               className="operator-connect"
-              href={`https://wa.me/${team[selected].phone}?text=${encodeURIComponent(baseMessage)}`}
+              href={whatsappUrl(team[selected].phone, baseMessage)}
               target="_blank"
               rel="noopener noreferrer"
             >

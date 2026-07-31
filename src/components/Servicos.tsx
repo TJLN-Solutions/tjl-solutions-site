@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { ArrowUpRight, Check, Code2, Cpu, Globe2, Monitor, Network, ScanLine } from "lucide-react"
-import { services } from "../data"
+import { primaryPhone, services, whatsappUrl } from "../data"
 import SectionHeader from "./SectionHeader"
 
 function ServiceVisual({ type }: { type: string }) {
@@ -64,7 +64,7 @@ export default function Servicos() {
               </div>
               <div className="service-bottom">
                 <span><small>INVESTIMENTO</small>Valor a ser negociado</span>
-                <a href={`https://wa.me/5518996460473?text=${encodeURIComponent(service.whatsapp)}`} target="_blank" rel="noopener noreferrer">
+                <a href={whatsappUrl(primaryPhone, service.whatsapp)} target="_blank" rel="noopener noreferrer">
                   Solicitar orçamento <ArrowUpRight />
                 </a>
               </div>

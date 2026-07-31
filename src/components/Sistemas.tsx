@@ -1,10 +1,11 @@
 import { ArrowUpRight, Bell, Check, Clock3, CreditCard, MessageCircle, Users } from "lucide-react"
+import { primaryPhone, whatsappUrl } from "../data"
 import SectionHeader from "./SectionHeader"
 
 const process = ["Cobrança criada", "Lembrete enviado", "Cliente notificado", "Pagamento identificado", "Status atualizado"]
 
 export default function Sistemas() {
-  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
+  const chargeLink = whatsappUrl(primaryPhone, "Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
   return (
     <section id="sistemas" className="experience-section charge-section">
       <div className="section-track" aria-hidden="true"><span>03</span></div>
@@ -33,7 +34,7 @@ export default function Sistemas() {
               <li><Check /> Histórico e relatórios financeiros</li>
               <li><Check /> Mensagens e lembretes automáticos</li>
             </ul>
-            <a className="btn-signal" href={`https://wa.me/5518996460473?text=${whatsapp}`} target="_blank" rel="noopener noreferrer">
+            <a className="btn-signal" href={chargeLink} target="_blank" rel="noopener noreferrer">
               Tenho interesse <ArrowUpRight />
             </a>
           </div>

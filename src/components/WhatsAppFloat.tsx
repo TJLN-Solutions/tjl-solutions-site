@@ -1,11 +1,10 @@
 import { MessageCircle } from 'lucide-react'
-
-const msg = encodeURIComponent('Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa.')
+import { baseMessage, primaryPhone, whatsappUrl } from '../data'
 
 export default function WhatsAppFloat() {
   return (
     <a
-      href={`https://wa.me/5518996460473?text=${msg}`}
+      href={whatsappUrl(primaryPhone, baseMessage)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar com BASE4 SYSTEMS pelo WhatsApp"
