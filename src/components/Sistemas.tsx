@@ -4,7 +4,7 @@ import SectionHeader from "./SectionHeader"
 const process = ["Cobrança criada", "Lembrete enviado", "Cliente notificado", "Pagamento identificado", "Status atualizado"]
 
 export default function Sistemas() {
-  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o TJL Charge.")
+  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
   return (
     <section id="sistemas" className="experience-section charge-section">
       <div className="section-track" aria-hidden="true"><span>03</span></div>
@@ -12,7 +12,7 @@ export default function Sistemas() {
         <SectionHeader
           index="03"
           eyebrow="Produto em desenvolvimento"
-          title="TJL Charge"
+          title="BASE4 Charge"
           description="Cobranças automáticas, organização financeira e mais controle para o seu negócio."
         />
 
@@ -38,9 +38,9 @@ export default function Sistemas() {
             </a>
           </div>
 
-          <div className="charge-dashboard" aria-label="Demonstração visual do painel TJL Charge">
+          <div className="charge-dashboard" aria-label="Demonstração visual do painel BASE4 Charge">
             <div className="dash-top">
-              <div><span className="dash-logo">T</span><strong>TJL Charge</strong></div>
+              <div><span className="dash-logo">B</span><strong>BASE4 Charge</strong></div>
               <div className="dash-live"><i /> SINCRONIZADO</div>
             </div>
             <div className="dash-metrics">

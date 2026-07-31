@@ -290,7 +290,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .core-center::before, .core-center::after { content: ""; position: absolute; inset: -14px; border: 1px solid var(--line-deco); border-radius: 50%; border-left-color: var(--accent); animation: rotate 8s linear infinite; }
 .core-center::after { inset: -28px; animation-direction: reverse; animation-duration: 12s; }
 .core-center span { color: var(--text-4); letter-spacing: .18em; font: 8px var(--font-mono); }
-.core-center strong { color: var(--text-1); font: 700 3.4rem/.8 var(--font-display); letter-spacing: -.08em; text-shadow: var(--text-glow); }
+.core-center strong { color: var(--text-1); font: 700 2.55rem/.8 var(--font-display); letter-spacing: -.08em; text-shadow: var(--text-glow); }
 .core-center small { color: var(--accent-text); font: 9px var(--font-mono); }
 .core-node { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; min-width: 156px; padding: 11px; border: 1px solid var(--line-1); background: var(--surface-2); color: var(--text-3); text-align: left; cursor: pointer; backdrop-filter: blur(8px); box-shadow: var(--card-shadow); transition: .35s var(--ease); }
 .core-node svg { width: 20px; color: var(--accent-text); }
@@ -347,7 +347,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .location-terminal a:hover { background: var(--accent-soft); }
 
 /* ============================================================
-   TJL CHARGE
+   BASE4 CHARGE
    ============================================================ */
 
 .charge-section { background: linear-gradient(180deg, transparent, var(--accent-tint), transparent); }
@@ -540,7 +540,7 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .map-strip-content > a { display: flex; align-items: center; gap: 9px; padding: 14px 18px; border: 1px solid var(--line-3); color: var(--text-1); font: 9px var(--font-mono); transition: .25s; }
 .map-strip-content > a:hover { border-color: var(--accent); background: var(--accent-soft); }
 .embedded-map { position: relative; min-height: 430px; overflow: hidden; border: 1px solid var(--line-3); background: var(--surface-inset); box-shadow: var(--shadow-2); }
-.embedded-map::before { content: "MAPA / TJL BASE 01"; position: absolute; z-index: 2; top: 12px; left: 12px; padding: 8px 10px; background: var(--surface-glass-dense); color: var(--text-2); pointer-events: none; font: 8px var(--font-mono); letter-spacing: .12em; }
+.embedded-map::before { content: "MAPA / BASE4 BASE 01"; position: absolute; z-index: 2; top: 12px; left: 12px; padding: 8px 10px; background: var(--surface-glass-dense); color: var(--text-2); pointer-events: none; font: 8px var(--font-mono); letter-spacing: .12em; }
 .embedded-map iframe { display: block; width: 100%; height: 430px; border: 0; }
 .map-placeholder { display: grid; place-items: center; align-content: center; gap: 12px; width: 100%; min-height: 430px; padding: 30px; border: 0; background: radial-gradient(circle, var(--accent-soft), transparent 55%), repeating-linear-gradient(0deg, var(--accent-tint) 0 1px, transparent 1px 35px), var(--surface-inset); color: var(--text-1); cursor: pointer; text-align: center; }
 .map-placeholder svg { width: 42px; height: 42px; color: var(--accent-text); }
@@ -648,7 +648,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
   .core-node b { font-size: 8px; }
   .core-node svg { width: 15px; }
   .core-center { width: 120px; }
-  .core-center strong { font-size: 2.4rem; }
+  .core-center strong { font-size: 1.85rem; }
   .node-sites { left: 0; }
   .node-sistemas { right: 0; }
   .node-automacoes { right: 0; }

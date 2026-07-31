@@ -3,7 +3,7 @@ import { AlertCircle, ArrowUpRight, CheckCircle2, MessageCircle, Phone, Radio } 
 import { baseMessage, team } from "../data"
 import SectionHeader from "./SectionHeader"
 
-const serviceOptions = ["Desenvolvimento de site", "Manutenção de hardware", "Desenvolvimento de automação", "TJL Charge", "Outro"]
+const serviceOptions = ["Desenvolvimento de site", "Manutenção de hardware", "Desenvolvimento de automação", "BASE4 Charge", "Outro"]
 type Fields = { nome: string; empresa: string; telefone: string; servico: string; mensagem: string }
 type Errors = Partial<Record<keyof Fields, string>>
 const emptyFields: Fields = { nome: "", empresa: "", telefone: "", servico: "", mensagem: "" }
@@ -37,7 +37,7 @@ export default function Contato() {
     if (!fields.mensagem.trim()) next.mensagem = "Mensagem é obrigatória."
     setErrors(next)
     if (Object.keys(next).length) return
-    const message = `Olá! Tenho interesse nos serviços da TJL Solutions.\n\nNome: ${fields.nome}${fields.empresa ? `\nEmpresa: ${fields.empresa}` : ""}\nTelefone: ${fields.telefone}\nServiço de interesse: ${fields.servico}\n\n${fields.mensagem}`
+    const message = `Olá! Tenho interesse nos serviços da BASE4 SYSTEMS.\n\nNome: ${fields.nome}${fields.empresa ? `\nEmpresa: ${fields.empresa}` : ""}\nTelefone: ${fields.telefone}\nServiço de interesse: ${fields.servico}\n\n${fields.mensagem}`
     window.open(`https://wa.me/${team[selected].phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer")
     setSent(true)
   }
@@ -46,7 +46,7 @@ export default function Contato() {
     <section id="contato" className="experience-section contact-section">
       <div className="section-track" aria-hidden="true"><span>06</span></div>
       <div className="content-shell">
-        <SectionHeader index="06" eyebrow="Central de comunicação" title="Inicie uma conexão com a TJL." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
+        <SectionHeader index="06" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
         <div className="contact-center">
           <div className="contact-operators">
             <div className="terminal-label">OPERADORES DISPONÍVEIS / 03</div>

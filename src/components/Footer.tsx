@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="content-shell">
         <div className="grid gap-12 md:grid-cols-[1.2fr_.8fr_1fr] pb-12">
           <div>
-            <div className="control-logo mb-5"><span className="control-logo-mark">T</span><span>TJL <b>SOLUTIONS</b></span></div>
+            <div className="control-logo mb-5"><span className="control-logo-mark">B</span><span>BASE4 <b>SYSTEMS</b></span></div>
             <p className="max-w-sm text-sm leading-7 footer-text">Tecnologia, inovação e soluções personalizadas para movimentar o seu negócio.</p>
             <p className="mt-5 flex items-center gap-2 text-xs footer-meta"><MapPin size={14} className="footer-icon"/> Rua XV de Novembro, 283 — Bilac, SP</p>
           </div>
@@ -25,8 +25,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-col justify-between gap-3 border-t footer-rule pt-7 text-[10px] tracking-widest footer-meta sm:flex-row">
-          <p>© {new Date().getFullYear()} TJL SOLUTIONS · TODOS OS DIREITOS RESERVADOS</p>
-          <p>SISTEMA DESENVOLVIDO PELA TJL</p>
+          <p>© {new Date().getFullYear()} BASE4 SYSTEMS · TODOS OS DIREITOS RESERVADOS</p>
+          <p>SISTEMA DESENVOLVIDO PELA BASE4</p>
         </div>
       </div>
     </footer>

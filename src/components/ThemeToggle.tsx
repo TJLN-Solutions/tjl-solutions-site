@@ -12,7 +12,7 @@ export default function ThemeToggle() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     try {
-      localStorage.setItem("tjl-theme", theme)
+      localStorage.setItem("base4-theme", theme)
     } catch {
       // The selected theme still applies when storage is unavailable.
     }

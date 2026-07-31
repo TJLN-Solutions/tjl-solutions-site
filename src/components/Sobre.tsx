@@ -17,12 +17,12 @@ export default function Sobre() {
           index="02"
           eyebrow="Centro de operações"
           title="Tecnologia, inovação e atendimento próximo."
-          description="A TJL conecta diferentes frentes para transformar necessidades reais em soluções modernas, funcionais e acessíveis."
+          description="A BASE4 conecta diferentes frentes para transformar necessidades reais em soluções modernas, funcionais e acessíveis."
         />
 
         <div className="about-grid">
           <div className="about-story">
-            <div className="terminal-label">TJL / MANIFESTO</div>
+            <div className="terminal-label">BASE4 / MANIFESTO</div>
             <p>
               Somos uma empresa especializada no desenvolvimento de soluções digitais e serviços de tecnologia.
               Trabalhamos com criação de sites, manutenção de computadores, desenvolvimento de sistemas e automações
