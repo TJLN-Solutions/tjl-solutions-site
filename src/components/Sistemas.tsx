@@ -4,7 +4,7 @@ import SectionHeader from "./SectionHeader"
 const process = ["Cobrança criada", "Lembrete enviado", "Cliente notificado", "Pagamento identificado", "Status atualizado"]
 
 export default function Sistemas() {
-  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o TJL Charge.")
+  const whatsapp = encodeURIComponent("Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
   return (
     <section id="sistemas" className="experience-section charge-section">
       <div className="section-track" aria-hidden="true"><span>03</span></div>
@@ -12,7 +12,7 @@ export default function Sistemas() {
         <SectionHeader
           index="03"
           eyebrow="Produto em desenvolvimento"
-          title="TJL Charge"
+          title="BASE4 Charge"
           description="Cobranças automáticas, organização financeira e mais controle para o seu negócio."
         />
 
@@ -38,9 +38,9 @@ export default function Sistemas() {
             </a>
           </div>
 
-          <div className="charge-dashboard" aria-label="Demonstração visual do painel TJL Charge">
+          <div className="charge-dashboard" aria-label="Demonstração visual do painel BASE4 Charge">
             <div className="dash-top">
-              <div><span className="dash-logo">T</span><strong>TJL Charge</strong></div>
+              <div><span className="dash-logo">B</span><strong>BASE4 Charge</strong></div>
               <div className="dash-live"><i /> SINCRONIZADO</div>
             </div>
             <div className="dash-metrics">
@@ -52,7 +52,7 @@ export default function Sistemas() {
               <div className="dash-chart">
                 <div className="dash-card-title"><span>Fluxo financeiro</span><small>Últimos 7 meses</small></div>
                 <svg viewBox="0 0 520 170" role="img" aria-label="Gráfico demonstrativo de crescimento financeiro">
-                  <defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#22d3ee" stopOpacity=".35"/><stop offset="1" stopColor="#22d3ee" stopOpacity="0"/></linearGradient></defs>
+                  <defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop stopColor="var(--accent)" stopOpacity=".35"/><stop offset="1" stopColor="var(--accent)" stopOpacity="0"/></linearGradient></defs>
                   <path className="chart-area" d="M10 145 C70 130 85 100 145 112 S225 70 275 88 S355 28 410 50 S470 18 510 20 L510 165 L10 165Z" />
                   <path className="chart-line" d="M10 145 C70 130 85 100 145 112 S225 70 275 88 S355 28 410 50 S470 18 510 20" />
                 </svg>

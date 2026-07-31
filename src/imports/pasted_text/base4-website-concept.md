@@ -1,4 +1,4 @@
-Crie um site institucional moderno, tecnológico, responsivo e visualmente marcante para uma empresa chamada **TJL Tecnologia**.
+Crie um site institucional moderno, tecnológico, responsivo e visualmente marcante para uma empresa chamada **BASE4 SYSTEMS**.
 
 ## Identidade visual
 
@@ -28,14 +28,14 @@ Crie o site como uma landing page completa, com menu fixo no topo e navegação 
 O menu deve conter:
 
 * Início
-* Sobre a TJL
+* Sobre a BASE4
 * Sistemas
 * Serviços
 * Contato
 
 Inclua no cabeçalho o nome ou logotipo textual:
 
-**TJL Tecnologia**
+**BASE4 SYSTEMS**
 
 Adicione um botão destacado:
 
@@ -92,7 +92,7 @@ Título:
 
 Texto:
 
-**A TJL Tecnologia é uma empresa especializada no desenvolvimento de soluções digitais e serviços de tecnologia. Trabalhamos com criação de sites, manutenção de computadores, desenvolvimento de sistemas e automações personalizadas para empresas e profissionais.**
+**A BASE4 SYSTEMS é uma empresa especializada no desenvolvimento de soluções digitais e serviços de tecnologia. Trabalhamos com criação de sites, manutenção de computadores, desenvolvimento de sistemas e automações personalizadas para empresas e profissionais.**
 
 **Nosso objetivo é entender as necessidades de cada cliente e desenvolver soluções modernas, funcionais e acessíveis, sempre com atendimento próximo e personalizado.**
 
@@ -116,7 +116,7 @@ Utilize um layout moderno com cards, ícones tecnológicos e animações suaves 
 
 Título:
 
-**Sistemas desenvolvidos pela TJL**
+**Sistemas desenvolvidos pela BASE4**
 
 Subtítulo:
 
@@ -124,11 +124,11 @@ Subtítulo:
 
 Crie um card principal para o sistema:
 
-### TJL Charge
+### BASE4 Charge
 
 Descrição:
 
-**O TJL Charge é um sistema de cobrança automática desenvolvido para empresas, comércios e profissionais que trabalham com mensalidades, crediários ou parcelamentos próprios.**
+**O BASE4 Charge é um sistema de cobrança automática desenvolvido para empresas, comércios e profissionais que trabalham com mensalidades, crediários ou parcelamentos próprios.**
 
 **A plataforma permitirá organizar clientes, controlar cobranças, acompanhar pagamentos e automatizar o envio de lembretes, trazendo mais praticidade, controle e eficiência para o negócio.**
 
@@ -153,9 +153,9 @@ Inclua um botão:
 
 Ao clicar, o usuário deve ser levado para a seção de contato ou abrir uma conversa no WhatsApp com uma mensagem pronta:
 
-“Olá! Tenho interesse em saber mais sobre o TJL Charge.”
+“Olá! Tenho interesse em saber mais sobre o BASE4 Charge.”
 
-O card do TJL Charge deve ter um visual premium, com bordas azuis iluminadas, efeito de brilho suave e uma pequena animação ao passar o mouse.
+O card do BASE4 Charge deve ter um visual premium, com bordas azuis iluminadas, efeito de brilho suave e uma pequena animação ao passar o mouse.
 
 Deixe a estrutura preparada para que outros sistemas possam ser adicionados futuramente.
 
@@ -258,7 +258,7 @@ Os cards devem possuir ícones, animações ao passar o mouse e entrada suave du
 
 Título:
 
-**Por que escolher a TJL?**
+**Por que escolher a BASE4?**
 
 Crie cards ou indicadores com os seguintes diferenciais:
 
@@ -324,7 +324,7 @@ Botão:
 
 Todos os botões devem abrir diretamente o WhatsApp com a mensagem:
 
-“Olá! Encontrei o contato pelo site da TJL e gostaria de conhecer melhor os serviços da empresa.”
+“Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa.”
 
 Adicione também um formulário com os seguintes campos:
 
@@ -339,7 +339,7 @@ No campo “Serviço de interesse”, coloque as opções:
 * Desenvolvimento de site
 * Manutenção de hardware
 * Desenvolvimento de automação
-* TJL Charge
+* BASE4 Charge
 * Outro
 
 Botão do formulário:
@@ -385,7 +385,7 @@ Texto:
 
 O rodapé deve conter:
 
-* Nome TJL Tecnologia
+* Nome BASE4 SYSTEMS
 * Texto: “Tecnologia, inovação e soluções para o seu negócio.”
 * Rua XV de Novembro, 283 — Bilac, SP
 * Links rápidos para as seções
@@ -395,11 +395,11 @@ O rodapé deve conter:
 
 Texto final:
 
-**© [ano atual] TJL Tecnologia. Todos os direitos reservados.**
+**© [ano atual] BASE4 SYSTEMS. Todos os direitos reservados.**
 
 Inclua também:
 
-**Desenvolvido pela TJL Tecnologia**
+**Desenvolvido pela BASE4 SYSTEMS**
 
 ---
 
@@ -504,11 +504,11 @@ Configure os principais elementos de SEO.
 
 Título da página:
 
-**TJL Tecnologia | Sites, Sistemas, Automações e Manutenção em Bilac**
+**BASE4 SYSTEMS | Sites, Sistemas, Automações e Manutenção em Bilac**
 
 Descrição:
 
-**A TJL Tecnologia desenvolve sites, sistemas e automações, além de oferecer manutenção de computadores e notebooks em Bilac, São Paulo. Conheça o TJL Charge e solicite um orçamento.**
+**A BASE4 SYSTEMS desenvolve sites, sistemas e automações, além de oferecer manutenção de computadores e notebooks em Bilac, São Paulo. Conheça o BASE4 Charge e solicite um orçamento.**
 
 Adicione palavras-chave relacionadas a:
 
@@ -518,7 +518,7 @@ Adicione palavras-chave relacionadas a:
 * Desenvolvimento de sistemas
 * Automação para empresas
 * Sistema de cobrança
-* TJL Charge
+* BASE4 Charge
 * Assistência técnica em Bilac
 
 Inclua metadados para compartilhamento em WhatsApp e redes sociais.
@@ -542,4 +542,4 @@ Use como referência visual sites de startups SaaS e empresas de desenvolvimento
 * Interface limpa
 * Chamadas para ação bem destacadas
 
-O principal objetivo do site é apresentar a TJL, divulgar os serviços, gerar contatos pelo WhatsApp e criar expectativa para o lançamento do TJL Charge.
+O principal objetivo do site é apresentar a BASE4, divulgar os serviços, gerar contatos pelo WhatsApp e criar expectativa para o lançamento do BASE4 Charge.

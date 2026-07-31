@@ -1,6 +1,6 @@
 import { MessageCircle } from 'lucide-react'
 
-const msg = encodeURIComponent('Olá! Encontrei o contato pelo site da TJL e gostaria de conhecer melhor os serviços da empresa.')
+const msg = encodeURIComponent('Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa.')
 
 export default function WhatsAppFloat() {
   return (
@@ -8,7 +8,7 @@ export default function WhatsAppFloat() {
       href={`https://wa.me/5518996460473?text=${msg}`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Falar com TJL Solutions pelo WhatsApp"
+      aria-label="Falar com BASE4 SYSTEMS pelo WhatsApp"
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-2xl border border-white/20"
       style={{
         background: '#16a34a',

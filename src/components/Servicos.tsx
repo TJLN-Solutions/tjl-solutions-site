@@ -6,7 +6,7 @@ import SectionHeader from "./SectionHeader"
 function ServiceVisual({ type }: { type: string }) {
   if (type === "sites") return (
     <div className="service-visual browser-visual">
-      <div className="browser-bar"><i /><i /><i /><span>tjl.digital/project</span></div>
+      <div className="browser-bar"><i /><i /><i /><span>base4.systems/project</span></div>
       <div className="browser-layout"><aside /><main><span /><strong /><div><i /><i /><i /></div></main></div>
       <Code2 className="visual-icon" /><small>RESPONSIVE / ONLINE</small>
     </div>
@@ -39,7 +39,7 @@ export default function Servicos() {
       <div className="content-shell">
         <SectionHeader index="04" eyebrow="Soluções modulares" title="Escolha uma frente. Veja o sistema responder." description="Projetos personalizados de acordo com as necessidades de cada cliente." />
         <div className="services-console">
-          <div className="service-selector" role="tablist" aria-label="Serviços da TJL">
+          <div className="service-selector" role="tablist" aria-label="Serviços da BASE4">
             {services.map((item, index) => (
               <button
                 type="button"

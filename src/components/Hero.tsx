@@ -6,11 +6,11 @@ const nodes = [
   { label: "Sistemas", desc: "Ferramentas sob medida", icon: MonitorCog, className: "node-sistemas" },
   { label: "Automações", desc: "Fluxos que executam sozinhos", icon: Network, className: "node-automacoes" },
   { label: "Hardware", desc: "Diagnóstico e performance", icon: Cpu, className: "node-hardware" },
-  { label: "TJL Charge", desc: "Cobranças mais inteligentes", icon: Zap, className: "node-charge" },
+  { label: "BASE4 Charge", desc: "Cobranças mais inteligentes", icon: Zap, className: "node-charge" },
 ]
 
 export default function Hero() {
-  const [focused, setFocused] = useState("TJL Charge")
+  const [focused, setFocused] = useState("BASE4 Charge")
 
   const tilt = (event: PointerEvent<HTMLDivElement>) => {
     if (!window.matchMedia("(pointer: fine)").matches) return
@@ -27,7 +27,7 @@ export default function Hero() {
       <div className="hero-layout">
         <div className="hero-copy">
           <div className="hero-kicker"><i /> Ecossistema digital · Bilac, SP</div>
-          <p className="hero-brand">TJL Solutions</p>
+          <p className="hero-brand">BASE4 SYSTEMS</p>
           <h1>Tecnologia que <span>transforma ideias</span> em soluções.</h1>
           <p className="hero-description">
             Desenvolvemos sites, sistemas e automações, além de cuidar da manutenção de computadores,
@@ -58,7 +58,7 @@ export default function Hero() {
             </svg>
             <div className="core-center">
               <span>SYSTEM</span>
-              <strong>TJL</strong>
+              <strong>BASE4</strong>
               <small>{focused}</small>
             </div>
             {nodes.map(({ label, desc, icon: Icon, className }) => (

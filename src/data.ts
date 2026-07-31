@@ -1,7 +1,7 @@
 export const navLinks = [
   { label: "Início", href: "#inicio", short: "01" },
   { label: "Empresa", href: "#sobre", short: "02" },
-  { label: "TJL Charge", href: "#sistemas", short: "03" },
+  { label: "BASE4 Charge", href: "#sistemas", short: "03" },
   { label: "Serviços", href: "#servicos", short: "04" },
   { label: "Diferenciais", href: "#diferenciais", short: "05" },
   { label: "Contato", href: "#contato", short: "06" },
@@ -14,7 +14,7 @@ export const team = [
 ]
 
 export const baseMessage =
-  "Olá! Encontrei o contato pelo site da TJL e gostaria de conhecer melhor os serviços da empresa."
+  "Olá! Encontrei o contato pelo site da BASE4 e gostaria de conhecer melhor os serviços da empresa."
 
 export const services = [
   {

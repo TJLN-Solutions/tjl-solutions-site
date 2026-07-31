@@ -4,7 +4,7 @@ import App from './App'
 import './index.css'
 
 try {
-  const storedTheme = localStorage.getItem("tjl-theme")
+  const storedTheme = localStorage.getItem("base4-theme")
   const theme =
     storedTheme === "light" || storedTheme === "dark"
       ? storedTheme

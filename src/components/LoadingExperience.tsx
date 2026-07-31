@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 export default function LoadingExperience() {
   const [visible, setVisible] = useState(() => {
     if (typeof window === "undefined") return false
-    return !sessionStorage.getItem("tjl-intro-seen")
+    return !sessionStorage.getItem("base4-intro-seen")
   })
   const [phase, setPhase] = useState(0)
 
@@ -11,7 +11,7 @@ export default function LoadingExperience() {
     if (!visible) return
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     if (reduced) {
-      sessionStorage.setItem("tjl-intro-seen", "1")
+      sessionStorage.setItem("base4-intro-seen", "1")
       setVisible(false)
       return
     }
@@ -19,7 +19,7 @@ export default function LoadingExperience() {
       window.setTimeout(() => setPhase(index + 1), delay),
     )
     const finish = window.setTimeout(() => {
-      sessionStorage.setItem("tjl-intro-seen", "1")
+      sessionStorage.setItem("base4-intro-seen", "1")
       setVisible(false)
     }, 2100)
     return () => {
@@ -31,16 +31,16 @@ export default function LoadingExperience() {
   if (!visible) return null
 
   const skip = () => {
-    sessionStorage.setItem("tjl-intro-seen", "1")
+    sessionStorage.setItem("base4-intro-seen", "1")
     setVisible(false)
   }
 
   return (
-    <div className="boot-screen" role="dialog" aria-label="Inicialização da interface TJL">
+    <div className="boot-screen" role="dialog" aria-label="Inicialização da interface BASE4">
       <button type="button" className="boot-skip" onClick={skip}>Pular</button>
       <div className="boot-frame">
-        <div className="boot-code">SYS.TJL / 18.2026 / BILAC.SP</div>
-        <div className={`boot-logo ${phase >= 1 ? "is-ready" : ""}`}>TJL</div>
+        <div className="boot-code">SYS.BASE4 / 18.2026 / BILAC.SP</div>
+        <div className={`boot-logo ${phase >= 1 ? "is-ready" : ""}`}>BASE4</div>
         <div className="boot-line"><span /></div>
         <div className="boot-log" aria-live="polite">
           <span className={phase >= 1 ? "active" : ""}>Inicializando interface</span>

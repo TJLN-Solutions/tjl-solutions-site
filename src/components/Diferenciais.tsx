@@ -2,10 +2,10 @@ import { Headphones, Lightbulb, Settings, UserCheck } from "lucide-react"
 import SectionHeader from "./SectionHeader"
 
 const modules = [
-  { id: "TJL-01", icon: UserCheck, title: "Atendimento personalizado", desc: "Analisamos cada projeto individualmente para oferecer uma solução adequada à necessidade do cliente." },
-  { id: "TJL-02", icon: Lightbulb, title: "Soluções modernas", desc: "Utilizamos tecnologias atuais para desenvolver projetos rápidos, seguros e visualmente profissionais." },
-  { id: "TJL-03", icon: Headphones, title: "Suporte próximo", desc: "Nossa equipe está disponível para orientar o cliente durante todas as etapas do projeto." },
-  { id: "TJL-04", icon: Settings, title: "Projetos sob medida", desc: "Cada sistema, site ou automação pode ser personalizado conforme a realidade do negócio." },
+  { id: "BASE4-01", icon: UserCheck, title: "Atendimento personalizado", desc: "Analisamos cada projeto individualmente para oferecer uma solução adequada à necessidade do cliente." },
+  { id: "BASE4-02", icon: Lightbulb, title: "Soluções modernas", desc: "Utilizamos tecnologias atuais para desenvolver projetos rápidos, seguros e visualmente profissionais." },
+  { id: "BASE4-03", icon: Headphones, title: "Suporte próximo", desc: "Nossa equipe está disponível para orientar o cliente durante todas as etapas do projeto." },
+  { id: "BASE4-04", icon: Settings, title: "Projetos sob medida", desc: "Cada sistema, site ou automação pode ser personalizado conforme a realidade do negócio." },
 ]
 
 export default function Diferenciais() {

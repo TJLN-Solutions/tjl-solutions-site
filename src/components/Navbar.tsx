@@ -34,9 +34,9 @@ export default function Navbar() {
   return (
     <>
       <header className={`control-bar ${scrolled ? "is-compact" : ""}`}>
-        <a href="#inicio" className="control-logo" aria-label="TJL Solutions — início">
-          <span className="control-logo-mark">T</span>
-          <span>TJL <b>SOLUTIONS</b></span>
+        <a href="#inicio" className="control-logo" aria-label="BASE4 SYSTEMS — início">
+          <span className="control-logo-mark">B</span>
+          <span>BASE4 <b>SYSTEMS</b></span>
         </a>
 
         <nav className="control-nav" aria-label="Navegação principal">
@@ -64,7 +64,7 @@ export default function Navbar() {
       </header>
 
       <aside id="mobile-command-menu" className={`mobile-command ${open ? "is-open" : ""}`} aria-hidden={!open}>
-        <div className="mobile-command-label">NAVEGAÇÃO / SISTEMA TJL</div>
+        <div className="mobile-command-label">NAVEGAÇÃO / SISTEMA BASE4</div>
         {navLinks.map((link) => (
           <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
             <span>{link.short}</span><strong>{link.label}</strong><ArrowUpRight />

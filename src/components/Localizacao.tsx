@@ -38,7 +38,7 @@ export default function Localizacao() {
         <div className="embedded-map" ref={mapRef}>
           {loadMap ? (
             <iframe
-              title="Mapa da TJL Solutions em Bilac"
+              title="Mapa da BASE4 SYSTEMS em Bilac"
               src={mapEmbedUrl}
               loading="lazy"
               allowFullScreen
