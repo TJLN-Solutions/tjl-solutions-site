@@ -534,6 +534,33 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .request-route button { flex-shrink: 0; padding: 9px 13px; border: 1px solid var(--line-3); background: transparent; color: var(--text-1); cursor: pointer; text-transform: uppercase; letter-spacing: .07em; font: 600 8px var(--font-mono); transition: .25s; }
 .request-route button:hover { background: var(--accent-soft); border-color: var(--accent); }
 
+/* Painel em espera — o formulário só é montado depois de escolher um contato */
+.request-standby { display: grid; justify-items: center; align-content: center; text-align: center; padding: 20px; animation: panel-enter .5s var(--ease) both; }
+.standby-dish { position: relative; display: grid; place-items: center; width: 84px; aspect-ratio: 1; margin-bottom: 26px; border: 1px solid var(--line-3); border-radius: 50%; color: var(--accent-text); }
+.standby-dish svg { width: 30px; height: 30px; }
+.standby-dish i, .standby-dish span { position: absolute; inset: -14px; border: 1px solid var(--line-deco); border-radius: 50%; animation: radar 2.8s infinite; }
+.standby-dish span { animation-delay: 1.4s; }
+.standby-label { margin: 0 0 14px; color: var(--accent-text); text-transform: uppercase; letter-spacing: .2em; font: 500 9px var(--font-mono); }
+.request-standby h3 { margin: 0 0 14px; color: var(--text-1); font: 600 1.6rem var(--font-display); letter-spacing: -.02em; }
+.standby-text { max-width: 44ch; margin: 0; color: var(--text-3); font-size: .85rem; line-height: 1.7; }
+.connection-status .is-idle { color: var(--text-4); }
+
+/* Entrada do formulário: o painel sobe, a régua do cabeçalho é traçada e os
+   campos entram em cascata. Roda uma vez, na montagem — trocar de contato
+   depois não remonta o formulário. */
+.request-form { animation: panel-enter .45s var(--ease) both; }
+.request-form .request-head,
+.request-form .request-field,
+.request-form .request-submit { animation: field-enter .5s var(--ease) both; animation-delay: calc(var(--i, 0) * 65ms); }
+.request-form .request-head { position: relative; }
+.request-form .request-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -14px; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); transform-origin: left; animation: head-draw .8s .2s var(--ease) both; }
+.request-route { animation: route-enter .35s var(--ease) both; }
+
+@keyframes panel-enter { from { opacity: 0; transform: translateY(16px); } }
+@keyframes field-enter { from { opacity: 0; transform: translateY(11px); } }
+@keyframes head-draw { from { transform: scaleX(0); opacity: 0; } }
+@keyframes route-enter { from { opacity: 0; transform: translateY(-7px); } }
+
 /* ============================================================
    LOCALIZAÇÃO
    ============================================================ */
