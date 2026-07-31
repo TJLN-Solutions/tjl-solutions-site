@@ -1,3 +1,4 @@
+
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
@@ -479,13 +480,12 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 
 .contact-center { display: grid; grid-template-columns: .72fr 1.28fr; min-height: 660px; border: 1px solid var(--line-1); background: var(--surface-1); box-shadow: var(--card-shadow); }
 .contact-operators { padding: 30px; border-right: 1px solid var(--line-1); }
-.contact-operators > button { position: relative; display: grid; grid-template-columns: 48px 1fr 8px 18px; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 17px; border: 1px solid var(--line-1); background: transparent; color: var(--text-3); text-align: left; cursor: pointer; transition: .3s; }
-.contact-operators > button:hover { border-color: var(--line-2); background: var(--accent-tint); }
-.contact-operators > button.active { border-color: var(--line-3); background: linear-gradient(90deg, var(--accent-soft), transparent); color: var(--text-1); }
+.contact-operators .operator { position: relative; display: grid; grid-template-columns: 48px 1fr 8px 18px; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 17px; border: 1px solid var(--line-1); background: transparent; color: var(--text-3); text-align: left; cursor: pointer; transition: .3s; }
+.contact-operators .operator:hover { border-color: var(--line-2); background: var(--accent-tint); }
+.contact-operators .operator.active { border-color: var(--line-3); background: linear-gradient(90deg, var(--accent-soft), transparent); color: var(--text-1); }
 .operator-avatar { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-3); background: var(--accent-soft); color: var(--accent-text); font: 600 17px var(--font-display); }
 .contact-operators button > span:nth-child(2) { display: flex; flex-direction: column; gap: 4px; }
-.contact-operators small { color: var(--text-4); font: 7px var(--font-mono); }
-.contact-operators strong { color: var(--text-1); font: 600 15px var(--font-display); }
+.contact-operators .operator strong { color: var(--text-1); font: 600 15px var(--font-display); }
 .contact-operators em { display: flex; align-items: center; gap: 5px; color: var(--text-3); font: 9px var(--font-mono); font-style: normal; }
 .contact-operators em svg { width: 10px; }
 .contact-operators button > i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: var(--ok-glow); }
@@ -519,6 +519,46 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .request-success p { color: var(--text-3); }
 .request-success button { margin-top: 15px; padding: 12px 16px; border: 1px solid var(--line-3); background: transparent; color: var(--text-1); cursor: pointer; }
 .request-success button:hover { background: var(--accent-soft); }
+
+/* Áreas de atendimento */
+.operator-group { margin-top: 22px; }
+.operator-group + .operator-group { margin-top: 26px; padding-top: 24px; border-top: 1px solid var(--line-1); }
+.operator-group-title { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--accent-text); text-transform: uppercase; letter-spacing: .14em; font: 600 9px var(--font-mono); }
+.operator-group-title svg { width: 13px; height: 13px; }
+.operator-group-desc { margin: 8px 0 0; color: var(--text-3); font-size: .76rem; line-height: 1.55; }
+.request-route { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; margin: 0 0 20px; padding: 13px 15px; border-left: 2px solid var(--accent); background: var(--accent-soft); color: var(--text-2); font-size: .78rem; line-height: 1.5; }
+.request-route > svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent-text); }
+.request-route span { flex: 1; min-width: 200px; }
+.request-route strong { color: var(--text-1); font-weight: 600; }
+.request-route button { flex-shrink: 0; padding: 9px 13px; border: 1px solid var(--line-3); background: transparent; color: var(--text-1); cursor: pointer; text-transform: uppercase; letter-spacing: .07em; font: 600 8px var(--font-mono); transition: .25s; }
+.request-route button:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+/* Painel em espera — o formulário só é montado depois de escolher um contato */
+.request-standby { display: grid; justify-items: center; align-content: center; text-align: center; padding: 20px; animation: panel-enter .5s var(--ease) both; }
+.standby-dish { position: relative; display: grid; place-items: center; width: 84px; aspect-ratio: 1; margin-bottom: 26px; border: 1px solid var(--line-3); border-radius: 50%; color: var(--accent-text); }
+.standby-dish svg { width: 30px; height: 30px; }
+.standby-dish i, .standby-dish span { position: absolute; inset: -14px; border: 1px solid var(--line-deco); border-radius: 50%; animation: radar 2.8s infinite; }
+.standby-dish span { animation-delay: 1.4s; }
+.standby-label { margin: 0 0 14px; color: var(--accent-text); text-transform: uppercase; letter-spacing: .2em; font: 500 9px var(--font-mono); }
+.request-standby h3 { margin: 0 0 14px; color: var(--text-1); font: 600 1.6rem var(--font-display); letter-spacing: -.02em; }
+.standby-text { max-width: 44ch; margin: 0; color: var(--text-3); font-size: .85rem; line-height: 1.7; }
+.connection-status .is-idle { color: var(--text-4); }
+
+/* Entrada do formulário: o painel sobe, a régua do cabeçalho é traçada e os
+   campos entram em cascata. Roda uma vez, na montagem — trocar de contato
+   depois não remonta o formulário. */
+.request-form { animation: panel-enter .45s var(--ease) both; }
+.request-form .request-head,
+.request-form .request-field,
+.request-form .request-submit { animation: field-enter .5s var(--ease) both; animation-delay: calc(var(--i, 0) * 65ms); }
+.request-form .request-head { position: relative; }
+.request-form .request-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -14px; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); transform-origin: left; animation: head-draw .8s .2s var(--ease) both; }
+.request-route { animation: route-enter .35s var(--ease) both; }
+
+@keyframes panel-enter { from { opacity: 0; transform: translateY(16px); } }
+@keyframes field-enter { from { opacity: 0; transform: translateY(11px); } }
+@keyframes head-draw { from { transform: scaleX(0); opacity: 0; } }
+@keyframes route-enter { from { opacity: 0; transform: translateY(-7px); } }
 
 /* ============================================================
    LOCALIZAÇÃO
