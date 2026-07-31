@@ -485,7 +485,6 @@ main, footer, .control-bar, .side-rail, .mobile-command { position: relative; z-
 .contact-operators .operator.active { border-color: var(--line-3); background: linear-gradient(90deg, var(--accent-soft), transparent); color: var(--text-1); }
 .operator-avatar { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-3); background: var(--accent-soft); color: var(--accent-text); font: 600 17px var(--font-display); }
 .contact-operators button > span:nth-child(2) { display: flex; flex-direction: column; gap: 4px; }
-.contact-operators .operator small { color: var(--text-4); font: 7px var(--font-mono); }
 .contact-operators .operator strong { color: var(--text-1); font: 600 15px var(--font-display); }
 .contact-operators em { display: flex; align-items: center; gap: 5px; color: var(--text-3); font: 9px var(--font-mono); font-style: normal; }
 .contact-operators em svg { width: 10px; }

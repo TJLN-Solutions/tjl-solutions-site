@@ -85,7 +85,10 @@ export default function Contato() {
                         onClick={() => setSelected(index)}
                       >
                         <span className="operator-avatar">{member.name[0]}</span>
-                        <span><small>{areas[member.area].short}</small><strong>{member.name}</strong><em><Phone />{member.display}</em></span>
+                        {/* A frente de atuação é da dupla, não da pessoa: fica no
+                            cabeçalho do grupo. Repeti-la aqui daria o mesmo texto
+                            nos dois cards, sem distinguir ninguém. */}
+                        <span><strong>{member.name}</strong><em><Phone />{member.display}</em></span>
                         <i /><Radio />
                       </button>
                     )
