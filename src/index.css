@@ -339,9 +339,10 @@ main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
 .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 11px; border: 1px solid var(--line-2); background: var(--surface-1); color: var(--text-2); cursor: pointer; font: 500 9px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; transition: border-color .2s, background .2s, color .2s; }
 .theme-toggle:hover { border-color: var(--line-3); background: var(--accent-soft); color: var(--text-1); }
 .theme-toggle svg { width: 15px; height: 15px; color: var(--accent-text); }
-/* O menu de seções não é só de celular: é onde vivem as 20 seções em
-   qualquer largura, para a barra poder ficar com quatro links. */
-.control-menu-button { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line-2); background: var(--surface-1); color: var(--text-2); cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
+/* O botão de menu é exclusivo do celular: aparece só onde as quatro entradas
+   da barra se escondem. No desktop elas já dão acesso às seções pelos cartões,
+   e o índice completo continua no mapa do rodapé. */
+.control-menu-button { display: none; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line-2); background: var(--surface-1); color: var(--text-2); cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
 .control-menu-button:hover { border-color: var(--line-3); background: var(--accent-soft); color: var(--text-1); }
 .control-menu-button svg { width: 17px; height: 17px; }
 
@@ -721,6 +722,8 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 
 @media (max-width: 1100px) {
   .control-nav { display: none; }
+  /* entra no lugar das entradas que saíram */
+  .control-menu-button { display: grid; }
   .control-actions { margin-left: auto; }
   .control-cta { margin-left: 0; }
   .hero-layout { grid-template-columns: 1fr; padding-top: 60px; }
