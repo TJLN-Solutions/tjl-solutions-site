@@ -1,5 +1,5 @@
 import { ArrowUpRight, MapPin, MessageCircle } from "lucide-react"
-import { baseMessage, navLinks, team, whatsappUrl } from "../data"
+import { baseMessage, menuLinks, team, whatsappUrl } from "../data"
 
 export default function Footer() {
   return (
@@ -12,9 +12,11 @@ export default function Footer() {
             <p className="mt-5 flex items-center gap-2 text-xs footer-meta"><MapPin size={14} className="footer-icon"/> Rua XV de Novembro, 283 — Bilac, SP</p>
           </div>
           <div>
-            <p className="terminal-label mb-5">MAPA DO SISTEMA</p>
-            <div className="grid gap-3">
-              {navLinks.map((link) => <a key={link.href} href={link.href} className="footer-nav-link group flex items-center gap-2 text-sm transition"><span className="font-mono text-[8px] footer-icon">{link.short}</span>{link.label}<ArrowUpRight size={12} className="opacity-0 transition group-hover:opacity-100"/></a>)}
+            <p className="terminal-label mb-5">MAPA DO SITE</p>
+            {/* A lista completa das seções vive aqui e no menu — a barra de
+                navegação leva só as quatro âncoras principais. */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {menuLinks.map((link) => <a key={link.href} href={link.href} className="footer-nav-link group flex items-center gap-2 text-sm transition"><span className="font-mono text-[8px] footer-icon">{link.short}</span>{link.label}<ArrowUpRight size={12} className="opacity-0 transition group-hover:opacity-100"/></a>)}
             </div>
           </div>
           <div>

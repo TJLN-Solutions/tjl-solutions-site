@@ -1,23 +1,61 @@
-import { useEffect, useState } from "react"
-import { Menu, X, ArrowUpRight } from "lucide-react"
-import { navLinks } from "../data"
+import { useEffect, useRef, useState, type FocusEvent } from "react"
+import { ArrowUpRight, ChevronDown, Menu, X } from "lucide-react"
+import { menuLinks, navGroups } from "../data"
 import ThemeToggle from "./ThemeToggle"
+
+/**
+ * Barra enxuta: marca, quatro entradas, um botão de ação e o alternador de
+ * tema como ícone. As entradas ficam junto da marca, não centralizadas — soltas
+ * no meio deixavam um vazio grande à esquerda.
+ *
+ * Cada entrada abre um cartão com as seções internas do assunto. O trigger é
+ * link de verdade: quem clica vai para a seção, mesmo que o cartão nunca abra.
+ */
+
+/** Todas as âncoras da barra, achatadas, para saber qual grupo está ativo. */
+const anchors = navGroups.flatMap((group) =>
+  [group.href, ...group.items.map((item) => item.href)].map((href) => ({ href, group: group.href })),
+)
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [active, setActive] = useState("#inicio")
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [openGroup, setOpenGroup] = useState<string | null>(null)
+  const [active, setActive] = useState("")
+
+  /**
+   * O fechamento é atrasado de propósito: entre o link e o cartão existe um
+   * vão de alguns pixels, e sem essa folga o cartão fecharia no meio do
+   * caminho do cursor.
+   */
+  const closeTimer = useRef<number | undefined>(undefined)
+
+  const openNow = (href: string) => {
+    window.clearTimeout(closeTimer.current)
+    setOpenGroup(href)
+  }
+
+  const closeSoon = () => {
+    window.clearTimeout(closeTimer.current)
+    closeTimer.current = window.setTimeout(() => setOpenGroup(null), 160)
+  }
+
+  useEffect(() => () => window.clearTimeout(closeTimer.current), [])
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 56)
-      for (let i = navLinks.length - 1; i >= 0; i--) {
-        const section = document.querySelector(navLinks[i].href)
+      // Percorre de baixo para cima: vale a última âncora cujo topo já passou
+      // da linha de leitura.
+      let current = ""
+      for (let i = anchors.length - 1; i >= 0; i--) {
+        const section = document.querySelector(anchors[i].href)
         if (section && section.getBoundingClientRect().top <= 180) {
-          setActive(navLinks[i].href)
+          current = anchors[i].group
           break
         }
       }
+      setActive(current)
     }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
@@ -25,11 +63,20 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-    if (!open) return
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false)
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setMenuOpen(false)
+      setOpenGroup(null)
+    }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [open])
+  }, [])
+
+  /** Só fecha quando o foco sai do grupo inteiro, não ao pular link a link. */
+  const onGroupBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) return
+    setOpenGroup(null)
+  }
 
   return (
     <>
@@ -40,47 +87,85 @@ export default function Navbar() {
         </a>
 
         <nav className="control-nav" aria-label="Navegação principal">
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className={active === link.href ? "active" : ""}>
-              <span>{link.short}</span>{link.label}
-            </a>
-          ))}
+          {navGroups.map((group) => {
+            const isOpen = openGroup === group.href
+            return (
+              <div
+                key={group.href}
+                className="nav-group"
+                onMouseEnter={() => openNow(group.href)}
+                onMouseLeave={closeSoon}
+                onFocus={() => openNow(group.href)}
+                onBlur={onGroupBlur}
+              >
+                <a
+                  href={group.href}
+                  className={active === group.href ? "active" : ""}
+                  aria-expanded={isOpen}
+                  aria-haspopup="true"
+                >
+                  {group.label}
+                  <ChevronDown aria-hidden="true" />
+                </a>
+
+                {isOpen && (
+                  <div className="nav-pop">
+                    <p className="nav-pop-label">{group.short} · {group.label}</p>
+                    {group.items.map((item) => (
+                      <a key={item.href} href={item.href} onClick={() => setOpenGroup(null)}>
+                        <strong>{item.label}</strong>
+                        <small>{item.desc}</small>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
         <div className="control-actions">
           <ThemeToggle />
-          <a href="#contato" className="control-cta">Abrir canal <ArrowUpRight size={15} /></a>
+          <a href="#contato" className="control-cta">
+            Falar com a equipe <ArrowUpRight size={15} />
+          </a>
+          <button
+            type="button"
+            className="control-menu-button"
+            onClick={() => setMenuOpen((value) => !value)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-command-menu"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu de seções"}
+          >
+            {menuOpen ? <X /> : <Menu />}
+          </button>
         </div>
-        <button
-          type="button"
-          className="control-menu-button"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="mobile-command-menu"
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
-        >
-          {open ? <X /> : <Menu />}
-        </button>
       </header>
 
-      <aside id="mobile-command-menu" className={`mobile-command ${open ? "is-open" : ""}`} aria-hidden={!open}>
-        <div className="mobile-command-label">NAVEGAÇÃO / SISTEMA BASE4</div>
-        {navLinks.map((link) => (
-          <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+      {/* `inert` tira o painel fechado da ordem de tabulação: sem isso, o Tab
+          entra em treze links invisíveis antes de chegar ao conteúdo. */}
+      <aside
+        id="mobile-command-menu"
+        className={`mobile-command ${menuOpen ? "is-open" : ""}`}
+        inert={!menuOpen}
+      >
+        <p className="mobile-command-label">TODAS AS SEÇÕES</p>
+        {menuLinks.map((link) => (
+          <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>
             <span>{link.short}</span><strong>{link.label}</strong><ArrowUpRight />
           </a>
         ))}
         <ThemeToggle />
-        <div className="mobile-command-status"><i /> Sistema online · Bilac, SP</div>
       </aside>
 
-      <nav className="side-rail" aria-label="Progresso da página">
-        {navLinks.map((link) => (
-          <a key={link.href} href={link.href} className={active === link.href ? "active" : ""}>
-            <span>{link.short}</span><em>{link.label}</em>
-          </a>
-        ))}
-      </nav>
+      {menuOpen && (
+        <button
+          type="button"
+          className="command-backdrop"
+          onClick={() => setMenuOpen(false)}
+          aria-label="Fechar menu"
+        />
+      )}
     </>
   )
 }
