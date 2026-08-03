@@ -1,5 +1,6 @@
 import { Headphones, Lightbulb, Settings, UserCheck } from "lucide-react"
 import SectionHeader from "./SectionHeader"
+import useInView from "../hooks/useInView"
 
 const modules = [
   { id: "BASE4-01", icon: UserCheck, title: "Atendimento personalizado", desc: "Analisamos cada projeto individualmente para oferecer uma solução adequada à necessidade do cliente." },
@@ -9,12 +10,17 @@ const modules = [
 ]
 
 export default function Diferenciais() {
+  const [ref, inView] = useInView<HTMLDivElement>()
+
   return (
     <section id="diferenciais" className="experience-section modules-section">
       <div className="section-track" aria-hidden="true"><span>15</span></div>
       <div className="content-shell">
         <SectionHeader index="15" eyebrow="Arquitetura humana" title="Quatro módulos. Uma forma própria de trabalhar." />
-        <div className="technology-modules">
+        {/* A revelação aqui é só por opacidade: os módulos pares já vivem
+            deslocados 45px por desenho, e um transform de entrada brigaria com
+            esse escalonamento. */}
+        <div ref={ref} className={`technology-modules ${inView ? "is-in" : ""}`}>
           <svg viewBox="0 0 1000 350" aria-hidden="true"><path d="M120 175 H880 M250 175 V70 M500 175 V280 M750 175 V70" /></svg>
           {modules.map(({ id, icon: Icon, title, desc }, index) => (
             <article key={id} className={`technology-module module-${index + 1}`}>

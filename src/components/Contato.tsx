@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react"
 import { AlertCircle, ArrowUpRight, CheckCircle2, Code2, MessageCircle, Phone, Radio, RadioTower, Wrench } from "lucide-react"
 import { areas, baseMessage, serviceOptions, team, teamByArea, whatsappUrl, type ServiceArea } from "../data"
 import SectionHeader from "./SectionHeader"
+import useInView from "../hooks/useInView"
 
 const areaIcon: Record<ServiceArea, typeof Wrench> = { hardware: Wrench, software: Code2 }
 const areaKeys = Object.keys(areas) as ServiceArea[]
@@ -15,6 +16,7 @@ export default function Contato() {
   // visitante decide com quem falar. Trocar de contato depois disso não
   // remonta o formulário, então a animação de entrada roda uma única vez e
   // nada do que já foi digitado se perde.
+  const [ref, inView] = useInView<HTMLDivElement>()
   const [selected, setSelected] = useState<number | null>(null)
   const [fields, setFields] = useState<Fields>(emptyFields)
   const [errors, setErrors] = useState<Errors>({})
@@ -63,6 +65,9 @@ export default function Contato() {
       <div className="section-track" aria-hidden="true"><span>18</span></div>
       <div className="content-shell">
         <SectionHeader index="18" eyebrow="Central de comunicação" title="Inicie uma conexão com a BASE4." description="Escolha um contato ou descreva o seu projeto. A solicitação será encaminhada diretamente pelo WhatsApp." />
+        {/* Entra como bloco único: revelar as duas metades por dentro deixaria
+            a moldura aparecendo vazia antes de se preencher. */}
+        <div ref={ref} className={`rv ${inView ? "is-in" : ""}`}>
         <div className="contact-center">
           <div className="contact-operators">
             <div className="terminal-label">ATENDIMENTO POR ÁREA / {String(team.length).padStart(2, "0")}</div>
@@ -170,6 +175,7 @@ export default function Contato() {
               </form>
             )}
           </div>
+        </div>
         </div>
       </div>
     </section>

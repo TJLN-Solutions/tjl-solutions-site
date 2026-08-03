@@ -1,11 +1,18 @@
 import { ArrowUpRight, Bell, Check, Clock3, CreditCard, MessageCircle, Users } from "lucide-react"
 import { primaryPhone, whatsappUrl } from "../data"
 import SectionHeader from "./SectionHeader"
+import useInView from "../hooks/useInView"
 
 const process = ["Cobrança criada", "Lembrete enviado", "Cliente notificado", "Pagamento identificado", "Status atualizado"]
 
 export default function Sistemas() {
   const chargeLink = whatsappUrl(primaryPhone, "Olá! Tenho interesse em saber mais sobre o BASE4 Charge.")
+
+  // O palco e a esteira do processo entram separados: estão longe um do outro
+  // na página, e revelar juntos deixaria a esteira animando fora da tela.
+  const [stageRef, stageInView] = useInView<HTMLDivElement>()
+  const [processRef, processInView] = useInView<HTMLDivElement>()
+
   return (
     <section id="sistemas" className="experience-section charge-section">
       <div className="section-track" aria-hidden="true"><span>06</span></div>
@@ -17,7 +24,8 @@ export default function Sistemas() {
           description="Cobranças automáticas, organização financeira e mais controle para o seu negócio."
         />
 
-        <div className="charge-stage">
+        {/* rv-sides: o texto vem da esquerda, o painel da direita */}
+        <div ref={stageRef} className={`charge-stage rv rv-sides ${stageInView ? "is-in" : ""}`}>
           <div className="charge-copy">
             <div className="launch-badge"><i /> Lançamento em breve</div>
             <p>
@@ -70,7 +78,7 @@ export default function Sistemas() {
           </div>
         </div>
 
-        <div className="charge-process">
+        <div ref={processRef} className={`charge-process rv ${processInView ? "is-in" : ""}`}>
           {process.map((item, index) => (
             <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><i /><p>{item}</p></div>
           ))}

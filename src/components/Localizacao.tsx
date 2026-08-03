@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowUpRight, Clock, MapPin, MapPinned } from "lucide-react"
 import { horarios } from "../data"
+import useInView from "../hooks/useInView"
 
 /**
  * Coordenadas conferidas contra o endereço no Google Maps. Os valores
@@ -27,6 +28,7 @@ const mapEmbedUrl =
   `&layer=mapnik&marker=${LAT},${LNG}`
 
 export default function Localizacao() {
+  const [ref, inView] = useInView<HTMLDivElement>()
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadMap, setLoadMap] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -52,7 +54,7 @@ export default function Localizacao() {
   return (
     <section id="localizacao" className="map-strip">
       <div className="map-strip-grid" aria-hidden="true" />
-      <div className="content-shell location-hub">
+      <div ref={ref} className={`content-shell location-hub rv ${inView ? "is-in" : ""}`}>
         <div className="map-strip-content">
           <div className="map-pin"><MapPin /><i /><span /></div>
           <div><small>BASE FÍSICA / BILAC.SP</small><h2>Rua XV de Novembro, 283</h2><p>Visite nossa loja e converse pessoalmente com a equipe.</p></div>

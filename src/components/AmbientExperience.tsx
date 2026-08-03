@@ -1,51 +1,21 @@
-import { useEffect, type CSSProperties } from "react"
+import { useEffect, useRef } from "react"
 
 /**
- * Fundo do site: azul quase preto com os dois azuis num só campo, pontos de
- * luz no azul claro como detalhe, e um grão fino por cima.
+ * Fundo animado da marca, na paleta da logo do BASE4 Charge.
  *
- * Histórico das tentativas, para não repetir:
- * · grade em perspectiva + orbes + feixes + brilho no cursor → cara de template;
- * · curvas de nível por toda a página → poluído;
- * · uma elipse de luz só no alto → dava para ver onde acabava, e o fundo lia
- *   como duas faixas de cor separadas.
+ * Peças: grade em perspectiva ao fundo, duas orbes azuis derivando devagar,
+ * dois feixes amarelos atravessando na diagonal e um brilho que acompanha o
+ * cursor. O amarelo aparece só nos feixes — é o traço da logo em movimento,
+ * não cor de área.
  *
- * Agora a luz vem de camadas amplas que se sobrepõem no próprio degradê (ver
- * --ambient-bg), então não há emenda entre o escuro e o claro. Os pontos são o
- * único elemento discreto por cima.
- *
- * O grão não é enfeite: um degradê escuro e amplo mostra faixas de banding em
- * tela de 8 bits, e a textura quebra essas faixas.
+ * Em máquina modesta, com dados economizados ou movimento reduzido, o CSS
+ * desliga os feixes, a segunda orbe e o brilho do cursor a partir da classe
+ * `performance-lite`.
  */
-
-/**
- * Pontos de luz em posições irregulares.
- *
- * As coordenadas saem de multiplicadores irracionais tomados módulo 1: dá uma
- * distribuição que não repete nem alinha, e é determinística — o desenho é
- * sempre o mesmo, sem depender de sorteio.
- */
-const DOTS = Array.from({ length: 26 }, (_, index) => {
-  const i = index + 1
-  const left = ((i * 0.6180339887) % 1) * 100
-  const top = ((i * 0.4142135624) % 1) * 100
-  const size = 1 + ((i * 0.7320508076) % 1) * 2.2
-  const opacity = 0.16 + ((i * 0.2360679775) % 1) * 0.26
-  return {
-    left: `${left.toFixed(2)}%`,
-    top: `${top.toFixed(2)}%`,
-    size: `${size.toFixed(2)}px`,
-    opacity: opacity.toFixed(3),
-    // um em cada quatro respira, com fases diferentes
-    alive: index % 4 === 1,
-    delay: `${-(index % 7) * 1.6}s`,
-  }
-})
-
 export default function AmbientExperience() {
+  const glowRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
-    // Máquina modesta, dados economizados ou movimento reduzido: o site inteiro
-    // entra em perfil leve. O CSS decide o que desligar a partir desta classe.
     const device = navigator as Navigator & {
       deviceMemory?: number
       connection?: { saveData?: boolean }
@@ -56,26 +26,37 @@ export default function AmbientExperience() {
       (device.hardwareConcurrency > 0 && device.hardwareConcurrency <= 4) ||
       (device.deviceMemory !== undefined && device.deviceMemory <= 4)
     document.documentElement.classList.toggle("performance-lite", lite)
+
+    // Sem mouse não há brilho a seguir, e em perfil leve ele nem existe.
+    if (lite || !window.matchMedia("(pointer: fine)").matches) return
+
+    // O movimento do ponteiro dispara muito mais que um quadro: agrupa tudo
+    // num requestAnimationFrame para não escrever no estilo várias vezes por
+    // quadro.
+    let frame = 0
+    const onMove = (event: PointerEvent) => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        glowRef.current?.style.setProperty("--pointer-x", `${event.clientX}px`)
+        glowRef.current?.style.setProperty("--pointer-y", `${event.clientY}px`)
+      })
+    }
+
+    window.addEventListener("pointermove", onMove, { passive: true })
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener("pointermove", onMove)
+    }
   }, [])
 
   return (
     <div className="ambient" aria-hidden="true">
-      <div className="ambient-dots">
-        {DOTS.map((dot, index) => (
-          <i
-            key={index}
-            className={dot.alive ? "is-alive" : undefined}
-            style={{
-              left: dot.left,
-              top: dot.top,
-              width: dot.size,
-              height: dot.size,
-              animationDelay: dot.alive ? dot.delay : undefined,
-              "--o": dot.opacity,
-            } as CSSProperties}
-          />
-        ))}
-      </div>
+      <div className="ambient-grid" />
+      <div className="ambient-beam ambient-beam-a" />
+      <div className="ambient-beam ambient-beam-b" />
+      <div className="ambient-orb ambient-orb-a" />
+      <div className="ambient-orb ambient-orb-b" />
+      <div ref={glowRef} className="cursor-glow" />
       <div className="ambient-noise" />
     </div>
   )

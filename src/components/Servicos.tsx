@@ -2,6 +2,7 @@ import { useState } from "react"
 import { ArrowUpRight, Check, Code2, Cpu, Globe2, Monitor, Network, ScanLine } from "lucide-react"
 import { primaryPhone, services, whatsappUrl } from "../data"
 import SectionHeader from "./SectionHeader"
+import useInView from "../hooks/useInView"
 
 function ServiceVisual({ type }: { type: string }) {
   if (type === "sites") return (
@@ -33,11 +34,15 @@ function ServiceVisual({ type }: { type: string }) {
 export default function Servicos() {
   const [active, setActive] = useState(0)
   const service = services[active]
+  const [ref, inView] = useInView<HTMLDivElement>()
   return (
     <section id="servicos" className="experience-section services-section">
       <div className="section-track" aria-hidden="true"><span>07</span></div>
       <div className="content-shell">
         <SectionHeader index="07" eyebrow="Soluções modulares" title="Escolha uma frente. Veja o sistema responder." description="Projetos personalizados de acordo com as necessidades de cada cliente." />
+        {/* O console entra como bloco único: revelar as duas metades por dentro
+            deixaria a moldura aparecendo vazia antes de se preencher. */}
+        <div ref={ref} className={`rv ${inView ? "is-in" : ""}`}>
         <div className="services-console">
           <div className="service-selector" role="tablist" aria-label="Serviços da BASE4">
             {services.map((item, index) => (
@@ -55,7 +60,14 @@ export default function Servicos() {
             ))}
           </div>
           <div className="service-detail" role="tabpanel">
-            <div className="service-detail-copy">
+            {/* A `key` troca junto com o serviço: o bloco remonta e a animação
+                de entrada roda de novo, então a troca deixa de ser um corte
+                seco de conteúdo.
+
+                Os prefixos são obrigatórios. Com a mesma `key` nos dois irmãos,
+                a reconciliação do React quebrava e o painel antigo ficava órfão
+                no DOM — um texto acumulado a cada troca de serviço. */}
+            <div className="service-detail-copy panel-swap" key={`copy-${service.key}`}>
               <div className="terminal-label">MODULE / {service.id}</div>
               <h3>{service.title}</h3>
               <p>{service.desc}</p>
@@ -69,8 +81,9 @@ export default function Servicos() {
                 </a>
               </div>
             </div>
-            <ServiceVisual type={service.key} />
+            <ServiceVisual key={`visual-${service.key}`} type={service.key} />
           </div>
+        </div>
         </div>
       </div>
     </section>

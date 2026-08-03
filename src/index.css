@@ -17,58 +17,67 @@
 :root {
   color-scheme: dark;
 
-  /* superfícies — azul quase preto, frio e profundo */
-  --bg: #05080f;
-  --surface-1: rgba(13, 19, 33, .72);
-  --surface-2: rgba(9, 14, 26, .84);
-  --surface-3: rgba(17, 25, 43, .92);
-  --surface-solid: #0b1220;
-  --surface-sunken: #070c16;
-  --surface-inset: rgba(6, 10, 18, .62);
-  --surface-glass: rgba(6, 10, 18, .72);
-  --surface-glass-dense: rgba(6, 10, 18, .94);
+  /* superfícies — preto e carvão, a base da logo */
+  --bg: #08080a;
+  --surface-1: rgba(30, 30, 35, .72);
+  --surface-2: rgba(23, 23, 27, .84);
+  --surface-3: rgba(39, 39, 45, .92);
+  --surface-solid: #1b1b1f;
+  --surface-sunken: #121215;
+  --surface-inset: rgba(18, 18, 21, .62);
+  --surface-glass: rgba(11, 11, 14, .72);
+  --surface-glass-dense: rgba(11, 11, 14, .94);
 
   /* texto — piso de 4.5:1 sobre --bg e sobre as superfícies */
-  --text-1: #eef2f8;
-  --text-2: #c3ccdc;
-  --text-3: #a6b1c4;
-  /* Levantado de #8b97ac: a malha azul clareia o topo, e as coordenadas e as
-     métricas do hero usam este tom direto sobre o fundo, sem card atrás. Com
-     o valor anterior caía para 3.97:1 ali. */
-  --text-4: #98a4b8;
+  --text-1: #f5f6f8;
+  --text-2: #c8cbd2;
+  --text-3: #a8acb6;
+  --text-4: #90959f;
 
-  /* linhas — estrutura em azul neutro. O verde fica reservado ao que
-     comunica algo (botão, rótulo, ícone), então a página não fica listrada
-     de acento. */
-  --line-1: rgba(148, 170, 205, .14);
-  --line-2: rgba(148, 170, 205, .24);
-  --line-3: rgba(123, 224, 164, .50);
+  /* linhas — a estrutura é NEUTRA de propósito.
+     --line-1 aparece 68 vezes na folha: é a borda de todo card e todo
+     divisor. Tingida de azul, ela sozinha pintava a página inteira e o preto
+     desaparecia. O azul fica reservado a --line-3, que marca o que está
+     ativo, em foco ou destacado. */
+  --line-1: rgba(255, 255, 255, .09);
+  --line-2: rgba(255, 255, 255, .16);
+  --line-3: rgba(88, 166, 255, .5);
   /* traço decorativo (anéis, conectores SVG, cantos) — precisa de mais
      força no claro, onde não há fundo escuro para criar o contraste */
-  --line-deco: rgba(148, 170, 205, .20);
+  --line-deco: rgba(88, 166, 255, .16);
   --hero-stroke-w: 1px;
 
-  /* acento */
-  --accent: #7be0a4;
-  --accent-text: #8fe8b3;
-  --accent-hover: #f0fff7;
-  --accent-soft: rgba(123, 224, 164, .10);
-  --accent-tint: rgba(123, 224, 164, .06);
-  --on-accent: #04211a;
+  /* acento — o azul da logo. O tom puro (#016ADD) só serve como fundo:
+     como texto sobre preto ele fica em 3.3:1, abaixo do piso. Por isso o
+     texto usa a variação clara. */
+  --accent: #016add;
+  --accent-text: #58a6ff;
+  --accent-hover: #0b7bf0;
+  --accent-soft: rgba(1, 106, 221, .16);
+  /* Cobre cada seção inteira num degradê: qualquer valor alto aqui vira
+     lavagem azul sobre o preto. */
+  --accent-tint: rgba(1, 106, 221, .03);
+  --on-accent: #ffffff;
+
+  /* detalhe — a faixa amarela da logo. Nunca é cor de área: vive em traço
+     fino, ponto de status e realce pontual. É o charme, não a estrutura. */
+  --detail: #ffd60a;
+  --detail-soft: rgba(255, 214, 10, .16);
 
   /* glow — em claro vira sombra discreta, não borrão neon */
-  --glow-sm: 0 0 12px rgba(123, 224, 164, .42);
-  --glow-md: 0 0 30px rgba(123, 224, 164, .26);
-  --glow-lg: 0 0 70px rgba(123, 224, 164, .18);
-  --glow-inset: inset 0 0 35px rgba(123, 224, 164, .10);
-  --text-glow: 0 0 30px rgba(123, 224, 164, .42);
+  --glow-sm: 0 0 12px rgba(1, 106, 221, .55);
+  --glow-md: 0 0 30px rgba(1, 106, 221, .34);
+  --glow-lg: 0 0 70px rgba(1, 106, 221, .24);
+  --glow-inset: inset 0 0 35px rgba(1, 106, 221, .14);
+  --text-glow: 0 0 30px rgba(1, 106, 221, .45);
 
-  /* semântico — o âmbar é o contraponto quente da paleta */
-  --ok: #5eeaa0;
-  --ok-text: #86f0b8;
-  --ok-glow: 0 0 12px rgba(94, 234, 160, .75);
+  /* semântico — os indicadores de vida usam o amarelo do detalhe: é onde
+     ele cabe naturalmente, sem virar cor de bloco */
+  --ok: #ffd60a;
+  --ok-text: #ffdf3d;
+  --ok-glow: 0 0 12px rgba(255, 214, 10, .7);
   --danger: #fb7185;
-  --alt: #e9c27e;
+  --alt: #58a6ff;
 
   /* elevação */
   --shadow-1: 0 16px 50px rgba(0, 0, 0, .28);
@@ -76,32 +85,42 @@
   --shadow-3: 0 35px 90px rgba(0, 0, 0, .42);
   --card-shadow: none;
 
-  /* ambiente — os dois azuis num só campo.
-     Antes a luz era uma elipse única no alto: dava para ver onde ela acabava
-     e o fundo virava duas faixas separadas. Agora são quatro camadas amplas
-     que se sobrepõem, então o azul claro nasce de dentro do escuro em vez de
-     ficar apoiado sobre ele. O detalhe pontual é o mesmo azul claro, em
-     pontos de luz esparsos. */
-  --ambient-bg:
-    radial-gradient(125% 85% at 8% -14%, rgba(88, 132, 236, .16), transparent 56%),
-    radial-gradient(95% 72% at 92% 4%, rgba(116, 160, 255, .085), transparent 60%),
-    radial-gradient(115% 88% at 42% 112%, rgba(52, 90, 190, .145), transparent 62%),
-    radial-gradient(70% 55% at 68% 48%, rgba(78, 120, 220, .076), transparent 68%),
-    linear-gradient(180deg, #080d1b 0%, #060a14 46%, #04060e 100%);
-  --dot: rgba(126, 166, 255, .9);
-  --ambient-noise-opacity: .016;
-  /* ainda usado pela grade fina da faixa do mapa */
-  --ambient-grid-line: rgba(148, 170, 205, .10);
-
+  /* ambiente — o fundo animado original, agora na paleta da marca:
+     grade em perspectiva e orbes no azul, feixes no amarelo do detalhe. */
+  /* A elevação azul no topo é curta e dessaturada: o preto precisa dominar
+     a partir do primeiro terço da tela. */
+  --ambient-bg: radial-gradient(circle at 50% -22%, #0a1220 0, #08080a 42%, #050506 100%);
+  /* grade neutra — é estrutura, não marca */
+  --ambient-grid-line: rgba(255, 255, 255, .07);
+  --ambient-grid-opacity: .22;
+  --ambient-noise-opacity: .022;
+  --ambient-orb-a: #0a2f5c;
+  --ambient-orb-b: #0b4a8f;
+  --ambient-orb-opacity: .09;
+  --ambient-orb-blur: 110px;
+  /* Os dois feixes são o amarelo da logo atravessando o preto — o gesto que
+     mais carrega a identidade sem pintar área nenhuma. */
+  --ambient-beam: rgba(255, 214, 10, .32);
+  --cursor-glow: rgba(1, 106, 221, .09);
   /* peças específicas que precisam virar junto com o tema */
-  --hero-stroke: rgba(158, 180, 215, .58);
-  --core-orb: radial-gradient(circle, #16244a, #070c18 62%);
-  --core-halo: radial-gradient(circle, rgba(22, 36, 74, .34), rgba(4, 8, 16, .2) 42%, transparent 70%);
-  --boot-bg: #04070e;
-  --skeleton: #1c2740;
-  --scroll-thumb: #33507f;
-  --selection-bg: rgba(123, 224, 164, .25);
-  --selection-text: #f2fff9;
+  /* Contorno do título: dessaturado, porque em azul cheio era a maior massa
+     de cor da primeira tela. A opacidade é calibrada, não escolhida a olho:
+     "transforma ideias" é conteúdo, e traço de 1px já é difícil de ler. Em
+     .55 dava 3.05:1, no limite do piso de texto grande; aqui fica em 4.01. */
+  --hero-stroke: rgba(160, 176, 200, .62);
+  --core-orb: radial-gradient(circle, #0f2c52, #0a0a0d 62%);
+  --core-halo: radial-gradient(circle, rgba(15, 44, 82, .34), rgba(6, 6, 9, .2) 42%, transparent 70%);
+  --boot-bg: #060608;
+  --skeleton: #2a2a31;
+  --scroll-thumb: #1f5fa8;
+  --selection-bg: rgba(1, 106, 221, .32);
+  --selection-text: #ffffff;
+
+  /* peças da orbe: precisam virar com o tema porque a esfera passa de
+     quase-preta a quase-branca, e cor cravada aqui desaparece de um lado */
+  --orb-dot: rgba(120, 180, 255, .5);
+  --orb-label: #eaf4ff;
+  --orb-label-glow: 0 0 26px rgba(1, 106, 221, .95);
 
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
@@ -110,70 +129,85 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --bg: #eef1f6;
+  --bg: #f1f3f7;
   --surface-1: #ffffff;
   --surface-2: #ffffff;
-  --surface-3: #f6f8fc;
+  --surface-3: #f7f9fc;
   --surface-solid: #ffffff;
   --surface-sunken: #ffffff;
-  --surface-inset: #f2f5fa;
+  --surface-inset: #f3f6fa;
   --surface-glass: rgba(252, 253, 255, .84);
   --surface-glass-dense: rgba(250, 252, 255, .97);
 
-  --text-1: #10151f;
-  --text-2: #3b4657;
-  --text-3: #4f5b6e;
-  --text-4: #58657a;
+  --text-1: #14161c;
+  --text-2: #3e434e;
+  --text-3: #525863;
+  --text-4: #5b616d;
 
-  --line-1: rgba(30, 52, 92, .15);
-  --line-2: rgba(30, 52, 92, .24);
-  --line-3: rgba(15, 107, 74, .45);
-  --line-deco: rgba(30, 52, 92, .24);
+  --line-1: rgba(20, 22, 28, .13);
+  --line-2: rgba(20, 22, 28, .21);
+  --line-3: rgba(1, 90, 190, .45);
+  --line-deco: rgba(1, 74, 158, .22);
   --hero-stroke-w: 2px;
 
-  --accent: #0f6b4a;
-  --accent-text: #0d6043;
-  --accent-hover: #094b34;
-  --accent-soft: rgba(15, 107, 74, .09);
-  --accent-tint: rgba(15, 107, 74, .05);
+  --accent: #0a58c2;
+  --accent-text: #0a51b4;
+  --accent-hover: #073f8f;
+  --accent-soft: rgba(10, 88, 194, .09);
+  --accent-tint: rgba(10, 88, 194, .022);
   --on-accent: #ffffff;
 
-  --glow-sm: 0 1px 3px rgba(15, 107, 74, .28);
-  --glow-md: 0 8px 24px rgba(15, 107, 74, .18);
-  --glow-lg: 0 18px 44px rgba(15, 107, 74, .14);
-  --glow-inset: inset 0 0 0 1px rgba(15, 107, 74, .06);
+  /* No claro o amarelo puro desaparece: o detalhe vira ouro escuro, que
+     mantém a identidade e continua legível sobre papel.
+
+     O tom e o preenchimento são calibrados juntos: com #8a6a00 sobre
+     preenchimento de 14%, o número da seção caía para 3.83:1. Assim fica
+     em 4.86:1 na página e 5.37:1 sobre card. */
+  --detail: #7a5d00;
+  --detail-soft: rgba(122, 93, 0, .1);
+
+  --glow-sm: 0 1px 3px rgba(10, 88, 194, .28);
+  --glow-md: 0 8px 24px rgba(10, 88, 194, .18);
+  --glow-lg: 0 18px 44px rgba(10, 88, 194, .14);
+  --glow-inset: inset 0 0 0 1px rgba(10, 88, 194, .06);
   --text-glow: none;
 
-  --ok: #12704a;
-  --ok-text: #0f6343;
-  --ok-glow: 0 1px 3px rgba(18, 112, 74, .35);
+  /* mesmo ouro do detalhe: dois tons quase iguais na tela só sujariam */
+  --ok: #7a5d00;
+  --ok-text: #7a5d00;
+  --ok-glow: 0 1px 3px rgba(122, 93, 0, .35);
   --danger: #b3261e;
-  --alt: #8a5a12;
+  --alt: #0a51b4;
 
   --shadow-1: 0 10px 30px rgba(15, 60, 50, .09);
   --shadow-2: 0 18px 44px rgba(15, 60, 50, .10);
   --shadow-3: 0 26px 60px rgba(15, 60, 50, .13);
   --card-shadow: 0 1px 2px rgba(15, 60, 50, .05), 0 12px 32px rgba(15, 60, 50, .07);
 
-  /* No claro a mesma malha vira azul lavado sobre papel, não brilho */
-  --ambient-bg:
-    radial-gradient(125% 85% at 8% -14%, rgba(88, 132, 236, .17), transparent 56%),
-    radial-gradient(95% 72% at 92% 4%, rgba(116, 160, 255, .13), transparent 60%),
-    radial-gradient(115% 88% at 42% 112%, rgba(88, 132, 236, .11), transparent 62%),
-    radial-gradient(70% 55% at 68% 48%, rgba(78, 120, 220, .06), transparent 68%),
-    linear-gradient(180deg, #e8edf7 0%, #eef1f6 46%, #e7ecf4 100%);
-  --dot: rgba(46, 88, 180, .55);
-  --ambient-noise-opacity: .01;
-  --ambient-grid-line: rgba(30, 52, 92, .10);
+  --ambient-bg: radial-gradient(circle at 50% -18%, #e4e9f2 0, #f1f3f7 44%, #eceef3 100%);
+  --ambient-grid-line: rgba(20, 22, 28, .07);
+  --ambient-grid-opacity: .3;
+  --ambient-noise-opacity: .012;
+  --ambient-orb-a: #ccd8e8;
+  --ambient-orb-b: #d7e2f0;
+  --ambient-orb-opacity: .3;
+  --ambient-orb-blur: 90px;
+  --ambient-beam: rgba(138, 106, 0, .18);
+  --cursor-glow: rgba(10, 88, 194, .06);
 
-  --hero-stroke: rgba(30, 52, 92, .70);
-  --core-orb: radial-gradient(circle, #ffffff, #dde5f2 64%);
-  --core-halo: radial-gradient(circle, rgba(30, 52, 92, .10), rgba(255, 255, 255, .55) 42%, transparent 70%);
-  --boot-bg: #f2f5fa;
-  --skeleton: #d5deec;
-  --scroll-thumb: #8f9fb8;
-  --selection-bg: rgba(15, 107, 74, .18);
-  --selection-text: #052b20;
+  /* Mesmo cuidado no claro: em .5 dava 2.83:1, abaixo do piso. */
+  --hero-stroke: rgba(34, 40, 52, .7);
+  --core-orb: radial-gradient(circle, #ffffff, #dbe6f5 64%);
+  --core-halo: radial-gradient(circle, rgba(10, 88, 194, .10), rgba(255, 255, 255, .55) 42%, transparent 70%);
+  --boot-bg: #f3f5f9;
+  --skeleton: #dcdfe5;
+  --scroll-thumb: #8ba2bf;
+  --selection-bg: rgba(10, 88, 194, .2);
+  --selection-text: #06203f;
+
+  --orb-dot: rgba(10, 88, 194, .34);
+  --orb-label: #0a58c2;
+  --orb-label-glow: none;
 }
 
 /* ============================================================
@@ -193,27 +227,23 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); }
 
 .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: var(--ambient-bg); }
-/* Pontos de luz no azul claro — o detalhe do fundo.
-   São poucos e de tamanhos diferentes, em posições irregulares: em grade
-   viraria textura, e textura repetida pela página é o que poluía antes.
-   A opacidade de cada ponto vem de --o, definido no componente. */
-.ambient-dots { position: absolute; inset: 0; }
+/* Fundo animado da marca: grade em perspectiva, duas orbes azuis derivando,
+   dois feixes amarelos atravessando e um brilho que segue o cursor. */
+.ambient-grid { position: absolute; inset: 0; opacity: var(--ambient-grid-opacity); background-image: linear-gradient(var(--ambient-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--ambient-grid-line) 1px, transparent 1px); background-size: 68px 68px; mask-image: linear-gradient(to bottom, black, transparent 86%); transform: perspective(700px) rotateX(62deg) scale(1.8) translateY(-5%); transform-origin: top; }
+.ambient-orb { position: absolute; width: 44vw; aspect-ratio: 1; border-radius: 50%; filter: blur(var(--ambient-orb-blur)); opacity: var(--ambient-orb-opacity); animation: drift 16s ease-in-out infinite alternate; }
+.ambient-orb-a { left: -20vw; top: 25vh; background: var(--ambient-orb-a); }
+.ambient-orb-b { right: -22vw; top: 65vh; background: var(--ambient-orb-b); animation-delay: -8s; }
 
-.ambient-dots i {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--dot);
-  opacity: var(--o);
-  box-shadow: 0 0 8px var(--dot);
-}
+/* Os feixes são o traço amarelo da logo em movimento. Ficam finos e lentos:
+   é detalhe atravessando o preto, não holofote. */
+.ambient-beam { position: absolute; width: 1px; height: 70vh; background: linear-gradient(transparent, var(--ambient-beam), transparent); transform: rotate(28deg); animation: beam 12s linear infinite; }
+.ambient-beam-a { left: 28%; top: -20%; }
+.ambient-beam-b { right: 20%; top: 40%; animation-delay: -6s; }
 
-/* Só alguns respiram, e devagar — todos pulsando pareceria céu estrelado. */
-.ambient-dots i.is-alive { animation: dot-breathe 11s ease-in-out infinite alternate; }
+.cursor-glow { position: absolute; inset: 0; background: radial-gradient(420px circle at var(--pointer-x, 50%) var(--pointer-y, 30%), var(--cursor-glow), transparent 70%); }
 
-@keyframes dot-breathe {
-  from { opacity: var(--o); }
-  to { opacity: calc(var(--o) * 2.2); }
-}
+@keyframes drift { to { transform: translate(12vw, -8vh) scale(1.15); } }
+@keyframes beam { from { transform: translateX(-25vw) rotate(28deg); } to { transform: translateX(50vw) rotate(28deg); } }
 .ambient-noise { position: absolute; inset: 0; opacity: var(--ambient-noise-opacity); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
 
@@ -339,11 +369,21 @@ main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
    HERO
    ============================================================ */
 
-.hero-shell { position: relative; min-height: 100svh; padding: 130px 0 70px; display: flex; align-items: center; overflow: hidden; }
-.hero-shell::after { content: ""; position: absolute; left: 4%; right: 4%; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--line-3), transparent); }
+/* A seção é a pista de rolagem da coreografia: mede várias telas de altura e
+   não desenha nada. O palco dentro dela é que fica preso no topo. */
+.hero-shell { position: relative; height: 340vh; }
+/* O respiro no topo é a altura da barra fixa: sem ele o selo do hero fica
+   atrás dela quando o conteúdo centraliza. */
+.hero-stage { position: sticky; top: 0; display: flex; align-items: center; height: 100svh; padding: 104px 0 84px; overflow: hidden; }
+.hero-stage::after { content: ""; position: absolute; left: 4%; right: 4%; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--line-3), transparent); }
+.hero-progress { position: absolute; left: 50%; bottom: 46px; width: 172px; height: 2px; transform: translateX(-50%); background: var(--line-1); overflow: hidden; }
+.hero-progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--detail)); transform-origin: left; }
 .hero-coordinates { position: absolute; top: 108px; right: 7%; color: var(--text-4); font: 9px var(--font-mono); letter-spacing: .16em; }
 .hero-coordinates span { margin-left: 14px; color: var(--ok-text); }
-.hero-layout { width: min(1320px, calc(100% - 48px)); margin: auto; display: grid; grid-template-columns: .92fr 1.08fr; align-items: center; gap: 30px; }
+/* O vão entre a coluna de texto e a cena é generoso de propósito: com 30px
+   a orbe encostava na tipografia. A régua mais larga também devolve espaço
+   para o título. */
+.hero-layout { width: min(1480px, calc(100% - 64px)); margin: auto; display: grid; grid-template-columns: .95fr 1.05fr; align-items: center; gap: clamp(40px, 4.5vw, 78px); }
 .hero-copy { position: relative; z-index: 2; }
 .hero-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--text-3); text-transform: uppercase; letter-spacing: .18em; font: 500 10px var(--font-mono); }
 .hero-kicker i, .status-online i, .dash-live i, .launch-badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: var(--ok-glow); }
@@ -362,36 +402,6 @@ main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
 .hero-metrics div { display: grid; grid-template-columns: auto auto; column-gap: 8px; align-items: end; }
 .hero-metrics strong { grid-row: 1 / 3; color: var(--text-1); font: 500 1.65rem var(--font-mono); }
 .hero-metrics span { max-width: 80px; color: var(--text-4); text-transform: uppercase; font: 8px/1.4 var(--font-mono); }
-.digital-core-wrap { --tilt-x: 0deg; --tilt-y: 0deg; perspective: 1000px; }
-.core-interface { position: relative; width: min(100%, 680px); aspect-ratio: 1; margin-left: auto; transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)); transition: transform .2s ease-out; }
-.core-interface::before { content: ""; position: absolute; inset: 8%; border: 1px solid var(--line-deco); border-radius: 50%; background: var(--core-halo); box-shadow: var(--glow-inset); animation: core-breathe 5s ease-in-out infinite; }
-.core-links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.core-links circle { fill: none; stroke: var(--line-deco); stroke-width: 1; stroke-dasharray: 5 9; transform-origin: center; animation: rotate 28s linear infinite; }
-.core-links circle:nth-child(2) { animation-direction: reverse; animation-duration: 18s; }
-.core-links path { fill: none; stroke: var(--line-deco); stroke-width: 1; stroke-dasharray: 8 12; animation: data-flow 4s linear infinite; }
-.core-center { position: absolute; left: 50%; top: 50%; display: grid; place-items: center; width: 170px; aspect-ratio: 1; transform: translate(-50%, -50%); border: 1px solid var(--line-3); border-radius: 50%; background: var(--core-orb); box-shadow: var(--glow-lg), var(--glow-inset); }
-.core-center::before, .core-center::after { content: ""; position: absolute; inset: -14px; border: 1px solid var(--line-deco); border-radius: 50%; border-left-color: var(--accent); animation: rotate 8s linear infinite; }
-.core-center::after { inset: -28px; animation-direction: reverse; animation-duration: 12s; }
-.core-center span { color: var(--text-4); letter-spacing: .18em; font: 8px var(--font-mono); }
-.core-center strong { color: var(--text-1); font: 700 2.55rem/.8 var(--font-display); letter-spacing: -.08em; text-shadow: var(--text-glow); }
-.core-center small { color: var(--accent-text); font: 9px var(--font-mono); }
-.core-node { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; min-width: 156px; padding: 11px; border: 1px solid var(--line-1); background: var(--surface-2); color: var(--text-3); text-align: left; cursor: pointer; backdrop-filter: blur(8px); box-shadow: var(--card-shadow); transition: .35s var(--ease); }
-.core-node svg { width: 20px; color: var(--accent-text); }
-.core-node span { display: flex; flex-direction: column; gap: 3px; }
-.core-node b { color: var(--text-1); font: 500 11px var(--font-mono); }
-.core-node small { white-space: nowrap; font: 8px var(--font-mono); }
-.core-node:hover, .core-node.active { z-index: 4; border-color: var(--accent); transform: scale(1.05); box-shadow: var(--glow-md); }
-.node-sites { left: 4%; top: 15%; }
-.node-sistemas { right: 0; top: 14%; animation-delay: -1s; }
-.node-automacoes { right: -2%; top: 54%; animation-delay: -2s; }
-.node-hardware { left: 8%; bottom: 12%; animation-delay: -3s; }
-.node-charge { right: 18%; bottom: 2%; animation-delay: -4s; }
-.core-node { animation: node-float 5s ease-in-out infinite; }
-.core-readout { position: absolute; right: 10%; top: 43%; display: flex; flex-direction: column; color: var(--text-4); font: 8px var(--font-mono); }
-.core-readout b { color: var(--ok-text); font-weight: 500; }
-.core-corner { position: absolute; width: 45px; height: 45px; border-color: var(--line-deco); }
-.core-corner-tl { left: 0; top: 0; border-left: 1px solid; border-top: 1px solid; }
-.core-corner-br { right: 0; bottom: 0; border-right: 1px solid; border-bottom: 1px solid; }
 .hero-scroll { position: absolute; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 14px; transform: translateX(-50%); color: var(--text-4); letter-spacing: .15em; font: 8px var(--font-mono); }
 .hero-scroll i { position: relative; width: 60px; height: 1px; background: var(--line-2); overflow: hidden; }
 .hero-scroll i::after { content: ""; position: absolute; inset: 0; background: var(--accent); animation: scan-x 2s infinite; }
@@ -417,7 +427,7 @@ main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
 .flow-code { position: absolute; right: 14px; top: 12px; color: var(--text-4); font: 8px var(--font-mono); }
 .flow-module h3 { margin: 0 0 5px; color: var(--text-1); font: 600 1.1rem var(--font-display); }
 .flow-module p { margin: 0; color: var(--text-3); font-size: .85rem; }
-.location-terminal { display: grid; grid-template-columns: 90px 1fr 1.3fr 1fr auto; gap: 25px; align-items: center; margin-top: 70px; padding: 22px 28px; border: 1px solid var(--line-1); background: var(--surface-sunken); box-shadow: var(--card-shadow); }
+.location-terminal { display: grid; grid-template-columns: 62px repeat(3, 1fr) auto; gap: 28px; align-items: center; margin-top: 70px; padding: 22px 28px; border: 1px solid var(--line-1); background: var(--surface-sunken); box-shadow: var(--card-shadow); }
 .location-terminal > div { display: flex; flex-direction: column; gap: 7px; }
 .location-terminal small { color: var(--text-4); letter-spacing: .14em; font: 8px var(--font-mono); }
 .location-terminal strong { color: var(--text-1); font: 500 12px var(--font-mono); }
@@ -696,7 +706,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 @keyframes rotate { to { transform: rotate(360deg); } }
 @keyframes data-flow { to { stroke-dashoffset: -80; } }
 @keyframes core-breathe { 50% { opacity: .65; transform: scale(.96); } }
-@keyframes node-float { 50% { transform: translateY(-7px); } }
 @keyframes scan-x { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 @keyframes radar { from { opacity: .8; transform: scale(.65); } to { opacity: 0; transform: scale(1.5); } }
 @keyframes chart-reveal { from { opacity: 0; transform: translateY(20px); } }
@@ -716,7 +725,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
   .control-cta { margin-left: 0; }
   .hero-layout { grid-template-columns: 1fr; padding-top: 60px; }
   .hero-copy { max-width: 820px; }
-  .digital-core-wrap { width: min(760px, 100%); margin: 0 auto; }
   .hero-shell { height: auto; }
   .hero-scroll { display: none; }
   .about-grid, .charge-stage { grid-template-columns: 1fr; }
@@ -726,7 +734,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
   .service-selector { display: grid; grid-template-columns: repeat(3, 1fr); border-right: 0; border-bottom: 1px solid var(--line-1); }
   .service-selector button { min-height: 130px; }
   .service-detail { grid-template-columns: 1fr 1fr; }
-  .location-terminal { grid-template-columns: 70px 1fr 1fr; }
+  .location-terminal { grid-template-columns: 62px 1fr 1fr; }
   .location-terminal > div:nth-child(4) { grid-column: 2; }
   .location-terminal a { grid-column: 3; }
 }
@@ -750,20 +758,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
   .hero-metrics { gap: 14px; justify-content: space-between; }
   .hero-metrics div { display: flex; flex-direction: column; }
   .hero-metrics strong { font-size: 1.2rem; }
-  .digital-core-wrap { margin-top: 35px; }
-  .core-interface { transform: none !important; }
-  .core-node { min-width: 0; width: 115px; padding: 8px; }
-  .core-node small { display: none; }
-  .core-node b { font-size: 8px; }
-  .core-node svg { width: 15px; }
-  .core-center { width: 120px; }
-  .core-center strong { font-size: 1.85rem; }
-  .node-sites { left: 0; }
-  .node-sistemas { right: 0; }
-  .node-automacoes { right: 0; }
-  .node-hardware { left: 0; }
-  .node-charge { right: 10%; }
-  .core-readout { display: none; }
   .about-story { padding: 25px 20px; }
   .about-flow { padding-left: 35px; }
   .flow-module { grid-template-columns: 40px 1fr; padding: 20px 18px; }
@@ -801,9 +795,8 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
   .map-pin { width: 60px; }
   .embedded-map, .embedded-map iframe, .map-placeholder { min-height: 330px; height: 330px; }
   .boot-log { flex-direction: column; }
-  /* Menos pontos no celular: a mesma quantidade num viewport estreito
-     fica adensada e vira textura. */
-  .ambient-dots i:nth-child(even) { display: none; }
+  .ambient-grid { background-size: 48px 48px; }
+  .cursor-glow { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -814,8 +807,12 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    PERFIL DE PERFORMANCE REDUZIDO
    ============================================================ */
 
-.performance-lite .ambient-noise { display: none; }
-.performance-lite .ambient-dots i.is-alive,
+.performance-lite .ambient-noise,
+.performance-lite .ambient-beam,
+.performance-lite .ambient-orb-b,
+.performance-lite .cursor-glow { display: none; }
+.performance-lite .ambient-orb { filter: blur(60px); }
+.performance-lite .ambient-orb,
 .performance-lite .technology-modules > svg path,
 .performance-lite .automation-visual path,
 .performance-lite .chart-line { animation: none; }
@@ -1150,11 +1147,15 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    ============================================================ */
 
 /* ---- variantes de entrada, combinadas com .rv ---- */
-.rv-left > * { transform: translate3d(-26px, 0, 0); }
-.rv-right > * { transform: translate3d(26px, 0, 0); }
-.rv-zoom > * { transform: scale(.955); }
-.rv-rise > * { transform: translate3d(0, 30px, 0); }
-.rv.is-in > * { transform: none; }
+/* O `:not(.is-in)` não é enfeite: sem ele, qualquer variante escrita depois do
+   reset empata em especificidade e vence por ordem, deixando o elemento
+   deslocado permanentemente. Foi o que aconteceu com a faixa de localização
+   (16px para baixo), com os cards das frentes (28px para o lado) e com tudo no
+   celular (22px para baixo). */
+.rv-left:not(.is-in) > * { transform: translate3d(-26px, 0, 0); }
+.rv-right:not(.is-in) > * { transform: translate3d(26px, 0, 0); }
+.rv-zoom:not(.is-in) > * { transform: scale(.955); }
+.rv-rise:not(.is-in) > * { transform: translate3d(0, 30px, 0); }
 
 /* ---- resposta ao clique ----
    Vem no fim da folha de propósito: precisa vencer o transform do
@@ -1173,7 +1174,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 .crew-phone:active,
 .tech-chips li:active,
 .operator:active,
-.core-node:active,
 .faq-list summary:active {
   transform: scale(.97);
   transition-duration: .08s;
@@ -1266,7 +1266,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 }
 
 /* O núcleo entra crescendo, junto com as primeiras linhas do título */
-.digital-core-wrap { animation: hero-core-in 1.1s var(--ease) .28s both; }
+.orb-wrap { animation: hero-core-in 1.1s var(--ease) .28s both; }
 
 @keyframes hero-core-in {
   from { opacity: 0; transform: scale(.93); }
@@ -1287,11 +1287,9 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 .hero-metrics > div:hover strong { color: var(--accent-text); transform: scale(1.08); }
 
 /* Nós do núcleo: além do flutuar que já existia, o ícone reage ao foco */
-.core-node svg { transition: transform .35s var(--ease); }
-.core-node:hover svg, .core-node.active svg { transform: scale(1.15) rotate(-4deg); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-kicker i, .digital-core-wrap { animation: none; }
+  .hero-kicker i, .orb-wrap { animation: none; }
 }
 
 .performance-lite .hero-kicker i { animation: none; }
@@ -1301,8 +1299,8 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    ============================================================ */
 
 /* Os dois cards vêm de fora para dentro, como duas metades se encontrando */
-.rv-sides > *:nth-child(odd) { transform: translate3d(-28px, 0, 0); }
-.rv-sides > *:nth-child(even) { transform: translate3d(28px, 0, 0); }
+.rv-sides:not(.is-in) > *:nth-child(odd) { transform: translate3d(-28px, 0, 0); }
+.rv-sides:not(.is-in) > *:nth-child(even) { transform: translate3d(28px, 0, 0); }
 
 /* A barra de acento à esquerda cresce de cima para baixo no hover — é o
    gesto que diz "este é o card ativo" sem precisar de contorno neon. */
@@ -1404,7 +1402,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 .about-pulse i { animation: pulse-dot 2.6s ease-in-out infinite; }
 
 /* Faixa de localização: cada peça entra em sequência */
-.location-terminal.rv > * { transform: translate3d(0, 16px, 0); }
+.location-terminal.rv:not(.is-in) > * { transform: translate3d(0, 16px, 0); }
 .location-terminal:hover .location-radar svg { animation: icon-nudge .6s var(--ease); }
 .location-terminal > div strong { transition: color .3s var(--ease); }
 .location-terminal > div:hover strong { color: var(--accent-text); }
@@ -1416,3 +1414,1032 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 }
 
 .performance-lite .about-pulse i { animation: none; }
+
+/* ============================================================
+   TROCA DE PAINEL — usado onde o conteúdo é substituído
+   As peças remontam por `key` no componente, então esta animação
+   roda de novo a cada troca de aba ou de serviço. Sem ela a troca
+   é um corte seco, que parece falha e não transição.
+   ============================================================ */
+
+@keyframes swap-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+}
+
+.panel-swap, .service-visual { animation: swap-in .42s var(--ease); }
+
+/* ============================================================
+   SEÇÃO 05 · EQUIPE
+   ============================================================ */
+
+.crew-avatar { transition: transform .4s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease); }
+.crew-card:hover .crew-avatar { transform: scale(1.1); border-color: var(--accent); box-shadow: var(--glow-md); }
+.crew-role { transition: letter-spacing .35s var(--ease); }
+.crew-card:hover .crew-role { letter-spacing: .16em; }
+.crew-phone svg { transition: transform .3s var(--ease); }
+.crew-phone:hover svg { transform: scale(1.2) rotate(-8deg); }
+
+/* ============================================================
+   SEÇÃO 06 · BASE4 CHARGE
+   ============================================================ */
+
+/* Os itens do produto reagem em cascata quando o cursor entra na lista */
+.charge-copy li { transition: transform .35s var(--ease), color .25s var(--ease); }
+.charge-copy ul:hover li { transform: translateX(5px); }
+.charge-copy ul:hover li:nth-child(2) { transition-delay: .04s; }
+.charge-copy ul:hover li:nth-child(3) { transition-delay: .08s; }
+.charge-copy ul:hover li:nth-child(4) { transition-delay: .12s; }
+.charge-copy li svg { transition: transform .3s var(--ease); }
+.charge-copy ul:hover li svg { transform: scale(1.2); }
+
+.launch-badge i { animation: pulse-dot 2.2s ease-in-out infinite; }
+
+/* Cartões de métrica do painel: sobem e acendem a borda */
+.dash-metrics article { transition: transform .3s var(--ease), border-color .3s var(--ease); }
+.dash-metrics article:hover { transform: translateY(-3px); border-color: var(--line-3); }
+.dash-metrics svg { transition: transform .35s var(--ease); }
+.dash-metrics article:hover svg { transform: scale(1.15); }
+
+/* A esteira do processo: a linha que liga cada etapa se estende ao entrar */
+.charge-process div::after { transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease); }
+.charge-process.is-in div::after { transform: scaleX(1); }
+.charge-process.is-in div:nth-child(1)::after { transition-delay: .1s; }
+.charge-process.is-in div:nth-child(2)::after { transition-delay: .25s; }
+.charge-process.is-in div:nth-child(3)::after { transition-delay: .4s; }
+.charge-process.is-in div:nth-child(4)::after { transition-delay: .55s; }
+.charge-process.is-in div:nth-child(5)::after { transition-delay: .7s; }
+
+/* ============================================================
+   SEÇÃO 07 · SERVIÇOS
+   ============================================================ */
+
+/* Os benefícios entram em cascata a cada troca de serviço */
+.service-benefits span { animation: swap-in .45s var(--ease) both; }
+.service-benefits span:nth-child(1) { animation-delay: .12s; }
+.service-benefits span:nth-child(2) { animation-delay: .17s; }
+.service-benefits span:nth-child(3) { animation-delay: .22s; }
+.service-benefits span:nth-child(4) { animation-delay: .27s; }
+.service-benefits span:nth-child(5) { animation-delay: .32s; }
+.service-benefits span:nth-child(6) { animation-delay: .37s; }
+.service-benefits span:nth-child(7) { animation-delay: .42s; }
+
+.service-selector button svg { transition: transform .3s var(--ease), opacity .3s var(--ease); }
+.service-selector button:hover svg { transform: translate(2px, -2px); }
+.service-selector strong { transition: transform .3s var(--ease); }
+.service-selector button:hover strong { transform: translateX(3px); }
+
+/* ============================================================
+   SEÇÃO 08 · COMO FUNCIONA
+   ============================================================ */
+
+/* Os passos remontam na troca de frente: entram escalonados */
+.step-card { animation: swap-in .5s var(--ease) both; }
+.step-card:nth-child(1) { animation-delay: .04s; }
+.step-card:nth-child(2) { animation-delay: .12s; }
+.step-card:nth-child(3) { animation-delay: .2s; }
+.step-card:nth-child(4) { animation-delay: .28s; }
+
+/* A régua sobre cada passo cresce quando o cursor chega */
+.step-card::before { transform-origin: left; transition: transform .4s var(--ease), width .4s var(--ease); }
+.step-card:hover::before { transform: scaleX(2.4); }
+.step-num { display: inline-block; transition: transform .35s var(--ease), color .3s var(--ease); }
+.step-card:hover .step-num { transform: scale(1.15); }
+.step-card h3 { transition: color .3s var(--ease); }
+.step-card:hover h3 { color: var(--accent-text); }
+
+/* ============================================================
+   SEÇÃO 09 · PRAZOS E GARANTIA
+   ============================================================ */
+
+/* As linhas da tabela entram uma após a outra ao trocar de frente */
+.data-table tbody tr { animation: swap-in .4s var(--ease) both; }
+.data-table tbody tr:nth-child(1) { animation-delay: .03s; }
+.data-table tbody tr:nth-child(2) { animation-delay: .07s; }
+.data-table tbody tr:nth-child(3) { animation-delay: .11s; }
+.data-table tbody tr:nth-child(4) { animation-delay: .15s; }
+.data-table tbody tr:nth-child(5) { animation-delay: .19s; }
+.data-table tbody tr:nth-child(6) { animation-delay: .23s; }
+.data-table tbody tr:nth-child(7) { animation-delay: .27s; }
+
+.data-table td:first-child { transition: transform .3s var(--ease), color .3s var(--ease); }
+.data-table tbody tr:hover td:first-child { transform: translateX(5px); color: var(--accent-text); }
+
+/* ============================================================
+   SEÇÃO 10 · FAIXAS DE INVESTIMENTO
+   ============================================================ */
+
+.price-list div { transition: background .25s var(--ease), padding-left .3s var(--ease); }
+.price-list div:hover { background: var(--accent-tint); padding-left: 8px; }
+.price-list dd { display: inline-block; transition: transform .3s var(--ease), color .25s var(--ease); }
+.price-list div:hover dd { transform: scale(1.06); color: var(--accent); }
+
+/* ============================================================
+   SEÇÃO 11 · PORTFÓLIO
+   ============================================================ */
+
+.work-thumb svg { transition: transform .5s var(--ease); }
+.work-card:hover .work-thumb svg { transform: scale(1.18) rotate(6deg); }
+/* A grade dentro da miniatura desliza de leve, dando profundidade */
+.work-thumb::after { transition: transform .6s var(--ease), opacity .4s var(--ease); }
+.work-card:hover .work-thumb::after { transform: translate(-14px, -14px); opacity: .9; }
+.work-thumb-code { transition: color .3s var(--ease), letter-spacing .3s var(--ease); }
+.work-card:hover .work-thumb-code { color: var(--accent-text); letter-spacing: .22em; }
+
+.work-stack li { transition: transform .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease); }
+.work-card:hover .work-stack li { border-color: var(--line-2); color: var(--text-2); transform: translateY(-2px); }
+.work-card:hover .work-stack li:nth-child(2) { transition-delay: .05s; }
+.work-card:hover .work-stack li:nth-child(3) { transition-delay: .1s; }
+
+/* ============================================================
+   DESLIGAMENTOS DAS SEÇÕES 05–11
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-swap, .service-visual, .service-benefits span,
+  .step-card, .data-table tbody tr { animation: none; }
+  .charge-process div::after { transform: none; transition: none; }
+  .launch-badge i { animation: none; }
+}
+
+.performance-lite .launch-badge i { animation: none; }
+
+/* ============================================================
+   DETALHE AMARELO — o charme da identidade
+
+   A logo tem uma faixa amarela sob a plataforma escura. Esse
+   traço é reaproveitado como assinatura em pontos escolhidos:
+   sempre linha fina ou marca pequena, nunca área preenchida. Se
+   o amarelo virar bloco, ele briga com o azul e a identidade se
+   desequilibra.
+   ============================================================ */
+
+/* A marca ganha a faixa da logo sob o quadrado */
+.control-logo-mark { position: relative; }
+
+.control-logo-mark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--detail);
+}
+
+/* O número da seção repete a assinatura, em traço mais fino */
+.section-heading-code span { position: relative; overflow: hidden; }
+
+.section-heading-code span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--detail);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .6s var(--ease) .25s;
+}
+
+.section-heading.is-in .section-heading-code span::after { transform: scaleX(1); }
+
+/* O botão principal recebe o traço na base — o mesmo desenho da logo */
+.btn-signal::before, .control-cta::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--detail);
+  opacity: .85;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .4s var(--ease);
+  z-index: 1;
+}
+
+.btn-signal:hover::before, .control-cta:hover::before { transform: scaleX(1); }
+
+/* Realce amarelo no que está ativo: aba escolhida e serviço em foco */
+.area-tabs button.is-active { position: relative; }
+
+.area-tabs button.is-active::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 3px;
+  height: 2px;
+  background: var(--detail);
+}
+
+.service-selector button.active { position: relative; }
+
+.service-selector button.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--detail);
+}
+
+/* Sublinhado do link do menu suspenso, no amarelo, ao passar o cursor */
+.nav-pop a { position: relative; }
+
+.nav-pop a::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  bottom: 4px;
+  width: 14px;
+  height: 1px;
+  background: var(--detail);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s var(--ease);
+}
+
+.nav-pop a:hover::after { transform: scaleX(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .section-heading-code span::after,
+  .btn-signal::before, .control-cta::before,
+  .nav-pop a::after { transform: none; transition: none; }
+}
+
+/* ============================================================
+   DETALHE AMARELO — segunda camada
+
+   Critério: o amarelo marca a NUMERAÇÃO do site e o que está
+   ATIVO ou EM FOCO. É onde ele combina e onde o contraste
+   trabalha a favor.
+
+   Onde ele NÃO entra, de propósito: texto corrido, títulos, os
+   grandes contadores e os valores de preço. Número gigante em
+   amarelo grita e disputa com o azul; preço em amarelo lê como
+   etiqueta de promoção. Cor terciária tem que saber sair de cena.
+   ============================================================ */
+
+/* ---- a numeração das seções ---- */
+
+/* O código da seção fica em amarelo ao lado do rótulo azul: os dois
+   tons da marca lado a lado, exatamente como na logo. */
+.section-heading-code span {
+  border-color: var(--detail);
+  background: var(--detail-soft);
+  color: var(--detail);
+}
+
+/* O número que acompanha a rolagem na régua esquerda */
+.section-track span { color: var(--detail); }
+
+/* Passos, módulos e códigos de projeto */
+.step-num { color: var(--detail); }
+.flow-code { color: var(--detail); }
+.work-thumb-code { color: var(--detail); }
+.service-selector button > span { color: var(--detail); }
+.tip-num { color: var(--detail); opacity: .55; }
+
+/* Numeração na navegação: menu suspenso, gaveta e mapa do rodapé */
+.nav-pop-label { color: var(--detail); }
+.mobile-command a span { color: var(--detail); }
+.footer-nav-link .footer-icon { color: var(--detail); }
+
+/* ---- estado: ativo, em foco, em progresso ---- */
+
+/* Anel de foco em amarelo. Além de reforçar a identidade, resolve um
+   problema real: o anel azul sobre um botão azul quase desaparecia. */
+:focus-visible { outline-color: var(--detail); }
+
+/* A barra de progresso da página vai do azul ao amarelo */
+.scroll-progress-bar { background: linear-gradient(90deg, var(--accent), var(--detail)); }
+
+/* A linha que fecha o cabeçalho da tabela — marca onde os dados começam */
+.data-table th { border-bottom-color: var(--detail); }
+
+/* ---- pontuação editorial ---- */
+
+/* Aspas do depoimento: uso clássico de cor terciária, e aqui ela não
+   compete com nada porque o texto ao lado é neutro. */
+.quote-mark { color: var(--detail); opacity: .9; }
+
+/* O "+" que abre a pergunta: sinaliza o que é clicável */
+.faq-list summary svg { color: var(--detail); }
+
+/* Os três números do hero — são números, seguem a regra */
+.hero-metrics strong { color: var(--detail); }
+
+/* O "B" do painel do Charge recebe a mesma faixa da marca no topo */
+.dash-logo { position: relative; }
+
+.dash-logo::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--detail);
+}
+
+/* ============================================================
+   CENA DA ORBE — a arte de abertura, montada pela rolagem
+
+   Recriação de public/og.png em DOM: esfera com textura de pontos,
+   anéis de órbita, cone de projeção, plataforma circular e cinco
+   módulos em moldura octogonal.
+
+   Quem comanda é --local, calculado no componente para cada
+   módulo a partir do progresso da rolagem. O CSS só desenha; a
+   coreografia é aritmética em JavaScript, porque cada módulo sai
+   num momento diferente.
+   ============================================================ */
+
+/* O invólucro guarda as variáveis e a escala; a cena guarda o desenho. Cards
+   são irmãos da cena para poderem sair da órbita no celular. */
+.orb-wrap {
+  position: relative;
+  width: min(100%, 740px);
+  margin-left: auto;
+  --stage-zoom: 1;
+  --orb-lift: -30px;
+  transform: scale(calc(var(--escala, 1) * var(--stage-zoom)));
+}
+
+.orb-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  perspective: 1100px;
+}
+
+/* ---- campo de anéis pontilhados ---- */
+.orb-field { position: absolute; inset: 0; display: grid; place-items: center; }
+
+.orb-field span {
+  position: absolute;
+  width: calc(40% + var(--anel) * 20%);
+  aspect-ratio: 1;
+  border: 1px dashed var(--line-deco);
+  border-radius: 50%;
+  opacity: calc(.55 - var(--anel) * .12);
+  animation: rotate calc(38s + var(--anel) * 20s) linear infinite;
+}
+
+.orb-field span:nth-child(even) { animation-direction: reverse; }
+
+/* ---- a orbe ---- */
+/* O deslocamento abre o vão entre a esfera e o disco: sem ele a orbe encosta
+   na plataforma e o cone não tem onde aparecer. */
+.orb-core { position: relative; display: grid; place-items: center; width: 37%; aspect-ratio: 1; transform: translateY(var(--orb-lift)); }
+
+.orb-core-halo {
+  position: absolute;
+  inset: -38%;
+  border-radius: 50%;
+  background: var(--core-halo);
+  animation: core-breathe 5.5s ease-in-out infinite;
+}
+
+.orb-core-sphere {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--core-orb);
+  box-shadow: var(--glow-lg), inset 0 0 42px rgba(1, 106, 221, .45);
+  overflow: hidden;
+}
+
+/* A textura de pontos é o que dá o aspecto de esfera de dados da arte.
+   A máscara radial apaga os pontos na borda, senão a esfera fica achatada. */
+.orb-core-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--orb-dot) 1px, transparent 1.4px);
+  background-size: 9px 9px;
+  /* --superficie vem do componente e cresce com a rolagem: é a face do globo
+     entrando em rotação por trás do rótulo, que fica parado para continuar
+     legível. */
+  background-position: var(--superficie, 0) 0;
+  mask-image: radial-gradient(circle, black 50%, transparent 80%);
+}
+
+.orb-core-shine { position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(158deg, rgba(255, 255, 255, .15), transparent 44%); }
+
+/* ---- gaiola 3D ----
+   Seis meridianos girados em Y mais cinco paralelos deitados formam a casca da
+   esfera, em preserve-3d. Quando o conjunto gira, os anéis passam por trás e
+   pela frente: é isso que faz a orbe ter volume em vez de ser um círculo. */
+.orb-cage {
+  position: absolute;
+  inset: -15%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rot-x, 14deg)) rotateY(var(--rot-y, 0deg));
+}
+
+.orb-cage span { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--line-2); }
+.orb-meridian { transform: rotateY(var(--m)); }
+/* um meridiano aceso dá referência do giro; todos iguais viram malha morta */
+.orb-meridian:first-child { border-color: var(--line-3); border-top-color: var(--accent); }
+.orb-parallel { border-style: dashed; opacity: .45; transform: rotateX(90deg) translateZ(var(--z)) scale(var(--s)); }
+
+.orb-core-label {
+  position: relative;
+  z-index: 2;
+  color: var(--orb-label);
+  font: 700 clamp(1.7rem, 3.4vw, 2.8rem)/1 var(--font-display);
+  letter-spacing: -.05em;
+  text-shadow: var(--orb-label-glow);
+}
+
+/* ---- cone de projeção e plataforma ---- */
+.orb-cone {
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  width: 30%;
+  height: 36%;
+  transform: translateX(-50%);
+  clip-path: polygon(33% 0, 67% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, rgba(1, 106, 221, .4), rgba(1, 106, 221, .03));
+}
+
+
+/* ---- módulos que saem da orbe ---- */
+/* ---- camadas ----
+   Resolve a trilha aparecendo cruzando a orbe: trilhas ATRÁS da esfera, cards
+   À FRENTE. Como as duas partem da borda (RAIO_ORBE no componente), nada é
+   desenhado sobre a esfera. */
+.orb-field { z-index: 0; }
+.orb-links { position: absolute; inset: 0; z-index: 1; transform: translateY(var(--orb-lift)); }
+.orb-cone { z-index: 2; }
+.orb-base { z-index: 3; }
+.orb-core { z-index: 4; }
+.orb-cards { position: absolute; inset: 0; z-index: 5; transform: translateY(var(--orb-lift)); }
+
+/* A trilha nasce no centro e cresce até o módulo: o comprimento é a distância
+   já percorrida, então a linha nunca aparece à frente do card. */
+.orb-link {
+  position: absolute;
+  /* ancorada no centro da cena: é daqui que a trilha parte */
+  left: 50%;
+  top: 50%;
+  width: var(--dist);
+  height: 1px;
+  transform-origin: left center;
+  /* gira primeiro, depois empurra para fora: o traço começa na borda da
+     esfera e cresce dali até o módulo */
+  transform: rotate(var(--ang)) translateX(var(--orb-r));
+  background: linear-gradient(90deg, var(--accent), rgba(88, 166, 255, .2));
+  opacity: var(--local);
+}
+
+/* nó amarelo na ponta da trilha, onde ela encontra o módulo */
+.orb-link::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: -2.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--detail);
+  box-shadow: 0 0 9px var(--detail);
+}
+
+.orb-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 196px;
+  padding: 1px;
+  /* O -50% do translate acompanha a largura, então o card cresce para os dois
+     lados a partir da própria âncora e não escorrega ao abrir. */
+  transition: width .5s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+  background: var(--line-3);
+  opacity: var(--local);
+  transform:
+    translate(calc(-50% + var(--x)), calc(-50% + var(--y)))
+    scale(calc(.45 + var(--local) * .55));
+  /* moldura octogonal da arte: dois planos recortados, o de fora fazendo o
+     traço de 1px que o clip-path não permitiria desenhar como borda */
+  clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px);
+}
+
+.orb-card-inner {
+  background: var(--surface-glass-dense);
+  backdrop-filter: blur(12px);
+  clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px);
+}
+
+/* ---- cabeçalho clicável ---- */
+.orb-card-head {
+  display: grid;
+  grid-template-columns: 30px 1fr 14px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 13px 15px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.orb-card-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line-2);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  transition: transform .35s var(--ease), border-color .3s var(--ease), background .3s var(--ease);
+}
+
+.orb-card-icon svg { width: 16px; height: 16px; }
+.orb-card-titles { display: grid; gap: 3px; min-width: 0; }
+.orb-card-label { color: var(--text-1); letter-spacing: .1em; text-transform: uppercase; font: 500 12px var(--font-mono); }
+.orb-card-titles small { color: var(--text-4); letter-spacing: .06em; font: 11px var(--font-mono); }
+
+.orb-card-chevron { width: 14px; height: 14px; color: var(--text-4); transition: transform .35s var(--ease), color .3s var(--ease); }
+
+/* ---- corpo que abre ----
+   max-height animado em vez de `height: auto`: o card é absoluto na cena, então
+   crescer não empurra ninguém, e o teto fixo dá uma transição previsível sem
+   precisar medir o conteúdo em JavaScript. */
+.orb-card-body {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height .5s var(--ease),
+    opacity .3s var(--ease);
+}
+
+.orb-card[data-open="true"] .orb-card-body { max-height: 210px; opacity: 1; }
+
+.orb-card-body ul { list-style: none; margin: 0; padding: 4px 15px 0; display: grid; gap: 9px; border-top: 1px solid var(--line-1); }
+.orb-card-body li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 9px;
+  color: var(--text-2);
+  letter-spacing: .02em;
+  font: 11px/1.45 var(--font-mono);
+  /* cada item entra deslizando, escalonado pelo nth-child abaixo */
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .35s var(--ease), transform .35s var(--ease);
+}
+
+.orb-card-body li:first-child { padding-top: 12px; }
+.orb-card-body li svg { width: 12px; height: 12px; margin-top: 2px; color: var(--accent-text); flex: none; }
+
+.orb-card[data-open="true"] .orb-card-body li { opacity: 1; transform: none; }
+.orb-card[data-open="true"] .orb-card-body li:nth-child(1) { transition-delay: .1s; }
+.orb-card[data-open="true"] .orb-card-body li:nth-child(2) { transition-delay: .17s; }
+.orb-card[data-open="true"] .orb-card-body li:nth-child(3) { transition-delay: .24s; }
+.orb-card[data-open="true"] .orb-card-body li:nth-child(4) { transition-delay: .31s; }
+
+.orb-card-body a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 12px 15px 14px;
+  padding: 9px 11px;
+  border: 1px solid var(--line-2);
+  color: var(--accent-text);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font: 500 10px var(--font-mono);
+  opacity: 0;
+  transition: opacity .3s var(--ease) .34s, border-color .25s var(--ease), background .25s var(--ease);
+}
+
+.orb-card[data-open="true"] .orb-card-body a { opacity: 1; }
+.orb-card-body a:hover { border-color: var(--accent); background: var(--accent-soft); }
+.orb-card-body a svg { width: 13px; height: 13px; transition: transform .25s var(--ease); }
+.orb-card-body a:hover svg { transform: translate(2px, -2px); }
+
+/* ---- estados ---- */
+.orb-card-head:hover .orb-card-icon,
+.orb-card[data-open="true"] .orb-card-icon { border-color: var(--accent); transform: scale(1.08); }
+.orb-card-head:hover .orb-card-chevron { color: var(--accent-text); }
+.orb-card[data-open="true"] .orb-card-chevron { transform: rotate(180deg); color: var(--accent-text); }
+
+/* Aberto: a moldura acende e ganha o traço amarelo no topo — a assinatura da
+   marca aparece no elemento em foco, não em todos ao mesmo tempo. */
+.orb-card[data-open="true"] { width: 258px; background: var(--accent); box-shadow: var(--glow-md); }
+.orb-card[data-open="true"] .orb-card-inner { position: relative; }
+
+.orb-card[data-open="true"] .orb-card-inner::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  top: 0;
+  height: 2px;
+  background: var(--detail);
+}
+
+/* ============================================================
+   RESPONSIVO DA CENA
+   ============================================================ */
+
+/* Coluna mais estreita: encolhe a cena para os módulos não escaparem */
+@media (max-width: 1400px) {
+  .orb-wrap { --stage-zoom: .84; }
+}
+
+@media (max-width: 1080px) {
+  /* Sem palco fixo: a seção volta a ser um hero comum e a cena aparece
+     montada, já que o hook devolve progresso 1 nesta largura. */
+  .hero-shell { height: auto; }
+  .hero-stage { position: static; height: auto; padding: 112px 0 72px; }
+  .hero-progress { display: none; }
+  .orb-wrap { margin: 40px auto 0; --stage-zoom: .9; }
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-field span, .orb-core-ring-a, .orb-core-halo { animation: none; }
+}
+
+.performance-lite .orb-field span,
+.performance-lite .orb-core-halo { animation: none; }
+
+/* ============================================================
+   PLATAFORMA — disco 3D, não elipse achatada
+
+   Anéis circulares reais deitados em rotateX e empilhados em
+   alturas diferentes, com marcações girando e a luz do centro
+   ligada ao progresso (--luz vem do componente). A base acende
+   conforme os módulos saem, em vez de ficar parada como desenho.
+   ============================================================ */
+
+.orb-base { position: absolute; left: 50%; bottom: -11%; width: 52%; aspect-ratio: 1; transform: translateX(-50%); perspective: 800px; }
+.orb-base-disc { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(74deg); }
+
+.orb-base-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--d);
+  aspect-ratio: 1;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(var(--h));
+}
+
+/* o anel interno é o que acende: recebe a luz e a intensidade da rolagem */
+.orb-base-ring.is-live {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 calc(14px + var(--luz) * 22px) rgba(1, 106, 221, calc(.35 + var(--luz) * .45)),
+    inset 0 0 18px rgba(1, 106, 221, calc(.2 * var(--luz)));
+  background: radial-gradient(circle, rgba(1, 106, 221, calc(.14 * var(--luz))), transparent 70%);
+}
+
+/* A luz sob a orbe: sobe do disco e cresce com a rolagem */
+.orb-base-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(24px);
+  background: radial-gradient(circle,
+    rgba(150, 205, 255, calc(.5 * var(--luz))),
+    rgba(1, 106, 221, calc(.24 * var(--luz))) 44%,
+    transparent 72%);
+  filter: blur(7px);
+}
+
+/* O cone acompanha a mesma luz, senão o feixe fica desligado da base */
+.orb-cone { opacity: calc(.45 + var(--luz) * .55); }
+
+
+/* Giro que não atropela o posicionamento: a propriedade `rotate` é aplicada
+   antes do `transform`, então o elemento gira no próprio eixo e continua
+   centralizado pelo translate. */
+@keyframes orb-spin { to { rotate: 360deg; } }
+
+/* A camada de cards cobre a cena inteira: sem isto ela engoliria o clique de
+   tudo que está atrás, e só os cards precisam ser clicáveis. */
+.orb-cards { pointer-events: none; }
+.orb-card { pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-card, .orb-card-body, .orb-card-body li, .orb-card-body a { transition: none; }
+}
+
+/* ============================================================
+   CENA DA ORBE — telas pequenas
+
+   A órbita não cabe em tela estreita: cinco cards a 288px do
+   centro pedem 772px só para eles. Encolher a cena resolveria a
+   geometria e destruiria a leitura — o texto cairia para 5px.
+
+   Então o celular troca de arranjo em vez de trocar de escala: a
+   orbe fica sozinha em cena e os módulos descem para uma lista
+   empilhada, com o mesmo conteúdo e o mesmo comportamento de
+   abrir no toque.
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .orb-wrap { margin: 36px auto 0; --stage-zoom: 1; }
+  .orb-stage { width: min(100%, 380px); margin: 0 auto; }
+  .orb-core { width: 44%; }
+
+  /* trilhas só fazem sentido ligando pontos em órbita */
+  .orb-links { display: none; }
+
+  /* os módulos saem da órbita e viram lista */
+  .orb-cards {
+    position: static;
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+    margin: 26px auto 0;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .orb-card {
+    position: static;
+    width: 100%;
+    /* !important porque a posição em órbita vem de estilo inline no
+       componente, e aqui ela precisa ser anulada por completo */
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .orb-card[data-open="true"] { width: 100%; }
+  .orb-card-head { padding: 15px 16px; }
+  .orb-card-body ul { padding: 4px 16px 0; }
+  .orb-card-body a { margin: 12px 16px 15px; }
+}
+
+/* Alvos de toque e rótulos mínimos: em tela pequena o texto de 8px do
+   desktop fica ilegível e o dedo não acerta área de 30px. */
+@media (max-width: 760px) {
+  .orb-card-label { font-size: 13px; }
+  .orb-card-titles small { font-size: 12px; }
+  .orb-card-body li { font-size: 12px; }
+  .orb-card-body a { font-size: 11px; min-height: 44px; }
+  .orb-card-icon { width: 34px; height: 34px; }
+  .orb-card-icon svg { width: 17px; height: 17px; }
+}
+
+/* ============================================================
+   ENTRADAS EM TELA ESTREITA
+
+   Deslocamento horizontal de entrada não cabe no celular: o
+   elemento fica esperando fora da tela e some na borda até a
+   revelação disparar. Aqui toda entrada passa a ser vertical.
+   Foi a causa do estouro horizontal em 360 e 390px — .front-card
+   e .about-story saíam 13px pela esquerda, .flow-module 22px pela
+   direita.
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .rv-sides:not(.is-in) > *:nth-child(odd),
+  .rv-sides:not(.is-in) > *:nth-child(even),
+  .rv-left:not(.is-in) > *,
+  .rv-right:not(.is-in) > * { transform: translate3d(0, 22px, 0); }
+
+  .about-flow .flow-module { transform: translate3d(0, 18px, 0); }
+
+  /* Nada de transform de repouso aqui: `.panel-swap` entra por ANIMAÇÃO, e o
+     deslocamento já vem do `from` do keyframe. Definir um valor de repouso
+     deixaria o painel 12px abaixo depois de a animação terminar. E o card da
+     orbe já é neutralizado abaixo, por ser item de lista no celular. */
+}
+
+@media (max-width: 900px) {
+  /* o card da orbe no celular não deve herdar o deslocamento acima:
+     ele é item de lista, não peça em órbita */
+  .orb-card { transform: none !important; }
+}
+
+/* ============================================================
+   CONTENÇÃO HORIZONTAL
+
+   As entradas laterais deslocam o elemento 28px para fora antes
+   de revelar, e a margem da página é de 24px: em qualquer largura
+   sobra um par de pixels que estende a área de rolagem.
+
+   `overflow-x: clip` recorta esse excedente sem criar contêiner
+   de rolagem — diferente de `hidden`, ele não vira scrollport, e
+   por isso o `position: sticky` do hero continua se referenciando
+   à janela. Era a única forma de conter sem quebrar o palco fixo.
+   ============================================================ */
+
+main { overflow-x: clip; }
+
+/* ============================================================
+   ALVOS DE TOQUE
+
+   Link de texto tem a altura da linha, e dedo não acerta 20px.
+   Em tela de toque todo alvo interativo passa a ter 44px.
+   ============================================================ */
+
+/* Até 1080px, porque é onde a barra de navegação colapsa — e porque iPad em
+   paisagem tem 1024px e é tela de toque. */
+@media (max-width: 1080px) {
+  .front-link,
+  .crew-phone,
+  .footer-nav-link,
+  .footer-col a,
+  .footer-about a,
+  .operator-connect,
+  .map-strip-content > a,
+  .service-bottom a,
+  .tech-chips li,
+  .work-stack li,
+  .control-logo,
+  .nav-pop a,
+  .orb-card-body a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* os canais diretos do rodapé são linha inteira: alinha e dá altura */
+  footer .flex.items-center.justify-between { min-height: 44px; }
+  /* chips não são link, mas são alvo de toque: só precisam de área */
+  .tech-chips li, .work-stack li { display: inline-flex; align-items: center; }
+}
+
+@media (max-width: 760px) {
+  /* Numa tela de 750px de altura, 112px só de respiro no topo come um sexto
+     da primeira dobra. */
+  .hero-stage { padding: 92px 0 56px; }
+  .orb-wrap { margin-top: 26px; }
+  .orb-cards { margin-top: 20px; }
+}
+
+/* ============================================================
+   SEÇÕES 12–20 · MOVIMENTO
+   ============================================================ */
+
+/* ---- 12 · Antes e depois ---- */
+
+/* A alça pulsa até alguém tocar nela: é a única peça da página que precisa
+   de convite, porque nada mais no site se arrasta. */
+.compare-handle::after { animation: pulse-dot 2.8s ease-in-out infinite; }
+.compare:hover .compare-handle::after,
+.compare:focus-within .compare-handle::after { animation: none; transform: translate(-50%, -50%) scale(1.12); }
+.compare-tag { transition: transform .35s var(--ease); }
+.compare:hover .compare-tag { transform: translateY(-3px); }
+
+.gain-card { transition: transform .35s var(--ease), border-color .3s var(--ease); }
+.gain-card:hover { transform: translateY(-4px); border-color: var(--line-3); }
+.gain-card strong { display: block; transition: transform .35s var(--ease); }
+.gain-card:hover strong { transform: scale(1.08); }
+
+/* ---- 13 · Tecnologias ---- */
+
+/* Os chips entram em cascata dentro do grupo já revelado. O atraso cresce em
+   passos pequenos: com 12 itens, 70ms cada viraria meio segundo de espera. */
+.tech-chips li { opacity: 0; transform: translateY(8px); transition: opacity .4s var(--ease), transform .4s var(--ease), border-color .25s var(--ease), color .25s var(--ease); }
+.tech-grid.is-in .tech-chips li { opacity: 1; transform: none; }
+.tech-grid.is-in .tech-chips li:nth-child(1) { transition-delay: .05s; }
+.tech-grid.is-in .tech-chips li:nth-child(2) { transition-delay: .08s; }
+.tech-grid.is-in .tech-chips li:nth-child(3) { transition-delay: .11s; }
+.tech-grid.is-in .tech-chips li:nth-child(4) { transition-delay: .14s; }
+.tech-grid.is-in .tech-chips li:nth-child(5) { transition-delay: .17s; }
+.tech-grid.is-in .tech-chips li:nth-child(6) { transition-delay: .2s; }
+.tech-grid.is-in .tech-chips li:nth-child(7) { transition-delay: .23s; }
+.tech-grid.is-in .tech-chips li:nth-child(8) { transition-delay: .26s; }
+.tech-grid.is-in .tech-chips li:nth-child(9) { transition-delay: .29s; }
+.tech-grid.is-in .tech-chips li:nth-child(10) { transition-delay: .32s; }
+.tech-grid.is-in .tech-chips li:nth-child(n + 11) { transition-delay: .35s; }
+
+.tech-group h3 svg { transition: transform .4s var(--ease); }
+.tech-group:hover h3 svg { transform: rotate(-10deg) scale(1.1); }
+
+/* ---- 14 · Depoimentos ---- */
+
+.quote-mark { transition: transform .4s var(--ease), opacity .3s var(--ease); }
+.quote-card:hover .quote-mark { transform: scale(1.15) rotate(-8deg); opacity: 1; }
+.quote-avatar { transition: transform .35s var(--ease), border-color .3s var(--ease); }
+.quote-card:hover .quote-avatar { transform: scale(1.08); border-color: var(--line-3); }
+
+/* ---- 15 · Diferenciais ---- */
+
+/* Só opacidade, pelo motivo comentado no componente: os módulos pares já
+   vivem deslocados 45px e um transform de entrada brigaria com isso. */
+.technology-modules .technology-module { opacity: 0; transition: opacity .6s var(--ease), border-color .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease); }
+.technology-modules.is-in .technology-module { opacity: 1; }
+.technology-modules.is-in .technology-module:nth-of-type(2) { transition-delay: .1s; }
+.technology-modules.is-in .technology-module:nth-of-type(3) { transition-delay: .2s; }
+.technology-modules.is-in .technology-module:nth-of-type(4) { transition-delay: .3s; }
+
+.technology-modules > svg { opacity: 0; transition: opacity .8s var(--ease) .35s; }
+.technology-modules.is-in > svg { opacity: 1; }
+
+.technology-module > svg { transition: transform .4s var(--ease), color .3s var(--ease); }
+.technology-module:hover > svg { transform: scale(1.12) rotate(-6deg); }
+.technology-module > div i { animation: pulse-dot 2.6s ease-in-out infinite; }
+.technology-module h3 { transition: color .3s var(--ease); }
+.technology-module:hover h3 { color: var(--accent-text); }
+
+/* ---- 16 · Dicas ---- */
+
+.tip-num { display: block; transition: transform .4s var(--ease), color .3s var(--ease); }
+.tip-card:hover .tip-num { transform: scale(1.1) translateX(3px); color: var(--accent-text); }
+.tip-card header svg { transition: transform .4s var(--ease); }
+.tip-card:hover header svg { transform: rotate(-10deg) scale(1.12); }
+
+/* ---- 17 · Dúvidas frequentes ---- */
+
+/* Barra de acento que cresce à esquerda da resposta aberta: marca onde o olho
+   deve voltar depois de percorrer a lista. */
+.faq-list details { position: relative; }
+
+.faq-list details::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform .4s var(--ease);
+}
+
+.faq-list details[open]::before { transform: scaleY(1); }
+.faq-list summary span { transition: transform .3s var(--ease); }
+.faq-list details[open] summary span,
+.faq-list summary:hover span { transform: translateX(8px); }
+
+/* ---- 18 · Contato ---- */
+
+.operator-avatar { transition: transform .35s var(--ease), border-color .3s var(--ease); }
+.operator:hover .operator-avatar,
+.operator.active .operator-avatar { transform: scale(1.08); border-color: var(--accent); }
+.standby-dish svg { animation: pulse-dot 3s ease-in-out infinite; }
+.request-field input, .request-field select, .request-field textarea { transition: border-color .25s var(--ease), background .25s var(--ease); }
+
+/* ---- 19 · Localização ---- */
+
+.hours-list div { transition: background .25s var(--ease), padding-left .3s var(--ease); }
+.hours-list div:hover { background: var(--accent-tint); padding-left: 8px; }
+.hours-block h3 svg { transition: transform .4s var(--ease); }
+.hours-block:hover h3 svg { transform: rotate(-14deg); }
+.map-placeholder svg { transition: transform .4s var(--ease); }
+.map-placeholder:hover svg { transform: scale(1.12) translateY(-3px); }
+
+/* ---- 20 · CTA final ---- */
+
+.final-cta h2 { transition: none; }
+.final-cta .terminal-label { position: relative; display: inline-block; }
+
+/* traço amarelo que se desenha sob o rótulo de fechamento */
+.final-cta .terminal-label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--detail);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .7s var(--ease) .2s;
+}
+
+.final-cta .rv.is-in .terminal-label::after { transform: scaleX(1); }
+
+/* ---- desligamentos ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-handle::after,
+  .technology-module > div i,
+  .standby-dish svg { animation: none; }
+  .tech-chips li,
+  .technology-modules .technology-module,
+  .technology-modules > svg { opacity: 1; transform: none; transition: none; }
+  .faq-list details::before,
+  .final-cta .terminal-label::after { transform: none; transition: none; }
+}
+
+.performance-lite .compare-handle::after,
+.performance-lite .technology-module > div i,
+.performance-lite .standby-dish svg { animation: none; }
