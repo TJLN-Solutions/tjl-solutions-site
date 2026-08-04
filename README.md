@@ -232,6 +232,9 @@ grids.
 - **`prefers-reduced-motion`** desliga entradas, pulsos, giros e a coreografia
   da abertura — a cena aparece montada.
 - **Alvos de toque de 44px** até 1080px, que cobre celular e iPad em paisagem.
+- **Palco fixo só com espaço vertical.** Abaixo de 800px de altura a coreografia
+  da abertura sai e o hero volta a rolar — o padrão de seção fixada não se
+  sustenta em tela baixa.
 - **Anel de foco em amarelo**, não em azul: sobre um botão azul o anel azul
   praticamente desaparecia.
 - **Gaveta de navegação com `inert`** quando fechada. Sem isso o Tab entra em
@@ -251,19 +254,47 @@ brilho do cursor, o grão e os pulsos.
 
 ## Responsividade
 
-Validado em 13 larguras. Em todas: **sem rolagem horizontal e sem elemento fora
-da tela.**
+Validado em **13 larguras** e **7 alturas**, incluindo resoluções reais de
+notebook e seus equivalentes com escala de tela do Windows. Em todas: sem
+rolagem horizontal, sem elemento fora da tela e sem conteúdo cortado.
+
+### Por largura
 
 | Faixa | Comportamento |
 | --- | --- |
 | ≤ 760px | Tipografia e alvos ampliados; tabelas rolam internamente |
 | ≤ 900px | Módulos da orbe saem da órbita e viram lista empilhada |
-| ≤ 1080px | Palco fixo é liberado; a cena aparece montada |
-| ≤ 1100px | Barra colapsa e o menu de seções assume |
+| ≤ 1100px | Barra colapsa, menu de seções assume e o palco fixo é liberado |
 | ≤ 1400px | Cena da orbe encolhe para caber na coluna |
 
 No celular os módulos da orbe **trocam de arranjo, não de escala**. Encolher a
 cena resolveria a geometria e destruiria a leitura: o texto cairia para 5px.
+
+### Por altura
+
+O palco fixo do hero tem altura de uma tela e recorta o que sobra. Notebook tem
+tela baixa — 720, 768, 864px — então a altura precisa de tratamento próprio.
+
+| Faixa | Comportamento |
+| --- | --- |
+| ≤ 940px | Título, vãos e a cena encolhem para caber |
+| ≤ 860px | Segundo passo de aperto |
+| ≤ 800px | Coreografia sai por completo; o hero volta a rolar |
+
+> [!WARNING]
+> **A coluna da orbe é quem dita a altura do hero**, não o texto — 685px contra
+> 520px em tela grande. E `transform: scale` encolhe o desenho mas **não reduz o
+> espaço que o elemento ocupa no layout**: reduzir `--stage-zoom` deixava a cena
+> menor e a altura reservada intacta.
+>
+> Por isso a cena é limitada por `width: min(100%, 740px, 74vh)`. Ela é
+> quadrada, então limitar a largura pela altura da janela limita as duas
+> dimensões. Ao mexer no tamanho do hero, meça a altura da coluna da orbe, não a
+> do texto.
+
+Folga do hero após o ajuste: 193px em 1920×1080, 94px em 1600×900, 85px em
+1536×864. Abaixo de 800px de altura o palco é liberado e a questão deixa de
+existir.
 
 ---
 
@@ -344,7 +375,6 @@ arestas.
 | Dívida | Detalhe |
 | --- | --- |
 | `framer-motion` declarado e não usado | Dependência de produção sem um único import. Pode sair do `package.json`. |
-| Duas quebras próximas | A barra colapsa em 1100px e o palco fixo solta em 1080px. Funciona, mas são duas medidas onde poderia haver uma. Unificar exige revisar juntas as regras herdadas do bloco de 1100px. |
 | Tipografia miúda em rótulos | Rótulos e códigos em mono usam 8–11px em várias seções, herança do desenho original. Legível no desktop, apertado em tela pequena — no celular há regras que ampliam os principais. |
 | `package-lock.json` fora do versionamento | O projeto usa pnpm. O arquivo aparece como não rastreado e deve ser ignorado ou removido. |
 | Sem testes automatizados | A validação foi feita por medição no navegador — contraste, alinhamento, ausência de estouro. Nada disso está preso em teste que rode sozinho. |
