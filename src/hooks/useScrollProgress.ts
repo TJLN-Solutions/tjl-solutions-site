@@ -1,7 +1,18 @@
 import { useEffect, useRef, useState } from "react"
 
-/** Abaixo desta largura o palco fixo não se sustenta: vira hero comum. */
-const LARGURA_MINIMA = 1080
+/**
+ * O palco fixo precisa de espaço nos dois eixos.
+ *
+ * Largura: acompanha a quebra em que o hero passa a uma coluna. Com o layout
+ * empilhado dentro de um palco de altura fixa, texto e cena somam mais que a
+ * tela e o excedente é cortado.
+ *
+ * Altura: notebook tem tela baixa. Em 1280×720 o conteúdo do hero pede ~670px
+ * e o palco oferece 530 — o resto era cortado sem aviso. Abaixo deste piso a
+ * coreografia sai e o hero volta a rolar normalmente.
+ */
+const LARGURA_MINIMA = 1101
+const ALTURA_MINIMA = 800
 
 /**
  * Progresso de 0 a 1 da rolagem por dentro de uma seção mais alta que a tela.
@@ -32,7 +43,8 @@ export default function useScrollProgress<T extends HTMLElement = HTMLDivElement
      */
     const semCoreografia = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      window.innerWidth < LARGURA_MINIMA
+      window.innerWidth < LARGURA_MINIMA ||
+      window.innerHeight < ALTURA_MINIMA
 
     const medir = () => {
       if (semCoreografia()) {
