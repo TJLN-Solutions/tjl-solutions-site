@@ -7,32 +7,6 @@ import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js
 const BRAND = '/assets/brand/'
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
-const clamp = value => Math.max(0, Math.min(1, value))
-
-function useScrollProgress(ref) {
-  useEffect(() => {
-    let frame = 0
-    const update = () => {
-      frame = 0
-      const element = ref.current
-      if (!element) return
-      const rect = element.getBoundingClientRect()
-      const distance = Math.max(1, rect.height - innerHeight)
-      const progress = clamp(-rect.top / distance)
-      element.style.setProperty('--progress', progress.toFixed(4))
-      element.style.setProperty('--matter', (1 - clamp(progress / .3)).toFixed(4))
-      element.style.setProperty('--core', (clamp((progress - .15) / .18) * (1 - clamp((progress - .68) / .14))).toFixed(4))
-      element.style.setProperty('--data', clamp((progress - .57) / .2).toFixed(4))
-      element.style.setProperty('--energy', clamp((progress - .22) / .46).toFixed(4))
-    }
-    const request = () => { if (!frame) frame = requestAnimationFrame(update) }
-    update()
-    addEventListener('scroll', request, { passive: true })
-    addEventListener('resize', request)
-    return () => { removeEventListener('scroll', request); removeEventListener('resize', request); cancelAnimationFrame(frame) }
-  }, [ref])
-}
-
 function useReveals() {
   useEffect(() => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -127,20 +101,7 @@ function Header() {
 function Particles({ count = 18 }) { return <div className="particles" aria-hidden="true">{Array.from({ length: count }, (_, i) => <i key={i} style={/** @type {React.CSSProperties} */ ({ '--i': i, '--x': `${(i * 47) % 100}%`, '--y': `${(i * 29) % 100}%`, '--o': .18 + (i % 4) * .09 })} />)}</div> }
 
 function HeroScene() {
-  const ref = useRef(/** @type {HTMLElement | null} */ (null))
-  useScrollProgress(ref)
-  useEffect(() => {
-    const element = ref.current
-    if (!element) return
-    const move = event => {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      element.style.setProperty('--cursor-x', ((event.clientX / innerWidth) - .5).toFixed(3))
-      element.style.setProperty('--cursor-y', ((event.clientY / innerHeight) - .5).toFixed(3))
-    }
-    addEventListener('pointermove', move)
-    return () => removeEventListener('pointermove', move)
-  }, [])
-  return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
+  return <section className="hero-scene" id="inicio" tabIndex={-1}><div className="hero-sticky">
     <div className="hero-atmosphere"><div className="hero-halo"/><div className="hero-floor"/><Particles count={22}/></div>
     <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/><div className="mark-scan"/></div>
     <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
@@ -150,20 +111,23 @@ function HeroScene() {
 }
 
 function TransformationScene() {
-  const ref = useRef(/** @type {HTMLElement | null} */ (null))
-  useScrollProgress(ref)
   const hardware = ['Diagnóstico', 'Reparo', 'Upgrade', 'Recuperação']
   const software = ['Sites', 'Sistemas', 'Automações', 'Integrações']
-  return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
-    <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
-    <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>Estrutura ganha<br/>inteligência.</h2><p>A luz atravessa o físico. O diagnóstico vira direção.</p></div>
-    <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
-    <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
-    <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
-    <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-    <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
-    <div className="software-words" aria-label="Serviços de software">{software.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
-    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/></div>
+  return <section className="transformation-scene" id="transformacao" tabIndex={-1}><div className="transformation-sticky">
+    <article className="transformation-card matter-card">
+      <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
+      <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map(item => <span key={item}>{item}</span>)}</div>
+      <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
+    </article>
+    <article className="transformation-card core-card">
+      <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>Estrutura ganha<br/>inteligência.</h2><p>A luz atravessa o físico. O diagnóstico vira direção.</p></div>
+      <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
+    </article>
+    <article className="transformation-card data-card">
+      <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
+      <div className="software-words" aria-label="Serviços de software">{software.map(item => <span key={item}>{item}</span>)}</div>
+      <div className="data-visual" aria-hidden="true"><i/><i/><i/><i/><span/></div>
+    </article>
   </div></section>
 }
 

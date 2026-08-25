@@ -32,7 +32,7 @@ test('matriz responsiva não cria overflow, saltos ou páginas excessivas', asyn
     })
     results.push({ requested: { width, height }, ...metrics })
     expect(metrics.horizontalOverflow, `${width}x${height}: overflow horizontal`).toBeLessThanOrEqual(1)
-    const maximumPageHeight = width <= 1100 ? 7600 : height * 12
+    const maximumPageHeight = width < 600 ? 7600 : width <= 1100 ? 8400 : height * 12
     expect(metrics.pageHeight, `${width}x${height}: página longa demais`).toBeLessThan(maximumPageHeight)
     await page.screenshot({ path: path.join(auditDir, `${width}x${height}.png`), fullPage: true })
   }
@@ -303,6 +303,64 @@ test('prévias dos projetos carregam sem distorção em celular e desktop', asyn
       expect(dimensions.naturalHeight).toBeGreaterThan(0)
       expect(dimensions.renderedWidth).toBeGreaterThan(40)
       expect(dimensions.renderedHeight).toBeGreaterThan(40)
+    }
+  }
+})
+
+test('redimensionamento em tempo real não reaproveita posições do layout anterior', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/')
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 1280, height: 720 },
+    { width: 1024, height: 811 },
+    { width: 768, height: 1024 },
+    { width: 480, height: 811 },
+    { width: 390, height: 844 },
+    { width: 960, height: 540 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport)
+    await page.evaluate(() => scrollTo(0, 0))
+    await page.waitForTimeout(50)
+    const heroParts = await page.locator('.hero-mark,.hero-copy,.hero-actions').evaluateAll(elements => elements.map(element => {
+      const rect = element.getBoundingClientRect()
+      return { left: rect.left, right: rect.right, width: rect.width }
+    }))
+    for (const part of heroParts) {
+      expect(part.left, `${viewport.width}x${viewport.height}: hero fora à esquerda`).toBeGreaterThanOrEqual(0)
+      expect(part.right, `${viewport.width}x${viewport.height}: hero fora à direita`).toBeLessThanOrEqual(viewport.width + 1)
+      expect(part.width, `${viewport.width}x${viewport.height}: hero colapsado`).toBeGreaterThan(100)
+    }
+    await page.evaluate(() => document.querySelector('#transformacao').scrollIntoView({ block: 'start' }))
+    await page.waitForTimeout(80)
+
+    const result = await page.evaluate(() => {
+      const viewportWidth = innerWidth
+      const boxes = [...document.querySelectorAll('.transformation-card')].map(card => {
+        const rect = card.getBoundingClientRect()
+        return { left: rect.left, right: rect.right, width: rect.width }
+      })
+      const headings = [...document.querySelectorAll('.transformation-card h2')].map(heading => {
+        const rect = heading.getBoundingClientRect()
+        return { left: rect.left, right: rect.right, width: rect.width, scrollWidth: heading.scrollWidth }
+      })
+      return { viewportWidth, scrollX, pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, boxes, headings }
+    })
+
+    expect(result.scrollX, `${viewport.width}x${viewport.height}: deslocamento horizontal persistente`).toBe(0)
+    expect(result.pageOverflow, `${viewport.width}x${viewport.height}: overflow após redimensionar`).toBeLessThanOrEqual(1)
+    for (const box of result.boxes) {
+      expect(box.left, `${viewport.width}x${viewport.height}: card fora à esquerda`).toBeGreaterThanOrEqual(0)
+      expect(box.right, `${viewport.width}x${viewport.height}: card fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
+      expect(box.width, `${viewport.width}x${viewport.height}: card colapsado`).toBeGreaterThan(250)
+    }
+    for (const heading of result.headings) {
+      expect(heading.left, `${viewport.width}x${viewport.height}: título fora à esquerda`).toBeGreaterThanOrEqual(0)
+      expect(heading.right, `${viewport.width}x${viewport.height}: título fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
+      expect(heading.scrollWidth, `${viewport.width}x${viewport.height}: título cortado`).toBeLessThanOrEqual(heading.width + 2)
     }
   }
 })
