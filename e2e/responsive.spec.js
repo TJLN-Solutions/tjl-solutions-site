@@ -174,3 +174,135 @@ test('teclado, modal e fluxos do Charge respondem sem erros de console', async (
   await expect(opener).toBeFocused()
   expect(errors).toEqual([])
 })
+
+test('imagens, recursos e textos permanecem íntegros em todos os formatos', async ({ page }) => {
+  const failedResources = []
+  page.on('response', response => {
+    if (response.status() >= 400 && new URL(response.url()).origin === 'http://localhost:3000') {
+      failedResources.push(`${response.status()} ${response.url()}`)
+    }
+  })
+
+  for (const [width, height] of [[320, 568], [375, 667], [412, 915], [667, 375], [768, 1024], [1024, 768], [1440, 900], [1920, 1080]]) {
+    await page.setViewportSize({ width, height })
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+
+    for (const section of await page.locator('main > section').all()) {
+      await section.scrollIntoViewIfNeeded()
+      await page.waitForTimeout(80)
+    }
+
+    const integrity = await page.evaluate(() => {
+      const visible = element => {
+        const style = getComputedStyle(element)
+        const rect = element.getBoundingClientRect()
+        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > .05 && rect.width > 1 && rect.height > 1
+      }
+      const brokenImages = [...document.images]
+        .filter(image => visible(image) && (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0))
+        .map(image => image.currentSrc || image.src)
+      const clippedText = []
+
+      for (const element of document.querySelectorAll('h1,h2,h3,p,a,button,label,legend,strong,small')) {
+        if (!visible(element) || !element.textContent.trim()) continue
+        if (element.closest('.demo-sidebar') || element.closest('.demo-calendar-grid')) continue
+        const style = getComputedStyle(element)
+        const rect = element.getBoundingClientRect()
+        const textNodes = [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim())
+        if (!textNodes.length) continue
+        const textBounds = textNodes.map(node => {
+          const range = document.createRange()
+          range.selectNodeContents(node)
+          return range.getBoundingClientRect()
+        })
+        const clipsX = ['hidden', 'clip'].includes(style.overflowX)
+        const clipsY = ['hidden', 'clip'].includes(style.overflowY)
+        if ((clipsX && textBounds.some(bounds => bounds.left < rect.left - 2 || bounds.right > rect.right + 2)) || (clipsY && textBounds.some(bounds => bounds.top < rect.top - 2 || bounds.bottom > rect.bottom + 2))) {
+          clippedText.push(`${element.tagName.toLowerCase()}.${element.className || '(sem-classe)'}: ${element.textContent.trim().slice(0, 80)}`)
+        }
+        if (textBounds.some(bounds => bounds.right < -2 || bounds.left > innerWidth + 2)) {
+          clippedText.push(`${element.tagName.toLowerCase()}.${element.className || '(sem-classe)'} fora da tela`)
+        }
+      }
+      return { brokenImages, clippedText }
+    })
+
+    expect(integrity.brokenImages, `${width}x${height}: imagens quebradas`).toEqual([])
+    expect(integrity.clippedText, `${width}x${height}: textos cortados ou fora da tela`).toEqual([])
+  }
+
+  expect(failedResources, 'recursos locais com erro HTTP').toEqual([])
+})
+
+test('âncoras mantêm os títulos abaixo do cabeçalho fixo', async ({ page }) => {
+  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 667, height: 375 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+    for (const id of ['solucoes', 'charge', 'capacidade', 'presenca', 'contato']) {
+      await page.evaluate(anchor => { location.hash = anchor }, id)
+      await page.waitForTimeout(80)
+      const header = await page.locator('.header-shell').boundingBox()
+      const heading = await page.locator(`#${id} h2`).first().boundingBox()
+      expect(header).not.toBeNull()
+      expect(heading, `${viewport.width}x${viewport.height} #${id}: título ausente`).not.toBeNull()
+      expect(heading.y, `${viewport.width}x${viewport.height} #${id}: título sob o cabeçalho`).toBeGreaterThanOrEqual(header.y + header.height + 4)
+    }
+  }
+})
+
+test('modal do Charge cabe na tela e conserva todas as abas navegáveis', async ({ page }) => {
+  const labels = ['Visão geral', 'Clientes', 'Vendas e contratos', 'Parcelas', 'Mensalidades', 'Calendário', 'Cobranças']
+  for (const viewport of [{ width: 320, height: 568 }, { width: 568, height: 320 }, { width: 768, height: 1024 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/#charge')
+    await page.getByRole('button', { name: /(?:Abrir|Ampliar) demonstração/ }).click()
+    const dialog = page.locator('.charge-modal-dialog')
+    await expect(dialog).toBeVisible()
+    const bounds = await dialog.boundingBox()
+    expect(bounds.x, `${viewport.width}x${viewport.height}: modal fora à esquerda`).toBeGreaterThanOrEqual(0)
+    expect(bounds.y, `${viewport.width}x${viewport.height}: modal fora acima`).toBeGreaterThanOrEqual(0)
+    expect(bounds.x + bounds.width, `${viewport.width}x${viewport.height}: modal fora à direita`).toBeLessThanOrEqual(viewport.width + 1)
+    expect(bounds.y + bounds.height, `${viewport.width}x${viewport.height}: modal fora abaixo`).toBeLessThanOrEqual(viewport.height + 1)
+    await expect(page.getByRole('button', { name: 'Fechar demonstração' })).toBeVisible()
+
+    const nav = page.locator('.charge-modal-content .demo-sidebar')
+    for (const label of labels) {
+      const button = nav.getByRole('button', { name: label, exact: true })
+      await button.scrollIntoViewIfNeeded()
+      await button.click()
+      await expect(button).toHaveAttribute('aria-current', 'page')
+      await expect(page.locator('.charge-modal-content .demo-view')).toBeVisible()
+    }
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow, `${viewport.width}x${viewport.height}: modal criou overflow na página`).toBeLessThanOrEqual(1)
+    await page.getByRole('button', { name: 'Fechar demonstração' }).click()
+  }
+})
+
+test('prévias dos projetos carregam sem distorção em celular e desktop', async ({ page }) => {
+  for (const viewport of [{ width: 320, height: 568 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/#capacidade')
+    const options = page.locator('.capability-list button')
+    for (const index of [0, 1]) {
+      await options.nth(index).click()
+      const image = page.locator('.portfolio-preview img')
+      await expect(image).toBeVisible()
+      const dimensions = await image.evaluate(element => ({
+        complete: element.complete,
+        naturalWidth: element.naturalWidth,
+        naturalHeight: element.naturalHeight,
+        renderedWidth: element.getBoundingClientRect().width,
+        renderedHeight: element.getBoundingClientRect().height,
+      }))
+      expect(dimensions.complete).toBe(true)
+      expect(dimensions.naturalWidth).toBeGreaterThan(0)
+      expect(dimensions.naturalHeight).toBeGreaterThan(0)
+      expect(dimensions.renderedWidth).toBeGreaterThan(40)
+      expect(dimensions.renderedHeight).toBeGreaterThan(40)
+    }
+  }
+})
