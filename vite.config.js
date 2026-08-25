@@ -1,32 +1,26 @@
-import { mkdir, writeFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
 import { sites } from '@openai/sites-vite-plugin'
-import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/postcss'
+import vinext from 'vinext'
 import { defineConfig } from 'vite'
+import hostingConfig from './.openai/hosting.json' with { type: 'json' }
 
-const workerSource = `export default {
-  async fetch(request, env) {
-    const response = await env.ASSETS.fetch(request)
-    if (response.status !== 404 || request.method !== 'GET') return response
+const PLACEHOLDER_DATABASE_ID = '00000000-0000-4000-8000-000000000000'
+const { d1, r2 } = hostingConfig
 
-    const url = new URL(request.url)
-    url.pathname = '/index.html'
-    return env.ASSETS.fetch(new Request(url, request))
-  },
-}\n`
-
-function sitesWorker() {
-  return {
-    name: 'base4-sites-worker',
-    apply: 'build',
-    async closeBundle() {
-      const serverDirectory = resolve('dist/server')
-      await mkdir(serverDirectory, { recursive: true })
-      await writeFile(resolve(serverDirectory, 'index.js'), workerSource)
-    },
-  }
+const localBindingConfig = {
+  main: 'vinext/server/app-router-entry',
+  compatibility_flags: ['nodejs_compat'],
+  d1_databases: d1 ? [{ binding: d1, database_name: 'site-creator-d1', database_id: PLACEHOLDER_DATABASE_ID }] : [],
+  r2_buckets: r2 ? [{ binding: r2, bucket_name: 'site-creator-r2' }] : [],
 }
 
-export default defineConfig({
-  plugins: [react(), sites(), sitesWorker()],
+export default defineConfig(async () => {
+  process.env.WRANGLER_WRITE_LOGS ??= 'false'
+  process.env.WRANGLER_LOG_PATH ??= '.wrangler/logs'
+  process.env.MINIFLARE_REGISTRY_PATH ??= '.wrangler/registry'
+  const { cloudflare } = await import('@cloudflare/vite-plugin')
+  return {
+    css: { postcss: { plugins: [tailwindcss()] } },
+    plugins: [vinext(), sites(), cloudflare({ viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] }, config: localBindingConfig })],
+  }
 })
