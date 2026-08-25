@@ -12,4 +12,6 @@ export const chargeInstallments = [
 
 export const chargeChart = [32, 48, 39, 66, 52, 82]
 
+export const chargeRevealAt = '2026-09-20T00:00:00-03:00'
+
 export const formatChargeMoney = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

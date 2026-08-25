@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import ChargeDemo from './ChargeDemo.jsx'
+import { chargeRevealAt } from './chargeDemoData.js'
 import { capabilities, people, problemsByField } from './data.js'
 
 const BRAND = '/assets/brand/'
@@ -134,8 +135,31 @@ function SolutionsScene() {
   </section>
 }
 
+const CHARGE_REVEAL_AT = new Date(chargeRevealAt).getTime()
+
+function ChargeCountdown() {
+  const [remaining, setRemaining] = useState(null)
+  useEffect(() => {
+    const update = () => setRemaining(Math.max(0, CHARGE_REVEAL_AT - Date.now()))
+    update()
+    const timer = window.setInterval(update, 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+  const units = remaining === null ? ['--', '--', '--', '--'] : [
+    Math.floor(remaining / 86400000),
+    Math.floor((remaining / 3600000) % 24),
+    Math.floor((remaining / 60000) % 60),
+    Math.floor((remaining / 1000) % 60),
+  ].map(value => String(value).padStart(2, '0'))
+  return <div className="charge-countdown" aria-label="Contagem regressiva para 20 de setembro de 2026">
+    <div className="countdown-signal"><i/><span>TRANSMISSÃO EM PROGRESSO</span><b>20 · SET · 2026</b></div>
+    <div className="countdown-units">{units.map((value, index) => <span key={index}><strong>{value}</strong><small>{['dias', 'horas', 'min', 'seg'][index]}</small></span>)}</div>
+    <p>Algo novo está tomando forma nos bastidores.</p>
+  </div>
+}
+
 function ChargeScene() {
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · WIREFRAME NAVEGÁVEL</span><h2>Cobrança que<br/>acontece no fluxo.</h2><p>Explore o fluxo do B4 Charge em um protótipo compacto. Navegue entre indicadores, clientes e parcelas — tudo funciona apenas nesta página e nenhum dado é salvo.</p><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Tenho interesse em conhecer o B4 Charge.')} target="_blank" rel="noreferrer">Conhecer o Charge <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-device"><ChargeDemo/></div><div className="device-shadow"/><Particles count={12}/></div></section>
+  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="charge-scanline"/><div className="device-shadow"/><Particles count={12}/></div></section>
 }
 
 function CapabilityScene() {
