@@ -23,5 +23,5 @@ export const people = [
   { name: 'Apollo', area: 'Hardware', role: 'Técnico em hardware', phone: '5518996464731' },
   { name: 'Leonardo', area: 'Hardware', role: 'Técnico em hardware', phone: '5518996311838' },
   { name: 'Thiago', area: 'Software', role: 'Desenvolvedor full-stack', phone: '5518996980211' },
-  { name: 'Nicolas', area: 'Software', role: 'Dev & UI/UX', phone: '5518996148839' }
+  { name: 'Nicolas', area: 'Software', role: 'Dev. Full Stack e UI/UX', phone: '5518996148839' }
 ]
