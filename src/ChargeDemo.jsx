@@ -22,7 +22,7 @@ function Status({ children }) {
 }
 
 function DemoNav({ view, setView }) {
-  const renderButton = item => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => setView(item.id)} title={item.label}><i>{item.icon}</i><span>{item.label}</span></button>
+  const renderButton = item => <button key={item.id} className={view === item.id ? 'active' : ''} aria-current={view === item.id ? 'page' : undefined} onClick={() => setView(item.id)} title={item.label}><i>{item.icon}</i><span>{item.label}</span></button>
   return <aside className="demo-sidebar" aria-label="Navegação da demonstração">
     <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent.png" alt=""/><b>CHARGE</b></div>
     {renderButton(views[0])}
@@ -45,8 +45,8 @@ function RevenueChart({ theme }) {
     if (!canvas) return undefined
     const draw = () => {
       const rect = canvas.getBoundingClientRect()
-      const width = Math.max(320, Math.round(rect.width))
-      const height = Math.max(120, Math.round(rect.height))
+      const width = Math.max(1, Math.round(rect.width))
+      const height = Math.max(1, Math.round(rect.height))
       const ratio = Math.min(window.devicePixelRatio || 1, 2)
       canvas.width = width * ratio
       canvas.height = height * ratio

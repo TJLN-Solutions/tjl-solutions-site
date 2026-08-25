@@ -2,9 +2,10 @@ import { useEffect, useId, useRef, useState } from 'react'
 import ChargeDemo from './ChargeDemo.jsx'
 import { chargeRevealAt } from './chargeDemoData.js'
 import { capabilities, people, problemsByField } from './data.js'
+import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
-const CONTACTS = { hardware: '5518996464731', software: '5518996980211' }
+const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
 
@@ -68,15 +69,41 @@ function Brand({ compact = false, className = '' }) {
   </a>
 }
 
+const NAV_ITEMS = [['Ecossistema', '#transformacao'], ['Soluções', '#solucoes'], ['Charge', '#charge'], ['Capacidade', '#capacidade'], ['BASE4', '#presenca']]
+
 function Header() {
   const [open, setOpen] = useState(false)
+  const menuButton = useRef(null)
+  const menuPanel = useRef(null)
+  const closeMenu = () => setOpen(false)
+  useEffect(() => {
+    if (!open) return undefined
+    const trigger = menuButton.current
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const panel = menuPanel.current
+    const focusables = () => [...(panel?.querySelectorAll('a,button') || [])]
+    focusables()[0]?.focus()
+    const handleKey = event => {
+      if (event.key === 'Escape') { event.preventDefault(); setOpen(false); return }
+      if (event.key !== 'Tab') return
+      const items = focusables()
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
+  }, [open])
+  const links = onClick => NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={onClick}>{label}</a>)
   return <header className="header-shell">
     <Brand />
-    <nav className={open ? 'open' : ''} aria-label="Navegação principal">
-      <a href="#transformacao" onClick={() => setOpen(false)}>Ecossistema</a><a href="#solucoes" onClick={() => setOpen(false)}>Soluções</a><a href="#charge" onClick={() => setOpen(false)}>Charge</a><a href="#capacidade" onClick={() => setOpen(false)}>Capacidade</a><a href="#presenca" onClick={() => setOpen(false)}>BASE4</a>
-    </nav>
+    <nav className="desktop-nav" aria-label="Navegação principal">{links(undefined)}</nav>
     <a className="header-contact" href="#contato">Iniciar conversa <Arrow /></a>
-    <button className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} onClick={() => setOpen(!open)}><span/><span/></button>
+    <button ref={menuButton} className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(current => !current)}><span/><span/></button>
+    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{links(closeMenu)}<a className="mobile-menu-cta" href="#contato" onClick={closeMenu}>Iniciar conversa <Arrow/></a></nav></div>}
   </header>
 }
 
@@ -126,12 +153,23 @@ function TransformationScene() {
 function SolutionsScene() {
   const [field, setField] = useState('hardware')
   const [active, setActive] = useState(0)
+  const tabsId = useId()
+  const tabRefs = useRef([])
   const items = problemsByField[field]
   const changeField = value => { setField(value); setActive(0) }
+  const fields = ['hardware', 'software']
+  const moveTab = (event, index) => {
+    const keys = { ArrowRight: 1, ArrowLeft: -1 }
+    if (!(event.key in keys) && event.key !== 'Home' && event.key !== 'End') return
+    event.preventDefault()
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? fields.length - 1 : (index + keys[event.key] + fields.length) % fields.length
+    changeField(fields[next])
+    tabRefs.current[next]?.focus()
+  }
   return <section className="solutions-scene" id="solucoes">
     <div className="scene-heading" data-reveal><p>O QUE RESOLVEMOS</p><h2>Tecnologia começa<br/>com um problema real.</h2></div>
-    <div className="solution-switch" role="tablist" aria-label="Área de solução" data-reveal><button role="tab" aria-selected={field === 'hardware'} onClick={() => changeField('hardware')}>Hardware</button><button role="tab" aria-selected={field === 'software'} onClick={() => changeField('software')}>Software</button><i className={field}/></div>
-    <div className={`problem-stage ${field}`} data-reveal><div className="problem-list" role="tabpanel">{items.map((item, index) => <button key={item.problem} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>)}</div><div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div></div>
+    <div className="solution-switch" role="tablist" aria-label="Área de solução" data-reveal>{fields.map((value, index) => <button key={value} ref={element => { tabRefs.current[index] = element }} id={`${tabsId}-${value}-tab`} role="tab" aria-selected={field === value} aria-controls={`${tabsId}-panel`} tabIndex={field === value ? 0 : -1} onKeyDown={event => moveTab(event, index)} onClick={() => changeField(value)}>{value === 'hardware' ? 'Hardware' : 'Software'}</button>)}<i className={field}/></div>
+    <div className={`problem-stage ${field}`} data-reveal><div className="problem-list" id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${field}-tab`} tabIndex={0}>{items.map((item, index) => <button key={item.problem} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>)}</div><div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div></div>
   </section>
 }
 
@@ -159,7 +197,30 @@ function ChargeCountdown() {
 }
 
 function ChargeScene() {
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="device-shadow"/></div></section>
+  const [expanded, setExpanded] = useState(false)
+  const opener = useRef(null)
+  const dialog = useRef(null)
+  const closeButton = useRef(null)
+  useEffect(() => {
+    if (!expanded) return undefined
+    const trigger = opener.current
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    closeButton.current?.focus()
+    const handleKey = event => {
+      if (event.key === 'Escape') { event.preventDefault(); setExpanded(false); return }
+      if (event.key !== 'Tab') return
+      const focusables = [...(dialog.current?.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])') || [])].filter(element => !element.disabled)
+      if (!focusables.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
+  }, [expanded])
+  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button ref={opener} type="button" onClick={() => setExpanded(true)}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
 }
 
 function CapabilityScene() {
@@ -174,16 +235,24 @@ function PresenceScene() {
 
 function ContactScene() {
   const [field, setField] = useState('hardware')
-  const [sent, setSent] = useState(false)
+  const [values, setValues] = useState({ name: '', detail: '' })
+  const [errors, setErrors] = useState({ name: '', detail: '' })
+  const [feedback, setFeedback] = useState('')
+  const [fallbackUrl, setFallbackUrl] = useState('')
   const uid = useId()
   const submit = event => {
     event.preventDefault()
-    const form = new FormData(event.currentTarget)
-    const message = field === 'hardware' ? `Olá! Sou ${form.get('name')}. Meu equipamento precisa de manutenção: ${form.get('detail')}` : `Olá! Sou ${form.get('name')}. Quero desenvolver um projeto: ${form.get('detail')}`
-    setSent(true)
-    window.open(wa(CONTACTS[field], message), '_blank', 'noopener,noreferrer')
+    const nextErrors = validateContact(values)
+    setErrors({ name: nextErrors.name || '', detail: nextErrors.detail || '' })
+    if (Object.keys(nextErrors).length) { setFeedback('Revise os campos indicados antes de continuar.'); return }
+    const url = buildWhatsAppUrl(field, values.name, values.detail)
+    setFallbackUrl(url)
+    const popup = window.open(url, '_blank', 'noopener,noreferrer')
+    setFeedback(popup ? 'Mensagem preparada. Conclua o envio no WhatsApp.' : 'O navegador bloqueou a nova janela. Use o link abaixo para continuar sem perder seus dados.')
   }
-  return <section className="contact-scene" id="contato"><div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div><form onSubmit={submit} data-reveal><fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => { setField('hardware'); setSent(false) }}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => { setField('software'); setSent(false) }}/><span>Desenvolvimento de software</span></label></div></fieldset><label htmlFor={`${uid}-name`}>Seu nome</label><input id={`${uid}-name`} name="name" autoComplete="name" required placeholder="Como podemos chamar você?"/><label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label><textarea id={`${uid}-detail`} name="detail" rows={3} required placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/><button type="submit">Continuar no WhatsApp <Arrow /></button><p className={sent ? 'form-feedback visible' : 'form-feedback'} role="status">Mensagem preparada. Conclua o envio no WhatsApp.</p></form></section>
+  const update = event => { setValues(current => ({ ...current, [event.target.name]: event.target.value })); setErrors(current => ({ ...current, [event.target.name]: undefined })); setFeedback(''); setFallbackUrl('') }
+  const switchField = value => { setField(value); setErrors({ name: '', detail: '' }); setFeedback(''); setFallbackUrl('') }
+  return <section className="contact-scene" id="contato"><div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div><form onSubmit={submit} noValidate data-reveal><fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset><label htmlFor={`${uid}-name`}>Seu nome</label><input id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>{errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}<label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label><textarea id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>{errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}<p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p><button type="submit">Continuar no WhatsApp <Arrow /></button><p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>{fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}</form></section>
 }
 
 function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao">Ecossistema</a><a href="#solucoes">Soluções</a><a href="#charge">Charge</a><a href="#presenca">BASE4</a><a href="#contato">Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
