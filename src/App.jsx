@@ -75,9 +75,23 @@ function Header() {
   const [open, setOpen] = useState(false)
   const menuButton = useRef(null)
   const menuPanel = useRef(null)
-  const closeMenu = () => setOpen(false)
+  const closeReason = useRef('cancel')
+  const closeMenu = () => { closeReason.current = 'cancel'; setOpen(false) }
+  const navigateMenu = event => {
+    const href = event.currentTarget.getAttribute('href')
+    if (!href) return
+    closeReason.current = 'navigate'
+    setOpen(false)
+    window.setTimeout(() => {
+      const target = document.querySelector(href)
+      if (!target) return
+      target.setAttribute('tabindex', '-1')
+      target.focus({ preventScroll: true })
+    }, 0)
+  }
   useEffect(() => {
     if (!open) return undefined
+    closeReason.current = 'cancel'
     const trigger = menuButton.current
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -95,15 +109,18 @@ function Header() {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
     document.addEventListener('keydown', handleKey)
-    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKey)
+      if (closeReason.current !== 'navigate') trigger?.focus()
+    }
   }, [open])
-  const links = onClick => NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={onClick}>{label}</a>)
   return <header className="header-shell">
     <Brand />
-    <nav className="desktop-nav" aria-label="Navegação principal">{links(undefined)}</nav>
+    <nav className="desktop-nav" aria-label="Navegação principal">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href}>{label}</a>)}</nav>
     <a className="header-contact" href="#contato">Iniciar conversa <Arrow /></a>
     <button ref={menuButton} className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(current => !current)}><span/><span/></button>
-    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{links(closeMenu)}<a className="mobile-menu-cta" href="#contato" onClick={closeMenu}>Iniciar conversa <Arrow/></a></nav></div>}
+    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={navigateMenu}>{label}</a>)}<a className="mobile-menu-cta" href="#contato" onClick={navigateMenu}>Iniciar conversa <Arrow/></a></nav></div>}
   </header>
 }
 
@@ -123,12 +140,12 @@ function HeroScene() {
     addEventListener('pointermove', move)
     return () => removeEventListener('pointermove', move)
   }, [])
-  return <section className="hero-scene" id="inicio" ref={ref}><div className="hero-sticky">
+  return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
     <div className="hero-atmosphere"><div className="hero-halo"/><div className="hero-floor"/><Particles count={22}/></div>
     <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} alt=""/><div className="mark-scan"/></div>
-    <div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
+    <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
     <div className="hero-actions"><a className="action action-solid" href={wa(CONTACTS.hardware, 'Olá! Preciso de assistência para meu equipamento.')} target="_blank" rel="noreferrer">Preciso de assistência <Arrow /></a><a className="action action-ghost" href={wa(CONTACTS.software, 'Olá! Quero desenvolver um projeto com a BASE4.')} target="_blank" rel="noreferrer">Quero desenvolver um projeto <Arrow /></a></div>
-    <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p><div className="scroll-mark"><i/><span>Continue</span></div>
+    <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p></div><div className="scroll-mark"><i/><span>Continue</span></div>
   </div></section>
 }
 
@@ -137,7 +154,7 @@ function TransformationScene() {
   useScrollProgress(ref)
   const hardware = ['Diagnóstico', 'Reparo', 'Upgrade', 'Recuperação']
   const software = ['Sites', 'Sistemas', 'Automações', 'Integrações']
-  return <section className="transformation-scene" id="transformacao" ref={ref}><div className="transformation-sticky">
+  return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
     <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
     <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>Estrutura ganha<br/>inteligência.</h2><p>A luz atravessa o físico. O diagnóstico vira direção.</p></div>
     <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
@@ -166,7 +183,7 @@ function SolutionsScene() {
     changeField(fields[next])
     tabRefs.current[next]?.focus()
   }
-  return <section className="solutions-scene" id="solucoes">
+  return <section className="solutions-scene" id="solucoes" tabIndex={-1}>
     <div className="scene-heading" data-reveal><p>O QUE RESOLVEMOS</p><h2>Tecnologia começa<br/>com um problema real.</h2></div>
     <div className="solution-switch" role="tablist" aria-label="Área de solução" data-reveal>{fields.map((value, index) => <button key={value} ref={element => { tabRefs.current[index] = element }} id={`${tabsId}-${value}-tab`} role="tab" aria-selected={field === value} aria-controls={`${tabsId}-panel`} tabIndex={field === value ? 0 : -1} onKeyDown={event => moveTab(event, index)} onClick={() => changeField(value)}>{value === 'hardware' ? 'Hardware' : 'Software'}</button>)}<i className={field}/></div>
     <div className={`problem-stage ${field}`} data-reveal><div className="problem-list" id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${field}-tab`} tabIndex={0}>{items.map((item, index) => <button key={item.problem} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>)}</div><div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div></div>
@@ -201,6 +218,7 @@ function ChargeScene() {
   const opener = useRef(null)
   const dialog = useRef(null)
   const closeButton = useRef(null)
+  const openDemo = event => { opener.current = event.currentTarget; setExpanded(true) }
   useEffect(() => {
     if (!expanded) return undefined
     const trigger = opener.current
@@ -220,7 +238,7 @@ function ChargeScene() {
     document.addEventListener('keydown', handleKey)
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
   }, [expanded])
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button ref={opener} type="button" onClick={() => setExpanded(true)}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
+  return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
 }
 
 function CapabilityScene() {
@@ -240,19 +258,40 @@ function ContactScene() {
   const [feedback, setFeedback] = useState('')
   const [fallbackUrl, setFallbackUrl] = useState('')
   const uid = useId()
+  const nameInput = useRef(null)
+  const detailInput = useRef(null)
   const submit = event => {
     event.preventDefault()
     const nextErrors = validateContact(values)
     setErrors({ name: nextErrors.name || '', detail: nextErrors.detail || '' })
-    if (Object.keys(nextErrors).length) { setFeedback('Revise os campos indicados antes de continuar.'); return }
+    if (Object.keys(nextErrors).length) {
+      setFeedback('Revise os campos indicados antes de continuar.')
+      window.requestAnimationFrame(() => (nextErrors.name ? nameInput : detailInput).current?.focus())
+      return
+    }
     const url = buildWhatsAppUrl(field, values.name, values.detail)
     setFallbackUrl(url)
     const popup = window.open(url, '_blank', 'noopener,noreferrer')
     setFeedback(popup ? 'Mensagem preparada. Conclua o envio no WhatsApp.' : 'O navegador bloqueou a nova janela. Use o link abaixo para continuar sem perder seus dados.')
   }
-  const update = event => { setValues(current => ({ ...current, [event.target.name]: event.target.value })); setErrors(current => ({ ...current, [event.target.name]: undefined })); setFeedback(''); setFallbackUrl('') }
+  const update = event => { setValues(current => ({ ...current, [event.target.name]: event.target.value })); setErrors(current => ({ ...current, [event.target.name]: '' })); setFeedback(''); setFallbackUrl('') }
   const switchField = value => { setField(value); setErrors({ name: '', detail: '' }); setFeedback(''); setFallbackUrl('') }
-  return <section className="contact-scene" id="contato"><div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div><form onSubmit={submit} noValidate data-reveal><fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset><label htmlFor={`${uid}-name`}>Seu nome</label><input id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>{errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}<label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label><textarea id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>{errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}<p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p><button type="submit">Continuar no WhatsApp <Arrow /></button><p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>{fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}</form></section>
+  return <section className="contact-scene" id="contato">
+    <div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div>
+    <form onSubmit={submit} noValidate data-reveal>
+      <fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset>
+      <label htmlFor={`${uid}-name`}>Seu nome</label>
+      <input ref={nameInput} id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>
+      {errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}
+      <label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label>
+      <textarea ref={detailInput} id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>
+      {errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}
+      <p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p>
+      <button type="submit">Continuar no WhatsApp <Arrow /></button>
+      <p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>
+      {fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}
+    </form>
+  </section>
 }
 
 function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao">Ecossistema</a><a href="#solucoes">Soluções</a><a href="#charge">Charge</a><a href="#presenca">BASE4</a><a href="#contato">Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }

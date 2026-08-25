@@ -22,7 +22,12 @@ function Status({ children }) {
 }
 
 function DemoNav({ view, setView }) {
-  const renderButton = item => <button key={item.id} className={view === item.id ? 'active' : ''} aria-current={view === item.id ? 'page' : undefined} onClick={() => setView(item.id)} title={item.label}><i>{item.icon}</i><span>{item.label}</span></button>
+  const itemRefs = useRef(new Map())
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 1100px)').matches) return
+    itemRefs.current.get(view)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest', inline: 'center' })
+  }, [view])
+  const renderButton = item => <button ref={element => { if (element) itemRefs.current.set(item.id, element) }} type="button" key={item.id} className={view === item.id ? 'active' : ''} aria-current={view === item.id ? 'page' : undefined} onClick={() => setView(item.id)} title={item.label}><i aria-hidden="true">{item.icon}</i><span>{item.label}</span></button>
   return <aside className="demo-sidebar" aria-label="Navegação da demonstração">
     <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent.png" alt=""/><b>CHARGE</b></div>
     {renderButton(views[0])}
@@ -116,7 +121,7 @@ function Clients() {
 }
 
 function PageHeading({ eyebrow, title, action = null }) {
-  return <div className="demo-view-heading"><div><small>{eyebrow}</small><strong>{title}</strong></div>{action && <span className="demo-prototype-action">{action}</span>}</div>
+  return <div className="demo-view-heading"><div><small>{eyebrow}</small><strong>{title}</strong></div>{action && <span className="demo-prototype-action" aria-label={`${action} — apenas uma referência visual`}>{action}<small>prévia</small></span>}</div>
 }
 
 function Sales() {
@@ -136,7 +141,8 @@ function Subscriptions() {
 
 function Calendar() {
   const days = Array.from({ length: 14 }, (_, index) => index + 1)
-  return <div className="demo-view"><PageHeading eyebrow="VENCIMENTOS, RECEBIMENTOS E ATRASOS" title="Calendário" action="Agosto de 2026"/><div className="demo-calendar-summary"><span><b>R$ 2.124,90</b>A receber no mês</span><span><b>R$ 850,00</b>Recebido no mês</span><span><b>4</b>Vencimentos</span></div><div className="demo-calendar-grid"><header>{['DOM','SEG','TER','QUA','QUI','SEX','SÁB'].map(day => <b key={day}>{day}</b>)}</header><main>{days.map(day => <button key={day}><b>{day}</b>{day === 1 && <><i className="late">4 atrasadas</i><i>R$ 2,1 mil</i></>}{day === 4 && <i className="paid">R$ 850,00</i>}</button>)}</main></div></div>
+  const [selectedDay, setSelectedDay] = useState(1)
+  return <div className="demo-view"><PageHeading eyebrow="VENCIMENTOS, RECEBIMENTOS E ATRASOS" title="Calendário" action={`Dia ${selectedDay} · Agosto de 2026`}/><div className="demo-calendar-summary"><span><b>R$ 2.124,90</b>A receber no mês</span><span><b>R$ 850,00</b>Recebido no mês</span><span><b>4</b>Vencimentos</span></div><div className="demo-calendar-grid"><header>{['DOM','SEG','TER','QUA','QUI','SEX','SÁB'].map(day => <b key={day}>{day}</b>)}</header><main>{days.map(day => <button type="button" className={selectedDay === day ? 'active' : ''} aria-pressed={selectedDay === day} onClick={() => setSelectedDay(day)} key={day}><b>{day}</b>{day === 1 && <><i className="late">4 atrasadas</i><i>R$ 2,1 mil</i></>}{day === 4 && <i className="paid">R$ 850,00</i>}</button>)}</main></div></div>
 }
 
 function Billing() {
