@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import ChargeDemo from './ChargeDemo.jsx'
 import { capabilities, people, problemsByField } from './data.js'
 
 const BRAND = '/assets/brand/'
@@ -134,7 +135,7 @@ function SolutionsScene() {
 }
 
 function ChargeScene() {
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>Cobrança que<br/>acontece no fluxo.</h2><p>O BASE4 Charge organiza clientes, pagamentos e lembretes em uma experiência simples.</p><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Tenho interesse em conhecer o BASE4 Charge.')} target="_blank" rel="noreferrer">Conhecer o Charge <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-device"><header><img src={`${BRAND}base4-symbol-transparent.png`} alt=""/><strong>Charge</strong><span><i/> Demonstração</span></header><main><div className="charge-total"><small>Fluxo monitorado</small><strong>Visão em tempo real</strong><div className="wave"><i/><i/></div></div><div className="charge-actions"><span>Clientes</span><span>Cobranças</span><span>Lembretes</span></div><div className="charge-activity"><i/><div><strong>Pagamento identificado</strong><small>Status atualizado automaticamente</small></div></div></main></div><div className="device-shadow"/><Particles count={12}/></div></section>
+  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · DEMONSTRAÇÃO INTERATIVA</span><h2>Cobrança que<br/>acontece no fluxo.</h2><p>Explore uma versão compacta do B4 Charge. Navegue entre indicadores, clientes e parcelas — tudo funciona apenas nesta página e nenhum dado é salvo.</p><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Tenho interesse em conhecer o B4 Charge.')} target="_blank" rel="noreferrer">Conhecer o Charge <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-device"><ChargeDemo/></div><div className="device-shadow"/><Particles count={12}/></div></section>
 }
 
 function CapabilityScene() {

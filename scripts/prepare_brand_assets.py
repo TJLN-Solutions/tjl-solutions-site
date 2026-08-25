@@ -16,14 +16,19 @@ def extract_from_white(image: Image.Image) -> Image.Image:
     for red, green, blue in source.get_flattened_data():
         darkest = min(red, green, blue)
         spread = max(red, green, blue) - darkest
-        # The supplied artwork is already antialiased on a very pale backdrop.
-        # Keep every opaque logo pixel byte-for-byte so charcoal shading does
-        # not collapse to black; fade only light, low-chroma backdrop pixels.
-        alpha = 0 if darkest >= 150 and spread <= 72 else 255
+        # Preserve the original opaque colors, but reverse the pale matte only
+        # on neutral transition pixels. This removes the last white fringe
+        # without crushing the charcoal faces of the mark to black.
+        alpha = 255
+        if spread <= 72 and darkest >= 78:
+            alpha = round(max(0, min(255, (150 - darkest) / 72 * 255)))
+            if 0 < alpha < 255:
+                factor = 255 / alpha
+                red = round(max(0, min(255, 255 + (red - 255) * factor)))
+                green = round(max(0, min(255, 255 + (green - 255) * factor)))
+                blue = round(max(0, min(255, 255 + (blue - 255) * factor)))
         pixels.append((red, green, blue, alpha))
     output.putdata(pixels)
-    alpha = output.getchannel("A").filter(ImageFilter.GaussianBlur(0.35))
-    output.putalpha(alpha)
     return output
 
 
