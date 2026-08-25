@@ -159,7 +159,7 @@ function ChargeCountdown() {
 }
 
 function ChargeScene() {
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="charge-scanline"/><div className="device-shadow"/><Particles count={12}/></div></section>
+  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="device-shadow"/></div></section>
 }
 
 function CapabilityScene() {

@@ -2,9 +2,16 @@ import { useMemo, useState } from 'react'
 import { chargeChart, chargeClients, chargeInstallments, formatChargeMoney } from './chargeDemoData.js'
 
 const views = [
-  { id: 'overview', label: 'Visão geral', icon: '◫' },
-  { id: 'clients', label: 'Clientes', icon: '◎' },
-  { id: 'installments', label: 'Parcelas', icon: '▤' },
+  { id: 'overview', label: 'Visão geral', icon: '▦' },
+  { id: 'clients', label: 'Clientes', icon: '♧' },
+  { id: 'installments', label: 'Parcelas', icon: '▱' },
+]
+
+const passiveNav = [
+  ['Vendas e contratos', '▧'],
+  ['Mensalidades', '□'],
+  ['Calendário', '▦'],
+  ['Cobranças', '♢'],
 ]
 
 function Status({ children }) {
@@ -12,31 +19,57 @@ function Status({ children }) {
 }
 
 function DemoNav({ view, setView }) {
+  const navButton = id => views.find(item => item.id === id)
   return <aside className="demo-sidebar" aria-label="Navegação da demonstração">
-    <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent.png" alt=""/><b>B4</b></div>
-    {views.map(item => <button key={item.id} className={view === item.id ? 'active' : ''} onClick={() => setView(item.id)} aria-label={item.label} title={item.label}><i>{item.icon}</i><span>{item.label}</span></button>)}
-    <div className="demo-avatar">TD</div>
+    <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent.png" alt=""/><b>CHARGE</b></div>
+    <button className={view === 'overview' ? 'active' : ''} onClick={() => setView('overview')}><i>{navButton('overview').icon}</i><span>Visão geral</span></button>
+    <p>CARTEIRA</p>
+    <button className={view === 'clients' ? 'active' : ''} onClick={() => setView('clients')}><i>{navButton('clients').icon}</i><span>Clientes</span></button>
+    <span className="demo-passive"><i>{passiveNav[0][1]}</i>{passiveNav[0][0]}</span>
+    <p>RECEBIMENTOS</p>
+    <button className={view === 'installments' ? 'active' : ''} onClick={() => setView('installments')}><i>{navButton('installments').icon}</i><span>Parcelas</span></button>
+    {passiveNav.slice(1).map(item => <span className="demo-passive" key={item[0]}><i>{item[1]}</i>{item[0]}</span>)}
+    <div className="demo-sidebar-footer"><span>◉ <b>Ajuda</b></span><span><i>TD</i><b>Thiago Demo</b></span></div>
   </aside>
 }
 
-function DemoHeader({ title }) {
-  return <header className="demo-header"><div><small>WIREFRAME NAVEGÁVEL · B4 CHARGE</small><strong>{title}</strong></div><div className="demo-search">⌕ <span>Pesquisar...</span></div><span className="demo-live"><i/> Sessão temporária</span></header>
+function DemoHeader({ title, theme, setTheme }) {
+  return <header className="demo-header"><span className="demo-menu">☰</span><strong>{title}</strong><div className="demo-search">⌕ <span>Pesquisar...</span></div><span className="demo-bell">♧<b>9</b></span><button className="demo-theme-toggle" onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} aria-label={`Ativar modo ${theme === 'dark' ? 'claro' : 'escuro'}`}>{theme === 'dark' ? '☼' : '◐'}</button><span className="demo-user"><b>Thiago Demo</b><small>MASTER_ADMIN · B4 Charge Demo</small></span><i className="demo-user-avatar">T</i></header>
+}
+
+function LinePlot({ values, variant }) {
+  return <div className={`demo-line demo-line-${variant}`}>{values.slice(0, -1).map((value, index) => {
+    const next = values[index + 1]
+    const width = 100 / (values.length - 1)
+    const rise = next - value
+    const length = Math.sqrt(width ** 2 + rise ** 2)
+    const angle = -Math.atan2(rise, width) * 180 / Math.PI
+    return <i key={index} style={{ left: `${index * width}%`, bottom: `${value}%`, width: `${length}%`, transform: `rotate(${angle}deg)` }}/>
+  })}</div>
 }
 
 function Overview({ installments, paid }) {
-  const open = installments.filter(item => !paid.has(item.id))
-  const overdue = open.filter(item => item.status === 'Vencida')
-  const received = 850 + [...paid].reduce((sum, id) => sum + (installments.find(item => item.id === id)?.value || 0), 0)
+  const paidValue = [...paid].reduce((sum, id) => sum + (installments.find(item => item.id === id)?.value || 0), 0)
+  const overduePaid = [...paid].reduce((sum, id) => {
+    const item = installments.find(entry => entry.id === id)
+    return sum + (item?.status === 'Vencida' ? item.value : 0)
+  }, 0)
+  const received = 850 + paidValue
+  const kpis = [
+    ['clock', '◷', formatChargeMoney(0), 'A receber hoje', '0 parcelas'],
+    ['received', '↗', formatChargeMoney(received), 'Recebido no mês', `${1 + paid.size} confirmados`],
+    ['open', '▣', formatChargeMoney(Math.max(0, 20524.5 - paidValue)), 'Em aberto', `${32 - paid.size} parcelas`],
+    ['late', '△', formatChargeMoney(Math.max(0, 6124.9 - overduePaid)), 'Atrasado', `${8 - (overduePaid ? 1 : 0)} parcelas`],
+    ['clients', '♧', '8', 'Clientes', 'cadastrados'],
+    ['contracts', '▧', '6', 'Contratos ativos', 'contratos'],
+  ]
   return <div className="demo-view demo-overview">
-    <div className="demo-welcome"><span>B4</span><div><strong>Bem-vindo ao B4 Charge</strong><small>Dados financeiros em uma visão simples</small></div></div>
-    <div className="demo-kpis">
-      <article><small>Recebido no mês</small><strong>{formatChargeMoney(received)}</strong><span>↑ confirmado</span></article>
-      <article><small>Em aberto</small><strong>{formatChargeMoney(open.reduce((sum, item) => sum + item.value, 0))}</strong><span>{open.length} parcelas</span></article>
-      <article><small>Atrasado</small><strong>{formatChargeMoney(overdue.reduce((sum, item) => sum + item.value, 0))}</strong><span>{overdue.length} parcela</span></article>
-    </div>
+    <div className="demo-page-title"><strong>Visão Geral</strong><span>Dados demonstrativos</span><b>＋ Nova venda</b></div>
+    <div className="demo-welcome"><span>B4</span><div><strong>Bem-vindo ao B4 Charge</strong><small>Dados financeiros da empresa em uma prévia navegável</small></div><aside><small>Vencendo hoje</small><strong>0</strong></aside></div>
+    <div className="demo-kpis">{kpis.map(item => <article className={`kpi-${item[0]}`} key={item[3]}><i>{item[1]}</i><strong>{item[2]}</strong><small>{item[3]}</small><span>{item[4]}</span></article>)}</div>
     <div className="demo-grid">
-      <article className="demo-chart"><header><div><small>Recebimentos e previsão</small><strong>Últimos 6 meses</strong></div><span>Recebido</span></header><div className="demo-bars">{chargeChart.map((height, index) => <i key={index} style={{ height: `${height}%` }}><b style={{ height: `${Math.max(16, height - 22)}%` }}/></i>)}</div><footer><span>jun</span><span>jul</span><span>ago</span><span>set</span><span>out</span><span>nov</span></footer></article>
-      <article className="demo-due"><header><small>Próximos vencimentos</small><button aria-label="Abrir parcelas">•••</button></header>{open.slice(0, 3).map(item => <div key={item.id}><i>{item.short}</i><span><b>{item.client}</b><small>{item.due} · {item.part}</small></span><strong>{formatChargeMoney(item.value)}</strong></div>)}</article>
+      <article className="demo-chart"><header><strong>Recebimentos e previsão</strong><span><i/> Recebido · <b/> Previsto</span></header><div className="demo-plot"><LinePlot values={chargeChart} variant="received"/><LinePlot values={[24, 31, 39, 74, 43, 43]} variant="forecast"/></div><footer><span>jun</span><span>jul</span><span>ago</span><span>set</span><span>out</span><span>nov</span></footer></article>
+      <article className="demo-donut-card"><header>Situação das parcelas</header><div className="demo-donut"><i/></div><footer><span><i/>Em aberto</span><span><i/>Recebida</span><span><i/>Atrasada</span></footer></article>
     </div>
   </div>
 }
@@ -52,6 +85,7 @@ function Installments({ installments, paid, receive }) {
 
 export default function ChargeDemo() {
   const [view, setView] = useState('overview')
+  const [theme, setTheme] = useState('dark')
   const [paid, setPaid] = useState(() => new Set())
   const [notice, setNotice] = useState('')
   const title = useMemo(() => views.find(item => item.id === view)?.label || 'Visão geral', [view])
@@ -59,5 +93,5 @@ export default function ChargeDemo() {
     setPaid(current => new Set(current).add(item.id))
     setNotice(`${item.client}: ${formatChargeMoney(item.value)} recebido apenas nesta demonstração.`)
   }
-  return <div className="charge-demo" data-testid="charge-demo"><DemoNav view={view} setView={setView}/><div className="demo-workspace"><DemoHeader title={title}/><main>{view === 'overview' && <Overview installments={chargeInstallments} paid={paid}/>} {view === 'clients' && <Clients/>} {view === 'installments' && <Installments installments={chargeInstallments} paid={paid} receive={receive}/>}</main><footer><i/> Wireframe funcional · nenhum dado é salvo</footer></div>{notice && <button className="demo-notice" onClick={() => setNotice('')} aria-label="Fechar aviso">✓ {notice}<span>×</span></button>}</div>
+  return <div className={`charge-demo theme-${theme}`} data-testid="charge-demo"><DemoNav view={view} setView={setView}/><div className="demo-workspace"><DemoHeader title={title} theme={theme} setTheme={setTheme}/><main>{view === 'overview' && <Overview installments={chargeInstallments} paid={paid}/>} {view === 'clients' && <Clients/>} {view === 'installments' && <Installments installments={chargeInstallments} paid={paid} receive={receive}/>}</main><footer><i/> Wireframe funcional · nenhum dado é salvo</footer></div>{notice && <button className="demo-notice" onClick={() => setNotice('')} aria-label="Fechar aviso">✓ {notice}<span>×</span></button>}</div>
 }
