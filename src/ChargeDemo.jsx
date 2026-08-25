@@ -20,7 +20,7 @@ function DemoNav({ view, setView }) {
 }
 
 function DemoHeader({ title }) {
-  return <header className="demo-header"><div><small>B4 CHARGE DEMO</small><strong>{title}</strong></div><div className="demo-search">⌕ <span>Pesquisar...</span></div><span className="demo-live"><i/> Dados locais</span></header>
+  return <header className="demo-header"><div><small>WIREFRAME NAVEGÁVEL · B4 CHARGE</small><strong>{title}</strong></div><div className="demo-search">⌕ <span>Pesquisar...</span></div><span className="demo-live"><i/> Sessão temporária</span></header>
 }
 
 function Overview({ installments, paid }) {
@@ -43,7 +43,7 @@ function Overview({ installments, paid }) {
 
 function Clients() {
   const [selected, setSelected] = useState(1)
-  return <div className="demo-view"><div className="demo-view-heading"><div><small>CARTEIRA</small><strong>Clientes</strong></div><button>+ Novo cliente</button></div><div className="demo-client-list">{chargeClients.map(client => <button key={client.id} className={selected === client.id ? 'active' : ''} onClick={() => setSelected(client.id)}><i>{client.initials}</i><span><b>{client.name}</b><small>{client.detail}</small></span><Status>{client.status}</Status><strong>{formatChargeMoney(client.balance)}</strong></button>)}</div><div className="demo-client-foot"><span>{chargeClients.length} clientes demonstrativos</span><span>Selecione uma linha para explorar</span></div></div>
+  return <div className="demo-view"><div className="demo-view-heading"><div><small>CARTEIRA · DADOS DE EXEMPLO</small><strong>Clientes</strong></div><span className="demo-prototype-action">+ Novo cliente</span></div><div className="demo-client-list">{chargeClients.map(client => <button key={client.id} className={selected === client.id ? 'active' : ''} onClick={() => setSelected(client.id)}><i>{client.initials}</i><span><b>{client.name}</b><small>{client.detail}</small></span><Status>{client.status}</Status><strong>{formatChargeMoney(client.balance)}</strong></button>)}</div><div className="demo-client-foot"><span>{chargeClients.length} clientes demonstrativos</span><span>Selecione uma linha para explorar</span></div></div>
 }
 
 function Installments({ installments, paid, receive }) {
@@ -59,5 +59,5 @@ export default function ChargeDemo() {
     setPaid(current => new Set(current).add(item.id))
     setNotice(`${item.client}: ${formatChargeMoney(item.value)} recebido apenas nesta demonstração.`)
   }
-  return <div className="charge-demo" data-testid="charge-demo"><DemoNav view={view} setView={setView}/><div className="demo-workspace"><DemoHeader title={title}/><main>{view === 'overview' && <Overview installments={chargeInstallments} paid={paid}/>} {view === 'clients' && <Clients/>} {view === 'installments' && <Installments installments={chargeInstallments} paid={paid} receive={receive}/>}</main><footer><i/> Demonstração isolada · nenhum dado é salvo</footer></div>{notice && <button className="demo-notice" onClick={() => setNotice('')} aria-label="Fechar aviso">✓ {notice}<span>×</span></button>}</div>
+  return <div className="charge-demo" data-testid="charge-demo"><DemoNav view={view} setView={setView}/><div className="demo-workspace"><DemoHeader title={title}/><main>{view === 'overview' && <Overview installments={chargeInstallments} paid={paid}/>} {view === 'clients' && <Clients/>} {view === 'installments' && <Installments installments={chargeInstallments} paid={paid} receive={receive}/>}</main><footer><i/> Wireframe funcional · nenhum dado é salvo</footer></div>{notice && <button className="demo-notice" onClick={() => setNotice('')} aria-label="Fechar aviso">✓ {notice}<span>×</span></button>}</div>
 }
