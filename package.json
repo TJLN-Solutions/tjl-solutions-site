@@ -1,0 +1,31 @@
+{
+  "name": "base4-systems",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "typecheck": "tsc -p jsconfig.json",
+    "test": "node --test",
+    "lint": "eslint . --max-warnings=0",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@openai/sites-vite-plugin": "^0.2.0",
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "eslint": "latest",
+    "eslint-plugin-react-hooks": "latest",
+    "eslint-plugin-react-refresh": "latest",
+    "globals": "latest"
+  }
+}
