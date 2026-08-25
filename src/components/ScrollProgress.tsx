@@ -1,24 +1,52 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ArrowUp } from "lucide-react"
 
 export default function ScrollProgress() {
   const [progress, setProgress] = useState(0)
   const [visible, setVisible] = useState(false)
 
+  /**
+   * Altura rolável guardada em ref.
+   *
+   * Lê-la no evento de rolagem custava um reflow forçado por evento: pedir
+   * `scrollHeight` obriga o navegador a recalcular o layout de uma página de
+   * ~24.000px antes de responder. Ela só muda em resize, então é medida ali.
+   */
+  const rolavel = useRef(0)
+
   useEffect(() => {
-    const update = () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight
-      const nextProgress = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0
-      setProgress(Math.min(100, Math.max(0, nextProgress)))
+    let frame = 0
+
+    const medirAltura = () => {
+      rolavel.current = document.documentElement.scrollHeight - window.innerHeight
+    }
+
+    const aplicar = () => {
+      const total = rolavel.current
+      setProgress(total > 0 ? Math.min(100, Math.max(0, (window.scrollY / total) * 100)) : 0)
       setVisible(window.scrollY > window.innerHeight * 0.65)
     }
 
-    update()
-    window.addEventListener("scroll", update, { passive: true })
-    window.addEventListener("resize", update)
+    // Rolagem dispara muito mais que um quadro: agrupa num rAF para calcular
+    // uma vez por quadro em vez de uma vez por evento.
+    const aoRolar = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(aplicar)
+    }
+
+    const aoRedimensionar = () => {
+      medirAltura()
+      aoRolar()
+    }
+
+    medirAltura()
+    aplicar()
+    window.addEventListener("scroll", aoRolar, { passive: true })
+    window.addEventListener("resize", aoRedimensionar)
     return () => {
-      window.removeEventListener("scroll", update)
-      window.removeEventListener("resize", update)
+      cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", aoRolar)
+      window.removeEventListener("resize", aoRedimensionar)
     }
   }, [])
 

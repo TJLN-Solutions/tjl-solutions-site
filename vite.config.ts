@@ -88,11 +88,20 @@ function sitesStaticWorker(): Plugin {
           }
         }
       }
-      const socialCard = path.resolve(__dirname, 'public/og.png')
-      if (existsSync(socialCard)) {
-        assets['/og.png'] = {
+      // O card social vai embutido em base64 no worker, então o formato importa
+      // para o tamanho do bundle: em PNG o arquivo ficava em 1,6 MB e sozinho
+      // dobrava o script. Aceita as duas extensões para não depender de qual
+      // está no public/.
+      const socialCards: [string, string][] = [
+        ['og.jpg', 'image/jpeg'],
+        ['og.png', 'image/png'],
+      ]
+      for (const [fileName, type] of socialCards) {
+        const socialCard = path.resolve(__dirname, 'public', fileName)
+        if (!existsSync(socialCard)) continue
+        assets[`/${fileName}`] = {
           body: readFileSync(socialCard).toString('base64'),
-          type: 'image/png',
+          type,
           base64: true,
         }
       }

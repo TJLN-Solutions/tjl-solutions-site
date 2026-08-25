@@ -428,6 +428,20 @@ export const investimento: Record<
 
 /* ---------------- 11 · Portfólio (confirmar os projetos) ---------------- */
 
+/**
+ * Destaque acima da grade: o BASE4 Charge é produto próprio, não um projeto
+ * de cliente — por isso vive fora do array `portfolio` e ganha um cartão
+ * diferente, com captura de tela real em vez do placeholder gráfico.
+ * Ainda em ajustes finais, daí o selo "Em breve" no link.
+ */
+export const portfolioDestaque = {
+  titulo: "BASE4 Charge",
+  categoria: "Produto próprio · SaaS financeiro",
+  desc: "Cobrança automatizada, contratos e relatórios financeiros em tempo real — o sistema que a própria BASE4 usa todos os dias, agora chegando para clientes.",
+  imagem: "/hero-banner.jpg",
+  href: "https://b4charge.base4systems.com.br",
+}
+
 export const portfolio = [
   {
     numero: "01",
@@ -435,33 +449,35 @@ export const portfolio = [
     titulo: "Sistema de gestão para distribuidora",
     desc: "Controle de estoque, pedidos, faturamento e rotas de entrega para distribuidora regional.",
     stack: ["React", "Node.js", "PostgreSQL"],
+    icone: "erp",
   },
+  /**
+   * Único item da grade com captura real (`imagem`) e link (`href`): projeto
+   * pessoal, site em produção — dá pra clicar e ver o trabalho de verdade.
+   * A print do hero foi tirada por nós direto do site no ar.
+   */
   {
     numero: "02",
-    categoria: "Loja virtual",
-    titulo: "E-commerce de calçados",
-    desc: "Catálogo amplo, checkout integrado, controle de estoque e painel de pedidos.",
-    stack: ["Next.js", "Pagamentos", "MySQL"],
-  },
-  {
-    numero: "03",
-    categoria: "Site institucional",
-    titulo: "Site para escritório de advocacia",
-    desc: "Presença digital sóbria, com blog, formulário de contato e área restrita para clientes.",
-    stack: ["React", "Tailwind", "CMS"],
-  },
-  {
-    numero: "04",
-    categoria: "Automação",
-    titulo: "Automação de relatórios para clínica",
-    desc: "Coleta de dados de várias fontes e envio programado de relatórios gerenciais.",
-    stack: ["Python", "BI", "API REST"],
+    categoria: "Site institucional · Estética automotiva",
+    titulo: "OBSIDIAN — Estética Automotiva de Alta Performance",
+    desc: "Site para estúdio de detailing premium em São Paulo: vitrificação, PPF e correção de pintura para veículos raros, com abertura animada e portfólio de trabalhos.",
+    stack: ["React", "Vite", "Tailwind CSS"],
+    imagem: "/portfolio-obsidian.jpg",
+    href: "https://obsidian-eta-self.vercel.app",
   },
 ]
 
 /* ---------------- 12 · Antes e depois (confirmar os ganhos) ---------------- */
 
 export const antesDepois = {
+  /**
+   * ⚠️ Imagens ILUSTRATIVAS, geradas por IA — não são fotos de um serviço
+   * real da BASE4. Servem de demonstração do comparador até existir foto
+   * de bancada. O rótulo "Ilustração" no quadro existe justamente para o
+   * visitante não ler isso como registro de um atendimento.
+   */
+  antes: "/antes-limpeza.jpg",
+  depois: "/depois-limpeza.jpg",
   ganhos: [
     { valor: "−15 °C", label: "Temperatura" },
     { valor: "−60%", label: "Barulho do cooler" },

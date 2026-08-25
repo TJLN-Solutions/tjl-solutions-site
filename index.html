@@ -5,6 +5,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><!-- figma:title --></title>
+
+    <!-- As fontes vêm daqui, não de @import no CSS. Pelo CSS a cadeia era
+         serial: HTML, folha do site, folha das fontes e só então os arquivos.
+         Declaradas no HTML, a busca começa junto com o CSS, e o preconnect
+         abre a conexão com o servidor de fontes antes de ela ser pedida.
+
+         Os pesos são só os que o CSS usa de fato: Space Grotesk não usa 400 e
+         Inter não usa 600 — cada peso é um arquivo separado. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap"
+    />
     <!-- figma:head-end -->
   </head>
   <body>

@@ -1,5 +1,4 @@
 
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -285,7 +284,8 @@ main, footer, .control-bar, .mobile-command { position: relative; z-index: 2; }
 .control-bar.is-compact { top: 8px; height: 58px; width: min(1180px, calc(100% - 24px)); background: var(--surface-glass-dense); }
 .control-logo { display: flex; align-items: center; gap: 10px; min-width: 178px; color: var(--text-1); font: 600 13px var(--font-display); letter-spacing: .08em; }
 .control-logo b { color: var(--accent-text); font-weight: 600; }
-.control-logo-mark { display: grid; place-items: center; width: 34px; aspect-ratio: 1; border: 1px solid var(--line-3); background: linear-gradient(135deg, var(--accent-soft), transparent); color: var(--text-1); font-weight: 700; box-shadow: var(--glow-inset); }
+.control-logo-mark { display: grid; place-items: center; width: 34px; aspect-ratio: 1; padding: 5px; border: 1px solid var(--line-3); background: linear-gradient(135deg, var(--accent-soft), transparent); box-shadow: var(--glow-inset); }
+.control-logo-mark img { width: 100%; height: 100%; object-fit: contain; }
 /* As entradas ficam junto da marca. Centralizadas, sobrava um vazio grande
    entre o logo e o primeiro link. */
 .control-nav { display: flex; align-items: center;justify-content: center; flex: 1; height: 100%; margin-left: 22px; }
@@ -984,45 +984,269 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    ============================================================ */
 
 .work-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
-.work-card { display: flex; flex-direction: column; border: 1px solid var(--line-1); background: var(--surface-1); box-shadow: var(--card-shadow); overflow: hidden; transition: .35s var(--ease); }
-.work-card:hover { border-color: var(--line-3); transform: translateY(-5px); box-shadow: var(--shadow-2); }
-.work-thumb { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 8; border-bottom: 1px solid var(--line-1); background: radial-gradient(circle at 50% 40%, var(--accent-soft), transparent 68%), var(--surface-inset); }
-.work-thumb::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--line-1) 1px, transparent 1px), linear-gradient(90deg, var(--line-1) 1px, transparent 1px); background-size: 28px 28px; opacity: .6; }
-.work-thumb svg { position: relative; width: 34px; height: 34px; color: var(--accent-text); }
-.work-thumb-code { position: absolute; left: 16px; top: 14px; color: var(--text-4); letter-spacing: .16em; font: 9px var(--font-mono); }
-.work-body { display: flex; flex-direction: column; gap: 10px; padding: 26px; }
-.work-body h3 { margin: 4px 0 0; color: var(--text-1); font: 600 1.2rem var(--font-display); }
+
+/* Barra de acento à esquerda: mesma assinatura do `.front-card` (linha que
+   cresce de 28% pra 100% no hover) — os dois são "cartão de conteúdo com
+   destaque", então repetir o gesto é coerência, não preguiça. */
+.work-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line-1);
+  background: var(--surface-1);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: border-color .4s var(--ease), transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.work-card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(var(--accent), transparent);
+  transform: scaleY(.28);
+  transform-origin: top;
+  transition: transform .5s var(--ease);
+}
+.work-card:hover {
+  border-color: var(--line-3);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-2), var(--glow-inset);
+}
+.work-card:hover::before { transform: scaleY(1); }
+
+/* ---- miniatura ---- */
+.work-thumb { position: relative; overflow: hidden; aspect-ratio: 16 / 8; border-bottom: 1px solid var(--line-1); background: radial-gradient(circle at 30% 28%, var(--accent-soft), transparent 68%), var(--surface-inset); }
+.work-thumb::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--line-1) 1px, transparent 1px), linear-gradient(90deg, var(--line-1) 1px, transparent 1px); background-size: 28px 28px; opacity: .5; }
+
+/* O número do próprio projeto vira o elemento gráfico do placeholder — não
+   é enfeite, é a mesma numeração que já organiza a lista, só grande o
+   bastante pra preencher o quadro em vez de repetir o mesmo ícone
+   genérico nos quatro cartões.
+   Fica inteiro dentro da moldura: testei sangrando pela quina direita e o
+   corte caía no meio do segundo dígito, o que lê como bug de layout, não
+   como recorte proposital. */
+.work-thumb-num {
+  position: absolute;
+  right: 20px;
+  bottom: -4px;
+  z-index: 0;
+  font: 700 clamp(3.6rem, 9vw, 5.6rem)/1 var(--font-display);
+  letter-spacing: -.05em;
+  color: var(--line-3);
+  opacity: .55;
+  user-select: none;
+  transition: transform .5s var(--ease), opacity .4s var(--ease);
+}
+.work-card:hover .work-thumb-num { transform: translateY(-5px); opacity: .9; }
+
+.work-thumb-icon {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line-3);
+  background: var(--surface-1);
+  color: var(--accent-text);
+  box-shadow: var(--glow-inset);
+  transition: transform .4s var(--ease), border-color .3s var(--ease);
+}
+.work-thumb-icon svg { width: 19px; height: 19px; }
+.work-card:hover .work-thumb-icon { transform: scale(1.08) rotate(-4deg); border-color: var(--accent); }
+
+/* Selo "PROJ. XX": mora fora de `.work-thumb` (é irmão dele em `.work-card`)
+   pra flutuar sobre a miniatura em ambas as variantes — placeholder ou
+   foto real — sem precisar de duas versões da mesma etiqueta. */
+.work-thumb-code {
+  position: absolute;
+  z-index: 3;
+  left: 14px;
+  top: 14px;
+  padding: 5px 9px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-1);
+  box-shadow: var(--card-shadow);
+  color: var(--text-4);
+  letter-spacing: .16em;
+  font: 9px var(--font-mono);
+  transition: color .3s var(--ease), letter-spacing .3s var(--ease), border-color .3s var(--ease);
+}
+.work-card:hover .work-thumb-code { color: var(--accent-text); letter-spacing: .22em; border-color: var(--line-3); }
+
+/* Captura real em vez do placeholder gráfico: some com a grade pontilhada,
+   a foto ocupa o quadro inteiro, com um véu no rodapé pra costurar a
+   transição até o corpo do cartão. */
+.work-thumb-photo::after { display: none; }
+.work-thumb-photo::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .38));
+}
+.work-thumb-photo img { position: relative; width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.work-card:hover .work-thumb-photo img { transform: scale(1.045); }
+
+/* ---- corpo ---- */
+.work-body { display: flex; flex-direction: column; gap: 10px; padding: 28px; }
+.work-body h3 { margin: 4px 0 0; color: var(--text-1); font: 600 clamp(1.2rem, 2vw, 1.4rem) var(--font-display); letter-spacing: -.025em; line-height: 1.25; }
 .work-body p { margin: 0; flex: 1; color: var(--text-3); font-size: .88rem; line-height: 1.8; }
 .work-stack { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 0; margin: 6px 0 0; border-top: 1px solid var(--line-1); }
 .work-stack li { padding: 5px 10px; border: 1px solid var(--line-1); background: var(--surface-inset); color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; font: 9px var(--font-mono); }
+
+/* ---- cartão de destaque: BASE4 Charge acima da grade ----
+   Mesma família visual do `.work-card` (borda, sombra, hover), mas com
+   captura de tela real em vez do placeholder gráfico, e maior — é
+   produto próprio em lançamento, não mais um item da lista. */
+.work-feature {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  margin-bottom: 26px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-1);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  text-decoration: none;
+  transition: .35s var(--ease);
+}
+.work-feature:hover { border-color: var(--line-3); transform: translateY(-5px); box-shadow: var(--shadow-2); }
+
+.work-feature-media { position: relative; min-height: 320px; overflow: hidden; background: var(--surface-inset); }
+.work-feature-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.work-feature:hover .work-feature-media img { transform: scale(1.045); }
+
+.work-feature-body { display: flex; flex-direction: column; gap: 10px; padding: 34px 36px; }
+.work-feature-body .launch-badge { align-self: flex-start; margin-bottom: 6px; }
+.work-feature-body h3 { margin: 4px 0 0; color: var(--text-1); font: 600 1.6rem var(--font-display); }
+.work-feature-body p { margin: 0; max-width: 46ch; color: var(--text-3); font-size: .92rem; line-height: 1.8; }
+
+.work-feature-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--accent-text); text-transform: uppercase; letter-spacing: .08em; font: 600 12px var(--font-mono); }
+.work-feature-link svg { width: 15px; height: 15px; transition: transform .3s var(--ease); }
+.work-feature:hover .work-feature-link svg { transform: translate(3px, -3px); }
 
 /* ============================================================
    12 · ANTES E DEPOIS
    ============================================================ */
 
-.compare { position: relative; aspect-ratio: 16 / 7; min-height: 280px; border: 1px solid var(--line-2); background: var(--surface-inset); overflow: hidden; touch-action: pan-y; }
+/* O palco inteiro entra numa peça só (quadro + ganhos + nota), com um
+   leve zoom-out — o comparador é o assunto da seção, então ele chega
+   como um objeto, não como três blocos soltos aparecendo em fila. */
+.compare-stage { opacity: 0; transform: translateY(22px) scale(.985); }
+.compare-stage.is-in { opacity: 1; transform: none; transition: opacity .7s var(--ease), transform .7s var(--ease); }
+
+.compare { position: relative; aspect-ratio: 16 / 7; min-height: 280px; border: 1px solid var(--line-2); background: var(--surface-inset); box-shadow: var(--shadow-2); overflow: hidden; touch-action: pan-y; }
 .compare-side { position: absolute; inset: 0; }
+.compare-side img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* O rótulo mora no canto do seu próprio lado: centralizado, os dois lados
    colocariam texto no mesmo ponto, um sobre o outro, em cima da alça. */
-.compare-tag { position: absolute; bottom: 18px; display: inline-flex; align-items: center; gap: 9px; padding: 9px 14px; text-transform: uppercase; letter-spacing: .18em; font: 500 10px var(--font-mono); backdrop-filter: blur(6px); }
+.compare-tag { position: absolute; bottom: 18px; z-index: 2; display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; text-transform: uppercase; letter-spacing: .18em; font: 500 10px var(--font-mono); backdrop-filter: blur(10px); }
 .compare-tag svg { width: 16px; height: 16px; }
-/* metade "depois": superfície limpa, com brilho e grade de bancada */
-.compare-after { background: radial-gradient(circle at 62% 40%, var(--accent-soft), transparent 62%), var(--surface-3); }
-.compare-after::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--line-1) 1px, transparent 1px), linear-gradient(90deg, var(--line-1) 1px, transparent 1px); background-size: 32px 32px; opacity: .7; }
+
+/* Véu no rodapé de cada metade: as fotos são escuras e cheias de detalhe,
+   e sem ele os rótulos "Antes"/"Depois" se perdiam no meio dos coolers. */
+.compare-side::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0 0;
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .62));
+  pointer-events: none;
+}
+
+/* metade "depois" (embaixo, sempre inteira) */
 .compare-after .compare-tag { right: 18px; border: 1px solid var(--line-3); background: var(--surface-glass-dense); color: var(--accent-text); }
-/* metade "antes": tom sujo e quente, sem depender de foto */
-.compare-before { background: repeating-linear-gradient(58deg, #322b23 0 12px, #241f19 12px 24px); clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
+
+/* metade "antes" (em cima, recortada pela posição da alça). O recorte é
+   `clip-path` e não largura: a foto não pode esticar conforme se arrasta,
+   senão os dois lados deixam de estar em escala e a comparação mente. */
+.compare-before { clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
 .compare-before .compare-tag { left: 18px; border: 1px solid rgba(217, 205, 184, .34); background: rgba(24, 20, 16, .72); color: #e6dcc8; }
-[data-theme="light"] .compare-before { background: repeating-linear-gradient(58deg, #a99a86 0 12px, #91826f 12px 24px); }
-[data-theme="light"] .compare-before .compare-tag { border-color: rgba(44, 35, 24, .4); background: rgba(255, 252, 245, .8); color: #2c2318; }
-.compare-handle { position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 2px; background: var(--accent); box-shadow: var(--glow-sm); transform: translateX(-1px); }
-.compare-handle::after { content: ""; position: absolute; left: 50%; top: 50%; width: 42px; height: 42px; transform: translate(-50%, -50%); border: 2px solid var(--accent); border-radius: 50%; background: var(--surface-glass-dense); backdrop-filter: blur(6px); }
-.compare-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; cursor: ew-resize; }
-.compare-range:focus-visible ~ .compare-handle::after { outline: 2px solid var(--accent); outline-offset: 4px; }
-.gains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 26px; }
-.gain-card { padding: 22px 18px; border: 1px solid var(--line-1); background: var(--surface-1); box-shadow: var(--card-shadow); text-align: center; }
-.gain-card strong { display: block; color: var(--accent-text); font: 600 clamp(1.4rem, 2.4vw, 1.9rem) var(--font-display); letter-spacing: -.03em; }
-.gain-card span { display: block; margin-top: 8px; color: var(--text-4); text-transform: uppercase; letter-spacing: .14em; font: 500 10px var(--font-mono); }
+/* A metade "antes" também ganha um leve tom quente e menos contraste —
+   reforça "sujo" mesmo em quem olha rápido, sem editar a foto. */
+.compare-before img { filter: saturate(.82) contrast(.95) sepia(.12); }
+
+/* Selo de honestidade: as imagens são ilustrativas, e isso precisa estar
+   no próprio quadro, não só na nota de rodapé. */
+.compare-illus {
+  position: absolute;
+  z-index: 3;
+  right: 14px;
+  top: 14px;
+  padding: 6px 10px;
+  border: 1px solid var(--line-2);
+  background: var(--surface-glass-dense);
+  backdrop-filter: blur(10px);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font: 500 9px var(--font-mono);
+}
+
+/* ---- alça ---- */
+.compare-handle { position: absolute; z-index: 4; top: 0; bottom: 0; left: var(--pos, 50%); width: 2px; background: var(--accent); box-shadow: var(--glow-sm); transform: translateX(-1px); }
+.compare-handle i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface-glass-dense);
+  backdrop-filter: blur(8px);
+  color: var(--accent-text);
+  box-shadow: var(--glow-sm);
+  transition: transform .35s var(--ease), background .3s var(--ease);
+}
+.compare-handle i svg { width: 18px; height: 18px; }
+.compare:hover .compare-handle i { transform: translate(-50%, -50%) scale(1.1); }
+.compare-range:active ~ .compare-handle i { transform: translate(-50%, -50%) scale(.94); }
+
+.compare-range { position: absolute; z-index: 5; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; cursor: ew-resize; }
+.compare-range:focus-visible ~ .compare-handle i { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* ---- ganhos ---- */
+.gains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 22px; }
+.gain-card {
+  position: relative;
+  padding: 26px 20px;
+  border: 1px solid var(--line-1);
+  background: var(--surface-1);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  overflow: hidden;
+}
+/* Linha de acento no topo, crescendo do centro pras pontas no hover —
+   a mesma ideia da barra lateral dos cartões de portfólio, virada 90°
+   porque aqui o cartão é largo e baixo, não alto. */
+.gain-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: scaleX(.3);
+  transition: transform .5s var(--ease);
+}
+.gain-card:hover::before { transform: scaleX(1); }
+.gain-card strong { display: flex; align-items: baseline; justify-content: center; gap: 1px; color: var(--accent-text); font: 600 clamp(1.5rem, 2.6vw, 2.1rem) var(--font-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.gain-sign { opacity: .65; }
+.gain-unit { margin-left: 2px; font-size: .62em; opacity: .8; }
+.gain-card > span { display: block; margin-top: 10px; color: var(--text-4); text-transform: uppercase; letter-spacing: .14em; font: 500 10px var(--font-mono); }
 .compare-note { margin: 18px 0 0; color: var(--text-4); font-size: .78rem; line-height: 1.7; }
 
 /* ============================================================
@@ -1118,9 +1342,11 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 }
 
 @media (max-width: 760px) {
-  .fronts-grid, .price-grid, .work-grid, .tech-grid, .crew-grid, .steps-grid,
+  .fronts-grid, .price-grid, .work-grid, .work-feature, .tech-grid, .crew-grid, .steps-grid,
   .metrics-grid, .gains-grid, .quote-grid, .tips-grid { grid-template-columns: 1fr; }
   .front-card, .price-card, .tech-group, .quote-card, .tip-card { padding: 24px 20px; }
+  .work-feature-media { min-height: 0; aspect-ratio: 16 / 9; }
+  .work-feature-body { padding: 26px 22px; }
   .metrics-strip { padding: 56px 0; }
   .metric-card { padding: 18px 12px; border-left: 0; border-bottom: 1px solid var(--line-1); }
   .metric-card:last-child { border-bottom: 0; }
@@ -1158,10 +1384,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    deslocado permanentemente. Foi o que aconteceu com a faixa de localização
    (16px para baixo), com os cards das frentes (28px para o lado) e com tudo no
    celular (22px para baixo). */
-.rv-left:not(.is-in) > * { transform: translate3d(-26px, 0, 0); }
-.rv-right:not(.is-in) > * { transform: translate3d(26px, 0, 0); }
 .rv-zoom:not(.is-in) > * { transform: scale(.955); }
-.rv-rise:not(.is-in) > * { transform: translate3d(0, 30px, 0); }
 
 /* ---- resposta ao clique ----
    Vem no fim da folha de propósito: precisa vencer o transform do
@@ -1543,14 +1766,14 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
    SEÇÃO 11 · PORTFÓLIO
    ============================================================ */
 
-.work-thumb svg { transition: transform .5s var(--ease); }
-.work-card:hover .work-thumb svg { transform: scale(1.18) rotate(6deg); }
-/* A grade dentro da miniatura desliza de leve, dando profundidade */
+/* A grade dentro da miniatura desliza de leve, dando profundidade.
+   (Hover do numeral, do ícone e do selo já vive junto das próprias regras
+   no bloco da seção 11 acima — só o que é puramente movimento fica aqui.) */
 .work-thumb::after { transition: transform .6s var(--ease), opacity .4s var(--ease); }
-.work-card:hover .work-thumb::after { transform: translate(-14px, -14px); opacity: .9; }
-.work-thumb-code { transition: color .3s var(--ease), letter-spacing .3s var(--ease); }
-.work-card:hover .work-thumb-code { color: var(--accent-text); letter-spacing: .22em; }
+.work-card:hover .work-thumb::after { transform: translate(-14px, -14px); opacity: .85; }
 
+/* As pílulas de stack sobem escalonadas: uma onda curta da esquerda pra
+   direita, não as três de uma vez. */
 .work-stack li { transition: transform .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease); }
 .work-card:hover .work-stack li { border-color: var(--line-2); color: var(--text-2); transform: translateY(-2px); }
 .work-card:hover .work-stack li:nth-child(2) { transition-delay: .05s; }
@@ -1708,7 +1931,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 .flow-code { color: var(--detail); }
 .work-thumb-code { color: var(--detail); }
 .service-selector button > span { color: var(--detail); }
-.tip-num { color: var(--detail); opacity: .55; }
 
 /* Numeração na navegação: menu suspenso, gaveta e mapa do rodapé */
 .nav-pop-label { color: var(--detail); }
@@ -2085,7 +2307,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 
 
 @media (prefers-reduced-motion: reduce) {
-  .orb-field span, .orb-core-ring-a, .orb-core-halo { animation: none; }
+  .orb-field span, .orb-core-halo { animation: none; }
 }
 
 .performance-lite .orb-field span,
@@ -2142,11 +2364,6 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 /* O cone acompanha a mesma luz, senão o feixe fica desligado da base */
 .orb-cone { opacity: calc(.45 + var(--luz) * .55); }
 
-
-/* Giro que não atropela o posicionamento: a propriedade `rotate` é aplicada
-   antes do `transform`, então o elemento gira no próprio eixo e continua
-   centralizado pelo translate. */
-@keyframes orb-spin { to { rotate: 360deg; } }
 
 /* A camada de cards cobre a cena inteira: sem isto ela engoliria o clique de
    tudo que está atrás, e só os cards precisam ser clicáveis. */
@@ -2230,9 +2447,7 @@ footer { background: var(--surface-1); box-shadow: var(--card-shadow); }
 
 @media (max-width: 900px) {
   .rv-sides:not(.is-in) > *:nth-child(odd),
-  .rv-sides:not(.is-in) > *:nth-child(even),
-  .rv-left:not(.is-in) > *,
-  .rv-right:not(.is-in) > * { transform: translate3d(0, 22px, 0); }
+  .rv-sides:not(.is-in) > *:nth-child(even) { transform: translate3d(0, 22px, 0); }
 
   .about-flow .flow-module { transform: translate3d(0, 18px, 0); }
 
@@ -2276,8 +2491,6 @@ main { overflow-x: clip; }
   .front-link,
   .crew-phone,
   .footer-nav-link,
-  .footer-col a,
-  .footer-about a,
   .operator-connect,
   .map-strip-content > a,
   .service-bottom a,
@@ -2312,17 +2525,20 @@ main { overflow-x: clip; }
 /* ---- 12 · Antes e depois ---- */
 
 /* A alça pulsa até alguém tocar nela: é a única peça da página que precisa
-   de convite, porque nada mais no site se arrasta. */
-.compare-handle::after { animation: pulse-dot 2.8s ease-in-out infinite; }
-.compare:hover .compare-handle::after,
-.compare:focus-within .compare-handle::after { animation: none; transform: translate(-50%, -50%) scale(1.12); }
+   de convite, porque nada mais no site se arrasta. (O `scale` de hover e o
+   de :active moram junto da própria regra da alça, mais acima.) */
+.compare-handle i { animation: pulse-dot 2.8s ease-in-out infinite; }
+.compare:hover .compare-handle i,
+.compare:focus-within .compare-handle i { animation: none; }
 .compare-tag { transition: transform .35s var(--ease); }
 .compare:hover .compare-tag { transform: translateY(-3px); }
+/* As fotos ganham um zoom mínimo no hover: dá vida ao quadro sem tirar as
+   duas metades de escala, porque as duas recebem o mesmo valor. */
+.compare-side img { transition: transform .8s var(--ease); }
+.compare:hover .compare-side img { transform: scale(1.03); }
 
-.gain-card { transition: transform .35s var(--ease), border-color .3s var(--ease); }
-.gain-card:hover { transform: translateY(-4px); border-color: var(--line-3); }
-.gain-card strong { display: block; transition: transform .35s var(--ease); }
-.gain-card:hover strong { transform: scale(1.08); }
+.gain-card { transition: transform .35s var(--ease), border-color .3s var(--ease), box-shadow .35s var(--ease); }
+.gain-card:hover { transform: translateY(-4px); border-color: var(--line-3); box-shadow: var(--shadow-2); }
 
 /* ---- 13 · Tecnologias ---- */
 
@@ -2373,8 +2589,6 @@ main { overflow-x: clip; }
 
 /* ---- 16 · Dicas ---- */
 
-.tip-num { display: block; transition: transform .4s var(--ease), color .3s var(--ease); }
-.tip-card:hover .tip-num { transform: scale(1.1) translateX(3px); color: var(--accent-text); }
 .tip-card header svg { transition: transform .4s var(--ease); }
 .tip-card:hover header svg { transform: rotate(-10deg) scale(1.12); }
 
@@ -2443,7 +2657,7 @@ main { overflow-x: clip; }
 /* ---- desligamentos ---- */
 
 @media (prefers-reduced-motion: reduce) {
-  .compare-handle::after,
+  .compare-handle i,
   .technology-module > div i,
   .standby-dish svg { animation: none; }
   .tech-chips li,
@@ -2451,9 +2665,11 @@ main { overflow-x: clip; }
   .technology-modules > svg { opacity: 1; transform: none; transition: none; }
   .faq-list details::before,
   .final-cta .terminal-label::after { transform: none; transition: none; }
+  /* Conteúdo nunca pode depender de animação para existir. */
+  .compare-stage, .compare-stage.is-in { opacity: 1; transform: none; transition: none; }
 }
 
-.performance-lite .compare-handle::after,
+.performance-lite .compare-handle i,
 .performance-lite .technology-module > div i,
 .performance-lite .standby-dish svg { animation: none; }
 
@@ -2515,4 +2731,30 @@ main { overflow-x: clip; }
 /* Tela baixa e estreita ao mesmo tempo: o hero empilha e a cena centraliza */
 @media (max-height: 800px) and (max-width: 1100px) {
   .orb-wrap { margin: 36px auto 0; }
+}
+
+/* ============================================================
+   PINTURA SOB DEMANDA
+
+   A página tem ~24.000px de altura e 20 seções. Sem isto o
+   navegador calcula layout e pintura de todas elas a cada
+   recálculo, mesmo das que estão a vinte telas de distância.
+
+   `content-visibility: auto` faz o trabalho ser adiado até a
+   seção se aproximar da tela. O `auto` no
+   `contain-intrinsic-size` é o que evita o salto de rolagem: o
+   navegador guarda o tamanho real depois da primeira pintura e
+   passa a usá-lo, então o valor abaixo só vale para o primeiro
+   cálculo.
+
+   O hero fica fora de propósito: tem `position: sticky` dentro e
+   é a primeira coisa na tela, então não há o que adiar.
+   ============================================================ */
+
+.experience-section,
+.metrics-strip,
+.map-strip,
+.final-cta {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }

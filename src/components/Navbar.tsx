@@ -43,23 +43,45 @@ export default function Navbar() {
   useEffect(() => () => window.clearTimeout(closeTimer.current), [])
 
   useEffect(() => {
-    const onScroll = () => {
+    /**
+     * As seções são resolvidas uma vez, não a cada rolagem.
+     *
+     * Antes o evento fazia até 21 `querySelector` mais 21 medições — e evento
+     * de rolagem dispara dezenas de vezes por segundo. Agora o DOM é consultado
+     * na montagem e o trabalho por quadro é só ler posição.
+     */
+    const secoes = anchors
+      .map(({ href, group }) => ({ group, el: document.querySelector(href) }))
+      .filter((item): item is { group: string; el: Element } => item.el !== null)
+
+    let frame = 0
+
+    const aplicar = () => {
       setScrolled(window.scrollY > 56)
       // Percorre de baixo para cima: vale a última âncora cujo topo já passou
       // da linha de leitura.
       let current = ""
-      for (let i = anchors.length - 1; i >= 0; i--) {
-        const section = document.querySelector(anchors[i].href)
-        if (section && section.getBoundingClientRect().top <= 180) {
-          current = anchors[i].group
+      for (let i = secoes.length - 1; i >= 0; i--) {
+        if (secoes[i].el.getBoundingClientRect().top <= 180) {
+          current = secoes[i].group
           break
         }
       }
       setActive(current)
     }
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
+
+    // Uma medição por quadro, não uma por evento.
+    const aoRolar = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(aplicar)
+    }
+
+    aplicar()
+    window.addEventListener("scroll", aoRolar, { passive: true })
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", aoRolar)
+    }
   }, [])
 
   useEffect(() => {
@@ -82,7 +104,7 @@ export default function Navbar() {
     <>
       <header className={`control-bar ${scrolled ? "is-compact" : ""}`}>
         <a href="#inicio" className="control-logo" aria-label="BASE4 SYSTEMS — início">
-          <span className="control-logo-mark">B</span>
+          <span className="control-logo-mark"><img src="/b4-icon.png" alt="" /></span>
           <span>BASE4 <b>SYSTEMS</b></span>
         </a>
 
