@@ -167,14 +167,14 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
     let frame = 0
 
     const clearMotion = element => {
-      for (const property of ['--progress', '--build', '--matter', '--core', '--data', '--energy', '--final', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
+      for (const property of ['--progress', '--build', '--matter', '--data', '--energy', '--final', '--bridge', '--handoff', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
     }
     const syncAnimations = (element, progress, isDesktop) => {
       const hardwareAnimation = element.querySelector('[data-scroll-svg="hardware"]')
       const softwareAnimation = element.querySelector('[data-scroll-svg="software"]')
       if (isDesktop) {
-        const hardwareSeeking = seekScrollSvg(hardwareAnimation, hardwareScrollTimeline(progress / .3))
-        const softwareSeeking = seekScrollSvg(softwareAnimation, (progress - .62) / .29)
+        const hardwareSeeking = seekScrollSvg(hardwareAnimation, hardwareScrollTimeline(progress / .32))
+        const softwareSeeking = seekScrollSvg(softwareAnimation, (progress - .36) / .32)
         return hardwareSeeking || softwareSeeking
       }
       let seeking = false
@@ -206,13 +206,14 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
-        element.style.setProperty('--build', clamp(progress / .3).toFixed(4))
+        element.style.setProperty('--build', clamp(progress / .32).toFixed(4))
         const seeking = syncAnimations(element, progress, true)
-        element.style.setProperty('--matter', (1 - clamp((progress - .28) / .1)).toFixed(4))
-        element.style.setProperty('--core', (clamp((progress - .3) / .1) * (1 - clamp((progress - .62) / .1))).toFixed(4))
-        element.style.setProperty('--data', (clamp((progress - .62) / .1) * (1 - clamp((progress - .91) / .07))).toFixed(4))
-        element.style.setProperty('--energy', (clamp((progress - .16) / .18) * (1 - clamp((progress - .84) / .1))).toFixed(4))
-        element.style.setProperty('--final', clamp((progress - .94) / .05).toFixed(4))
+        element.style.setProperty('--matter', (1 - clamp((progress - .3) / .08)).toFixed(4))
+        element.style.setProperty('--data', (clamp((progress - .32) / .08) * (1 - clamp((progress - .69) / .06))).toFixed(4))
+        element.style.setProperty('--energy', (clamp((progress - .17) / .14) * (1 - clamp((progress - .78) / .1))).toFixed(4))
+        element.style.setProperty('--final', clamp((progress - .7) / .1).toFixed(4))
+        element.style.setProperty('--bridge', (clamp((progress - .67) / .08) * (1 - clamp((progress - .88) / .08))).toFixed(4))
+        element.style.setProperty('--handoff', clamp((progress - .9) / .1).toFixed(4))
         if (seeking && !frame) frame = requestAnimationFrame(update)
       }
     }
@@ -401,23 +402,19 @@ function TransformationScene() {
         <span className="hardware-scan"/>
       </div>
     </article>
-    <article className="transformation-card core-card">
-      <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>A base<br/>que conecta.</h2><p>Estrutura e inteligência trabalhando como uma única solução.</p></div>
-      <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
-    </article>
     <article className="transformation-card data-card">
       <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
       <div className="data-visual" aria-hidden="true">
         <ScrollSvg className="scene-motion software-motion" src="/assets/scene/coding.svg" role="software" duration="7"/>
       </div>
-      <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
     </article>
     <article className="transformation-card final-card">
-      <div className="final-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
+      <div className="final-bridge" aria-hidden="true"/>
+      <div className="final-mark" aria-hidden="true"><img src={`${BRAND}base4-logo-horizontal.png`} width="730" height="165" loading="lazy" decoding="async" alt=""/></div>
       <div className="final-copy"><span>BASE4 SYSTEMS</span><h2>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></h2><p>Tecnologia de ponta a ponta.</p></div>
     </article>
     <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/><i/></div>
+    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/></div>
   </div></section>
 }
 
@@ -440,7 +437,15 @@ function SolutionsScene() {
   return <section className="solutions-scene" id="solucoes" tabIndex={-1}>
     <div className="scene-heading" data-reveal><p>O QUE RESOLVEMOS</p><h2>Tecnologia começa<br/>com um problema real.</h2></div>
     <div className="solution-switch" role="tablist" aria-label="Área de solução" data-reveal>{fields.map((value, index) => <button key={value} ref={element => { tabRefs.current[index] = element }} id={`${tabsId}-${value}-tab`} role="tab" aria-selected={field === value} aria-controls={`${tabsId}-panel`} tabIndex={field === value ? 0 : -1} onKeyDown={event => moveTab(event, index)} onClick={() => changeField(value)}>{value === 'hardware' ? 'Hardware' : 'Software'}</button>)}<i className={field}/></div>
-    <div className={`problem-stage ${field}`} data-reveal><div className="problem-list" id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${field}-tab`} tabIndex={0}>{items.map((item, index) => <button key={item.problem} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>)}</div><div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div></div>
+    <div className={`problem-stage ${field}`} data-reveal>
+      <div className="problem-list" id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${field}-tab`} tabIndex={0}>
+        {items.map((item, index) => <div key={item.problem} className={`problem-item ${active === index ? 'active' : ''}`}>
+          <button className={active === index ? 'active' : ''} aria-expanded={active === index} aria-controls={`${tabsId}-${field}-answer-${index}`} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>
+          <div className="problem-inline-answer" id={`${tabsId}-${field}-answer-${index}`} aria-hidden={active !== index}><div><span>O caminho BASE4</span><h3>{item.answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p></div></div>
+        </div>)}
+      </div>
+      <div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div>
+    </div>
   </section>
 }
 
@@ -495,10 +500,33 @@ function ChargeScene() {
   return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
 }
 
+function CapabilityVisual({ index, inline = false }) {
+  const item = capabilities[index]
+  const headerUrl = index === 0 ? 'portfoliosaramarques.vercel.app' : index === 1 ? 'obsidian-eta-self.vercel.app' : 'base4.systems / projeto'
+  return <div className={`capability-visual visual-${item.visual} ${inline ? 'capability-visual-inline' : 'capability-visual-desktop'}`}>
+    <div className="screen screen-back"><span/><span/><span/></div>
+    <div className="screen screen-front">
+      <header><i/><i/><i/><span>{headerUrl}</span></header>
+      {index === 0 ? <a className="portfolio-preview" href="https://portfoliosaramarques.vercel.app/" target="_blank" rel="noreferrer" aria-label="Abrir o portfólio de Sara Marques em uma nova aba"><img src="/assets/projects/sara-portfolio-preview.jpg" width="1066" height="1600" loading="lazy" decoding="async" alt="Prévia do portfólio de Sara Marques"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Sara Marques</strong><em>Fotografia e audiovisual</em><b>Visitar site <Arrow/></b></span></a> : index === 1 ? <a className="portfolio-preview" href="https://obsidian-eta-self.vercel.app" target="_blank" rel="noreferrer" aria-label="Abrir o site da Obsidian em uma nova aba"><img src="/assets/projects/obsidian-preview.jpg" width="1568" height="741" loading="lazy" decoding="async" alt="Prévia do site da Obsidian Estética Automotiva"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Obsidian</strong><em>Estética automotiva de alta performance</em><b>Visitar site <Arrow/></b></span></a> : <main><span/><strong/><span/><div><i/><i/><i/></div></main>}
+    </div>
+    <div className="visual-label">{index <= 1 ? 'Clique para visitar' : item.label}</div>
+  </div>
+}
+
 function CapabilityScene() {
   const [active, setActive] = useState(0)
-  const headerUrl = active === 0 ? 'portfoliosaramarques.vercel.app' : active === 1 ? 'obsidian-eta-self.vercel.app' : 'base4.systems / projeto'
-  return <section className="capability-scene" id="capacidade"><div className="capability-intro" data-reveal><p>CAPACIDADE DE DESENVOLVIMENTO</p><h2>Do código à operação.</h2><span>Sites, sistemas e automações construídos em torno da operação de cada cliente.</span></div><div className="capability-stage" data-reveal><div className="capability-list">{capabilities.map((item, index) => <button key={item.label} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><small>{item.label}</small><strong>{item.title}</strong><span>{item.detail}</span><Arrow /></button>)}</div><div className={`capability-visual visual-${capabilities[active].visual}`}><div className="screen screen-back"><span/><span/><span/></div><div className="screen screen-front"><header><i/><i/><i/><span>{headerUrl}</span></header>{active === 0 ? <a className="portfolio-preview" href="https://portfoliosaramarques.vercel.app/" target="_blank" rel="noreferrer" aria-label="Abrir o portfólio de Sara Marques em uma nova aba"><img src="/assets/projects/sara-portfolio-preview.jpg" width="1066" height="1600" loading="lazy" decoding="async" alt="Prévia do portfólio de Sara Marques"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Sara Marques</strong><em>Fotografia e audiovisual</em><b>Visitar site <Arrow/></b></span></a> : active === 1 ? <a className="portfolio-preview" href="https://obsidian-eta-self.vercel.app" target="_blank" rel="noreferrer" aria-label="Abrir o site da Obsidian em uma nova aba"><img src="/assets/projects/obsidian-preview.jpg" width="1568" height="741" loading="lazy" decoding="async" alt="Prévia do site da Obsidian Estética Automotiva"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Obsidian</strong><em>Estética automotiva de alta performance</em><b>Visitar site <Arrow/></b></span></a> : <main><span/><strong/><span/><div><i/><i/><i/></div></main>}</div><div className="visual-label">{active === 0 ? 'Clique para visitar' : active === 1 ? 'Clique para visitar' : capabilities[active].label}</div></div></div></section>
+  return <section className="capability-scene" id="capacidade">
+    <div className="capability-intro" data-reveal><p>CAPACIDADE DE DESENVOLVIMENTO</p><h2>Do código à operação.</h2><span>Sites, sistemas e automações construídos em torno da operação de cada cliente.</span></div>
+    <div className="capability-stage" data-reveal>
+      <div className="capability-list">
+        {capabilities.map((item, index) => <div key={item.label} className={`capability-item ${active === index ? 'active' : ''}`}>
+          <button className={active === index ? 'active' : ''} aria-expanded={active === index} aria-controls={`capability-panel-${index}`} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><small>{item.label}</small><strong>{item.title}</strong><span>{item.detail}</span><Arrow /></button>
+          <div className="capability-inline-panel" id={`capability-panel-${index}`} aria-hidden={active !== index}><div className="capability-inline-shell">{active === index && <CapabilityVisual index={index} inline/>}</div></div>
+        </div>)}
+      </div>
+      <CapabilityVisual index={active}/>
+    </div>
+  </section>
 }
 
 // Comparador antes/depois: um <input type="range"> nativo, esticado por CSS
