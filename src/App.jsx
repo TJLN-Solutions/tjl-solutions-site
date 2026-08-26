@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import ChargeDemo from './ChargeDemo.jsx'
 import { chargeRevealAt } from './chargeDemoData.js'
-import { capabilities, people, problemsByField } from './data.js'
+import { capabilities, faq, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
@@ -9,6 +9,41 @@ const GPU_FRAMES = Array.from({ length: 24 }, (_, index) => `/assets/scene/gpu-s
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
+
+// Scroll suave feito à mão: o `scroll-behavior: smooth` nativo do navegador é
+// cancelado no meio da animação pelos hooks de scroll desta página (eles fazem
+// getBoundingClientRect a cada frame), o que fazia o clique em links âncora
+// (#menu, #contato...) não rolar a página. Esta versão controla o scroll
+// diretamente, então nada a interrompe.
+function smoothScrollToId(id) {
+  const element = document.getElementById(id)
+  if (!element) return
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { element.scrollIntoView(); return }
+  const startY = window.scrollY
+  const targetY = startY + element.getBoundingClientRect().top
+  const distance = targetY - startY
+  if (Math.abs(distance) < 2) return
+  const duration = Math.min(900, Math.max(320, Math.abs(distance) * .32))
+  const startTime = performance.now()
+  const ease = t => 1 - (1 - t) ** 3
+  const step = now => {
+    const progress = Math.min(1, (now - startTime) / duration)
+    scrollTo(0, startY + distance * ease(progress))
+    if (progress < 1) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+  // Rede de segurança: se o navegador atrasar o rAF (aba em segundo plano etc.),
+  // garante que o destino final seja alcançado mesmo assim.
+  setTimeout(() => { if (Math.abs(window.scrollY - targetY) > 2) scrollTo(0, targetY) }, duration + 150)
+}
+
+function smoothNavigate(event) {
+  const href = event.currentTarget.getAttribute('href')
+  if (!href || href.charAt(0) !== '#' || href.length < 2) return
+  event.preventDefault()
+  smoothScrollToId(href.slice(1))
+  if (history.pushState) history.pushState(null, '', href)
+}
 
 function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
   useEffect(() => {
@@ -98,15 +133,32 @@ function useReveals() {
 
 function Arrow() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg> }
 function Plus() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> }
+function Check() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l6 6L20 6"/></svg> }
+
+// Revela um título palavra por palavra (borrado → nítido, com leve atraso
+// entre uma palavra e outra). `startIndex` encadeia o atraso entre linhas.
+function RevealWords({ text, startIndex = 0 }) {
+  const words = text.split(' ')
+  return words.map((word, index) => <span key={index} style={/** @type {React.CSSProperties} */ ({ '--w': startIndex + index })}>{word}{index < words.length - 1 ? ' ' : ''}</span>)
+}
 
 function Brand({ compact = false, className = '' }) {
-  return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" aria-label="BASE4 SYSTEMS — início">
+  return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" onClick={smoothNavigate} aria-label="BASE4 SYSTEMS — início">
     <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" decoding="async" alt="" />
     {!compact && <img className="brand-wordmark" src={`${BRAND}base4-wordmark-white.png`} width="1010" height="99" decoding="async" alt="BASE4 SYSTEMS" />}
   </a>
 }
 
-const NAV_ITEMS = [['Ecossistema', '#transformacao'], ['Soluções', '#solucoes'], ['Charge', '#charge'], ['Capacidade', '#capacidade'], ['BASE4', '#presenca']]
+const NAV_ITEMS = [['Ecossistema', '#transformacao'], ['Soluções', '#solucoes'], ['Charge', '#charge'], ['Capacidade', '#capacidade'], ['BASE4', '#presenca'], ['Sobre', '#sobre'], ['Equipe', '#equipe'], ['FAQ', '#faq']]
+
+const ABOUT_POINTS = ['Hardware e software sob o mesmo teto', 'Equipe tecnicamente capacitada', 'Orçamento antes da execução, sem letra miúda']
+
+// TODO: números reais a substituir — Nicolas vai passar os valores certos depois.
+const ABOUT_STATS = [
+  { value: '2026', label: 'Ano de fundação' },
+  { value: '50+', label: 'Equipamentos atendidos' },
+  { value: '5+', label: 'Projetos entregues' },
+]
 
 function Header() {
   const [open, setOpen] = useState(false)
@@ -114,17 +166,26 @@ function Header() {
   const menuPanel = useRef(null)
   const closeReason = useRef('cancel')
   const closeMenu = () => { closeReason.current = 'cancel'; setOpen(false) }
-  const navigateMenu = event => {
-    const href = event.currentTarget.getAttribute('href')
-    if (!href) return
-    closeReason.current = 'navigate'
-    setOpen(false)
+  const focusTarget = href => {
     window.setTimeout(() => {
       const target = document.querySelector(href)
       if (!target) return
       target.setAttribute('tabindex', '-1')
       target.focus({ preventScroll: true })
     }, 0)
+  }
+  const navigate = event => {
+    const href = event.currentTarget.getAttribute('href')
+    smoothNavigate(event)
+    if (href) focusTarget(href)
+  }
+  const navigateMenu = event => {
+    const href = event.currentTarget.getAttribute('href')
+    if (!href) return
+    smoothNavigate(event)
+    closeReason.current = 'navigate'
+    setOpen(false)
+    focusTarget(href)
   }
   useEffect(() => {
     if (!open) return undefined
@@ -154,8 +215,8 @@ function Header() {
   }, [open])
   return <header className="header-shell">
     <Brand />
-    <nav className="desktop-nav" aria-label="Navegação principal">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href}>{label}</a>)}</nav>
-    <a className="header-contact" href="#contato">Iniciar conversa <Arrow /></a>
+    <nav className="desktop-nav" aria-label="Navegação principal">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={navigate}>{label}</a>)}</nav>
+    <a className="header-contact" href="#contato" onClick={navigate}>Iniciar conversa <Arrow /></a>
     <button ref={menuButton} className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(current => !current)}><span/><span/></button>
     {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={navigateMenu}>{label}</a>)}<a className="mobile-menu-cta" href="#contato" onClick={navigateMenu}>Iniciar conversa <Arrow/></a></nav></div>}
   </header>
@@ -279,7 +340,7 @@ function ChargeScene() {
     document.addEventListener('keydown', handleKey)
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
   }, [expanded])
-  return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2>O próximo fluxo<br/>está chegando.</h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
+  return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
 }
 
 function CapabilityScene() {
@@ -289,7 +350,59 @@ function CapabilityScene() {
 }
 
 function PresenceScene() {
-  return <section className="presence-scene" id="presenca"><div className="presence-glow"/><div className="presence-heading" data-reveal><p>PRESENÇA</p><h2>Perto na bancada.<br/>Sem fronteiras no código.</h2><span>Você fala com quem entende, executa e acompanha o trabalho.</span></div><div className="presence-content" data-reveal><div className="location-block"><span>Loja física em Bilac</span><h3>Rua XV de Novembro, 283</h3><p>Segunda a sexta · 08h–18h<br/>Sábado · 08h–12h</p><a href="https://www.google.com/maps/dir/?api=1&destination=-21.4055942,-50.4757713" target="_blank" rel="noreferrer">Traçar rota <Arrow /></a><div className="location-line"><i/><span>Atendimento presencial</span><i/></div></div><div className="people-flow">{people.map(person => <a key={person.name} href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer"><span>{person.area}</span><strong>{person.name}</strong><small>{person.role}</small><Arrow /></a>)}</div></div><div className="trust-sentence" data-reveal><span>Orçamento antes da execução</span><i/><span>Garantia</span><i/><span>Código-fonte quando aplicável</span><i/><span>Suporte após a entrega</span></div></section>
+  return <section className="presence-scene" id="presenca"><div className="presence-glow"/><div className="presence-heading" data-reveal><p>PRESENÇA</p><h2>Perto na bancada.<br/>Sem fronteiras no código.</h2><span>Você fala com quem entende, executa e acompanha o trabalho.</span></div><div className="presence-content" data-reveal><div className="location-block"><span>Loja física em Bilac</span><h3>Rua XV de Novembro, 283</h3><p>Segunda a sexta · 08h–18h<br/>Sábado · 08h–12h</p><a href="https://www.google.com/maps/dir/?api=1&destination=-21.4055942,-50.4757713" target="_blank" rel="noreferrer">Traçar rota <Arrow /></a><div className="location-line"><i/><span>Atendimento presencial</span><i/></div></div><div className="location-map"><iframe src="https://maps.google.com/maps?q=-21.4055942,-50.4757713&z=16&output=embed" title="Localização da BASE4 SYSTEMS em Bilac, SP" loading="lazy" referrerPolicy="no-referrer-when-downgrade"/></div></div><div className="trust-sentence" data-reveal><span>Orçamento antes da execução</span><i/><span>Garantia</span><i/><span>Código-fonte quando aplicável</span><i/><span>Suporte após a entrega</span></div></section>
+}
+
+function AboutScene() {
+  return <section className="about-scene" id="sobre"><div className="about-content" data-reveal><span>NOSSA HISTÓRIA</span><h2>Uma base para o que<br/>antes era separado.</h2><p>A BASE4 nasceu em 2026, em Bilac, para resolver um problema simples: quem precisa de tecnologia normalmente precisa contratar duas empresas diferentes — uma para consertar o hardware, outra para construir o software. Reunimos as duas coisas debaixo do mesmo teto, com uma equipe que entende tanto de bancada quanto de código.</p><ul className="about-points">{ABOUT_POINTS.map(point => <li key={point}><Check/>{point}</li>)}</ul></div><div className="about-stats" data-reveal>{ABOUT_STATS.map(stat => <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div></section>
+}
+
+// Ícones do card de sócio — mail e GitHub vieram do card original do Uiverse;
+// WhatsApp e LinkedIn são os paths oficiais da simple-icons.
+function MailIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> }
+function WhatsAppIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> }
+function LinkedInIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> }
+function GithubIcon() { return <svg viewBox="0 0 496 512" aria-hidden="true"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> }
+
+// Card de sócio — adaptado de https://uiverse.io/Centered101/cowardly-newt-15
+// (mesma mecânica de hover, recolorido pra paleta do site). WhatsApp já linka
+// pro número real; LinkedIn e GitHub ficam sem link até termos os perfis.
+function MemberCard({ person, index }) {
+  const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase()
+  return <div className="member-card-wrap" data-reveal style={/** @type {React.CSSProperties} */ ({ '--i': index })}>
+    <div className="member-card">
+      <button className="member-mail" type="button" aria-label={`E-mail de ${person.name} (em breve)`}><MailIcon/></button>
+      <div className="member-photo">{person.photo ? <img src={person.photo} alt="" /> : <b aria-hidden="true">{initials}</b>}</div>
+      <div className="member-bottom">
+        <div className="member-content">
+          <span className="member-name">{person.name}</span>
+          <span className="member-role">{person.role}</span>
+          <span className="member-bio">{person.differential}</span>
+        </div>
+        <div className="member-footer">
+          <div className="member-socials">
+            <a href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer" aria-label={`WhatsApp de ${person.name}`}><WhatsAppIcon/></a>
+            <span aria-hidden="true" title="LinkedIn (em breve)"><LinkedInIcon/></span>
+            <span aria-hidden="true" title="GitHub (em breve)"><GithubIcon/></span>
+          </div>
+          <a className="member-button" href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer">Falar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+function TeamScene() {
+  return <section className="team-scene" id="equipe"><div className="team-heading" data-reveal><p>EQUIPE</p><h2>Quem faz a BASE4<br/>acontecer.</h2><span>Pessoas de verdade, por trás de cada reparo e cada linha de código.</span></div><div className="team-grid">{people.map((person, index) => <MemberCard key={person.name} person={person} index={index}/>)}</div></section>
+}
+
+function FaqScene() {
+  const [open, setOpen] = useState(0)
+  const uid = useId()
+  return <section className="faq-scene" id="faq"><div className="faq-heading" data-reveal><span>PERGUNTAS FREQUENTES</span><h2>Antes de falar com a gente.</h2></div><div className="faq-list" data-reveal>{faq.map((item, index) => {
+    const isOpen = open === index
+    return <div key={item.q} className={`faq-item${isOpen ? ' is-open' : ''}`}><h3><button type="button" id={`${uid}-q-${index}`} aria-expanded={isOpen} aria-controls={`${uid}-a-${index}`} onClick={() => setOpen(isOpen ? -1 : index)}>{item.q}<Plus/></button></h3><div className="faq-answer" id={`${uid}-a-${index}`} role="region" aria-labelledby={`${uid}-q-${index}`}><div className="faq-answer-inner"><p>{item.a}</p></div></div></div>
+  })}</div></section>
 }
 
 function ContactScene() {
@@ -335,6 +448,6 @@ function ContactScene() {
   </section>
 }
 
-function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao">Ecossistema</a><a href="#solucoes">Soluções</a><a href="#charge">Charge</a><a href="#presenca">BASE4</a><a href="#contato">Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
+function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao" onClick={smoothNavigate}>Ecossistema</a><a href="#solucoes" onClick={smoothNavigate}>Soluções</a><a href="#charge" onClick={smoothNavigate}>Charge</a><a href="#presenca" onClick={smoothNavigate}>BASE4</a><a href="#sobre" onClick={smoothNavigate}>Sobre</a><a href="#equipe" onClick={smoothNavigate}>Equipe</a><a href="#faq" onClick={smoothNavigate}>FAQ</a><a href="#contato" onClick={smoothNavigate}>Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
 
-export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo">Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><PresenceScene/><ContactScene/></main><Footer/></> }
+export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo" onClick={smoothNavigate}>Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><PresenceScene/><AboutScene/><TeamScene/><FaqScene/><ContactScene/></main><Footer/></> }
