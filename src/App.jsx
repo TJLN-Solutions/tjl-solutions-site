@@ -5,10 +5,58 @@ import { capabilities, faq, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
-const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence-amd-edsr/frame-${String(index).padStart(2, '0')}.webp`)
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
+
+function seekScrollSvg(object, progress) {
+  if (!(object instanceof HTMLElement)) return
+  const svg = object.querySelector('svg')
+  const duration = Number(object.dataset.duration)
+  if (!(svg instanceof SVGSVGElement) || typeof svg.setCurrentTime !== 'function' || !Number.isFinite(duration)) return
+  svg.pauseAnimations?.()
+  svg.setCurrentTime(clamp(progress) * Math.max(0, duration - 1 / 60))
+}
+
+function ScrollSvg({ src, role, duration, className }) {
+  const container = useRef(/** @type {HTMLDivElement | null} */ (null))
+  const [markup, setMarkup] = useState('')
+
+  useEffect(() => {
+    let active = true
+    fetch(src)
+      .then(response => {
+        if (!response.ok) throw new Error(`Não foi possível carregar ${src}`)
+        return response.text()
+      })
+      .then(source => {
+        const document = new DOMParser().parseFromString(source, 'image/svg+xml')
+        document.querySelectorAll('script, foreignObject').forEach(node => node.remove())
+        document.querySelectorAll('*').forEach(node => {
+          for (const attribute of [...node.attributes]) {
+            if (/^on/i.test(attribute.name)) node.removeAttribute(attribute.name)
+            if ((attribute.name === 'href' || attribute.name === 'xlink:href') && !attribute.value.startsWith('#')) node.removeAttribute(attribute.name)
+          }
+        })
+        const svg = document.documentElement
+        svg.removeAttribute('width')
+        svg.removeAttribute('height')
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+        if (active) setMarkup(svg.outerHTML)
+      })
+      .catch(() => { if (active) setMarkup('') })
+    return () => { active = false }
+  }, [src])
+
+  useEffect(() => {
+    const svg = container.current?.querySelector('svg')
+    if (!(svg instanceof SVGSVGElement)) return
+    svg.pauseAnimations?.()
+    svg.setCurrentTime?.(0)
+  }, [markup])
+
+  return <div ref={container} className={className} data-scroll-svg={role} data-duration={duration} dangerouslySetInnerHTML={{ __html: markup }}/>
+}
 
 // Scroll suave feito à mão: o `scroll-behavior: smooth` nativo do navegador é
 // cancelado no meio da animação pelos hooks de scroll desta página (eles fazem
@@ -53,32 +101,43 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
 
     const clearMotion = element => {
       for (const property of ['--progress', '--build', '--matter', '--core', '--data', '--energy', '--final', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
-      element.querySelectorAll('.gpu-frame.is-active').forEach(gpuFrame => {
-        gpuFrame.classList.remove('is-active')
-        gpuFrame.style.removeProperty('opacity')
-      })
-      element.querySelector('.gpu-frame[data-frame="0"]')?.classList.add('is-active')
-      delete element.dataset.gpuFrame
+    }
+    const syncAnimations = (element, progress, isDesktop) => {
+      const hardwareAnimation = element.querySelector('[data-scroll-svg="hardware"]')
+      const softwareAnimation = element.querySelector('[data-scroll-svg="software"]')
+      if (isDesktop) {
+        seekScrollSvg(hardwareAnimation, progress / .22)
+        seekScrollSvg(softwareAnimation, (progress - .51) / .28)
+        return
+      }
+      for (const animation of [hardwareAnimation, softwareAnimation]) {
+        if (!animation) continue
+        const card = animation.closest('.transformation-card')
+        if (!card) continue
+        const cardRect = card.getBoundingClientRect()
+        seekScrollSvg(animation, (innerHeight - cardRect.top) / Math.max(1, innerHeight + cardRect.height))
+      }
     }
     const update = () => {
       frame = 0
       const element = ref.current
       if (!element) return
-      if (!desktop.matches || reduced.matches) { clearMotion(element); return }
+      if (reduced.matches) {
+        clearMotion(element)
+        element.querySelectorAll('[data-scroll-svg]').forEach(animation => seekScrollSvg(animation, 0))
+        return
+      }
+      if (!desktop.matches) {
+        clearMotion(element)
+        if (phases) syncAnimations(element, 0, false)
+        return
+      }
       const rect = element.getBoundingClientRect()
       const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
         element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
-        const gpuFrame = String(Math.round(clamp(progress / .22) * (GPU_FRAMES.length - 1)))
-        if (element.dataset.gpuFrame !== gpuFrame) {
-          element.querySelectorAll('.gpu-frame.is-active').forEach(gpuFrame => {
-            gpuFrame.classList.remove('is-active')
-            gpuFrame.style.removeProperty('opacity')
-          })
-          element.querySelector(`.gpu-frame[data-frame="${gpuFrame}"]`)?.classList.add('is-active')
-          element.dataset.gpuFrame = gpuFrame
-        }
+        syncAnimations(element, progress, true)
         element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
         element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
         element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
@@ -97,6 +156,8 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
     }
 
     update()
+    const animations = ref.current?.querySelectorAll('[data-scroll-svg]') ?? []
+    animations.forEach(animation => animation.addEventListener('load', request))
     addEventListener('scroll', request, { passive: true })
     addEventListener('resize', request)
     if (pointer) addEventListener('pointermove', move, { passive: true })
@@ -108,6 +169,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       if (pointer) removeEventListener('pointermove', move)
       desktop.removeEventListener('change', request)
       reduced.removeEventListener('change', request)
+      animations.forEach(animation => animation.removeEventListener('load', request))
       cancelAnimationFrame(frame)
     }
   }, [phases, pointer, ref])
@@ -264,8 +326,7 @@ function TransformationScene() {
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
       <div className="matter-object" aria-hidden="true">
-        <div className="gpu-sequence">{GPU_FRAMES.map((src, index) => <img className={`gpu-frame${index === 0 ? ' is-active' : ''}`} src={src} width="1560" height="800" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" alt="" key={src} data-frame={index}/>)}</div>
-        <img className="gpu-static scene-asset" src="/assets/scene/gpu-sequence-amd-edsr/frame-00.webp" width="1560" height="800" loading="lazy" decoding="async" alt=""/>
+        <ScrollSvg className="scene-motion hardware-motion" src="/assets/scene/gpu.svg" role="hardware" duration="5.35"/>
         <span className="hardware-scan"/>
       </div>
     </article>
@@ -276,7 +337,7 @@ function TransformationScene() {
     <article className="transformation-card data-card">
       <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
       <div className="data-visual" aria-hidden="true">
-        <img className="scene-asset" src="/assets/scene/base4-digital-interface.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <ScrollSvg className="scene-motion software-motion" src="/assets/scene/coding.svg" role="software" duration="7"/>
         <span className="data-pulse"/>
       </div>
       <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
