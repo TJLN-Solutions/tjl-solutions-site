@@ -168,12 +168,9 @@ function HeroScene() {
 function TransformationScene() {
   const ref = useRef(/** @type {HTMLElement | null} */ (null))
   useDesktopSceneMotion(ref, { phases: true })
-  const hardware = ['Diagnóstico', 'Reparo', 'Upgrade', 'Recuperação']
-  const software = ['Sites', 'Sistemas', 'Automações', 'Integrações']
   return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
-      <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
       <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
     </article>
     <article className="transformation-card core-card">
@@ -182,7 +179,6 @@ function TransformationScene() {
     </article>
     <article className="transformation-card data-card">
       <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
-      <div className="software-words" aria-label="Serviços de software">{software.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
       <div className="data-visual" aria-hidden="true"><i/><i/><i/><i/><span/></div>
     </article>
     <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
