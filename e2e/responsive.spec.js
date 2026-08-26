@@ -306,7 +306,7 @@ test('novos visuais da narrativa carregam com proporção preservada', async ({ 
     await page.goto('/#transformacao')
     const assets = [
       viewport.width > 1100
-        ? { selector: '.matter-object .gpu-frame', naturalWidth: 1170, naturalHeight: 600 }
+        ? { selector: '.matter-object .gpu-frame', naturalWidth: 1060, naturalHeight: 660 }
         : { selector: '.matter-object .gpu-static', naturalWidth: 1400, naturalHeight: 583 },
       { selector: '.data-visual .scene-asset', naturalWidth: 1280, naturalHeight: 853 },
     ]
