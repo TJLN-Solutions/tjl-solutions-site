@@ -377,14 +377,142 @@ function Header() {
   </header>
 }
 
-function Particles({ count = 18 }) { return <div className="particles" aria-hidden="true">{Array.from({ length: count }, (_, i) => <i key={i} style={/** @type {React.CSSProperties} */ ({ '--i': i, '--x': `${(i * 47) % 100}%`, '--y': `${(i * 29) % 100}%`, '--o': .18 + (i % 4) * .09 })} />)}</div> }
+function ConstellationField() {
+  const canvasRef = useRef(/** @type {HTMLCanvasElement | null} */ (null))
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return undefined
+    const context = canvas.getContext('2d')
+    if (!context) return undefined
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
+    const interactiveViewport = matchMedia('(min-width: 901px)')
+    const pointer = { x: 0, y: 0, targetX: 0, targetY: 0, active: false }
+    let width = 0
+    let height = 0
+    let animationFrame = 0
+    let visible = true
+    let nodes = []
+
+    const fraction = value => value - Math.floor(value)
+    const makeNodes = () => {
+      const count = Math.max(28, Math.min(58, Math.round(width / 31)))
+      nodes = Array.from({ length: count }, (_, index) => ({
+        x: fraction(Math.sin((index + 1) * 91.73) * 43758.54) * width,
+        y: fraction(Math.sin((index + 1) * 47.11) * 24634.63) * height,
+        radius: index % 7 === 0 ? 1.65 : index % 3 === 0 ? 1.15 : .8,
+      }))
+    }
+    const draw = () => {
+      animationFrame = 0
+      if (!visible) return
+      const interactive = interactiveViewport.matches && !reducedMotion.matches
+      if (interactive) {
+        pointer.x += (pointer.targetX - pointer.x) * .13
+        pointer.y += (pointer.targetY - pointer.y) * .13
+      }
+      const positions = nodes.map(node => {
+        if (!interactive || !pointer.active) return node
+        const dx = node.x - pointer.x
+        const dy = node.y - pointer.y
+        const distance = Math.hypot(dx, dy)
+        const influence = Math.max(0, 1 - distance / 230)
+        const force = influence * influence * 28
+        return { ...node, x: node.x + dx / Math.max(distance, 1) * force, y: node.y + dy / Math.max(distance, 1) * force }
+      })
+      context.clearRect(0, 0, width, height)
+      if (pointer.active && interactive) {
+        const glow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 250)
+        glow.addColorStop(0, 'rgba(24,132,255,.085)')
+        glow.addColorStop(1, 'rgba(5,18,43,0)')
+        context.fillStyle = glow
+        context.fillRect(0, 0, width, height)
+      }
+      for (let first = 0; first < positions.length; first += 1) {
+        for (let second = first + 1; second < positions.length; second += 1) {
+          const dx = positions[first].x - positions[second].x
+          const dy = positions[first].y - positions[second].y
+          const distance = Math.hypot(dx, dy)
+          if (distance > 165) continue
+          const cursorDistance = pointer.active ? Math.min(
+            Math.hypot(positions[first].x - pointer.x, positions[first].y - pointer.y),
+            Math.hypot(positions[second].x - pointer.x, positions[second].y - pointer.y),
+          ) : 999
+          const cursorBoost = interactive ? Math.max(0, 1 - cursorDistance / 260) : 0
+          context.strokeStyle = `rgba(47,151,255,${.055 + (1 - distance / 165) * .12 + cursorBoost * .3})`
+          context.lineWidth = .75 + cursorBoost * .65
+          context.beginPath()
+          context.moveTo(positions[first].x, positions[first].y)
+          context.lineTo(positions[second].x, positions[second].y)
+          context.stroke()
+        }
+      }
+      positions.forEach(node => {
+        const distance = pointer.active ? Math.hypot(node.x - pointer.x, node.y - pointer.y) : 999
+        const cursorBoost = interactive ? Math.max(0, 1 - distance / 240) : 0
+        context.fillStyle = `rgba(95,199,255,${.34 + cursorBoost * .62})`
+        context.shadowColor = '#208cff'
+        context.shadowBlur = 3 + cursorBoost * 10
+        context.beginPath()
+        context.arc(node.x, node.y, node.radius + cursorBoost * .7, 0, Math.PI * 2)
+        context.fill()
+      })
+      context.shadowBlur = 0
+      if (interactive && (Math.abs(pointer.targetX - pointer.x) > .15 || Math.abs(pointer.targetY - pointer.y) > .15)) animationFrame = requestAnimationFrame(draw)
+    }
+    const requestDraw = () => { if (!animationFrame) animationFrame = requestAnimationFrame(draw) }
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect()
+      const pixelRatio = Math.min(devicePixelRatio || 1, 1.5)
+      width = Math.max(1, rect.width)
+      height = Math.max(1, rect.height)
+      canvas.width = Math.round(width * pixelRatio)
+      canvas.height = Math.round(height * pixelRatio)
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+      makeNodes()
+      requestDraw()
+    }
+    const move = event => {
+      const rect = canvas.getBoundingClientRect()
+      pointer.targetX = event.clientX - rect.left
+      pointer.targetY = event.clientY - rect.top
+      if (!pointer.active) { pointer.x = pointer.targetX; pointer.y = pointer.targetY }
+      pointer.active = true
+      requestDraw()
+    }
+    const leave = () => { pointer.active = false; requestDraw() }
+    const observer = new IntersectionObserver(entries => {
+      visible = entries[0]?.isIntersecting ?? true
+      if (visible) requestDraw()
+    })
+    const resizeObserver = new ResizeObserver(resize)
+    observer.observe(canvas)
+    resizeObserver.observe(canvas)
+    addEventListener('pointermove', move, { passive: true })
+    addEventListener('blur', leave)
+    document.addEventListener('mouseleave', leave)
+    reducedMotion.addEventListener('change', requestDraw)
+    interactiveViewport.addEventListener('change', requestDraw)
+    resize()
+    return () => {
+      observer.disconnect()
+      resizeObserver.disconnect()
+      removeEventListener('pointermove', move)
+      removeEventListener('blur', leave)
+      document.removeEventListener('mouseleave', leave)
+      reducedMotion.removeEventListener('change', requestDraw)
+      interactiveViewport.removeEventListener('change', requestDraw)
+      cancelAnimationFrame(animationFrame)
+    }
+  }, [])
+  return <canvas ref={canvasRef} className="constellation-field" aria-hidden="true"/>
+}
 
 function HeroScene() {
   const ref = useRef(/** @type {HTMLElement | null} */ (null))
   useDesktopSceneMotion(ref, { pointer: true })
   return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
-    <div className="hero-atmosphere"><div className="hero-halo"/><div className="hero-floor"/><Particles count={22}/></div>
-    <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/><div className="mark-scan"/></div>
+    <div className="hero-atmosphere"><ConstellationField/></div>
+    <div className="hero-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/></div>
     <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
     <div className="hero-actions"><a className="action action-solid" href={wa(CONTACTS.hardware, 'Olá! Preciso de assistência para meu equipamento.')} target="_blank" rel="noreferrer">Preciso de assistência <Arrow /></a><a className="action action-ghost" href={wa(CONTACTS.software, 'Olá! Quero desenvolver um projeto com a BASE4.')} target="_blank" rel="noreferrer">Quero desenvolver um projeto <Arrow /></a></div>
     <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p></div><div className="scroll-mark"><i/><span>Continue</span></div>
