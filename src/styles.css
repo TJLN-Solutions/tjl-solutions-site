@@ -216,10 +216,16 @@ img { max-width: 100%; }
 .hardware-compare-tag{position:absolute;top:18px;z-index:3;padding:8px 14px;border:1px solid rgba(255,255,255,.14);border-radius:99px;background:rgba(4,10,20,.6);color:#dce8f7;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;backdrop-filter:blur(8px)}
 .hardware-compare-tag-before{left:18px}
 .hardware-compare-tag-after{right:18px}
+/* O clique precisa cair na TRILHA (que pula nativamente pro ponto clicado),
+   não no polegar (que só inicia um arraste relativo à posição atual — se ele
+   cobrisse toda a área, todo clique "começaria" ali e o valor saltava errado).
+   Por isso o polegar fica reduzido a uma linha de 1px; o handle visual
+   (círculo branco) é outro elemento, posicionado via --pos. */
 .hardware-compare-range{position:absolute;inset:0;z-index:5;width:100%;height:100%;margin:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:ew-resize;touch-action:pan-y}
-.hardware-compare-range::-webkit-slider-thumb{-webkit-appearance:none;width:100%;height:100%;background:transparent}
-.hardware-compare-range::-moz-range-thumb{width:100%;height:100%;background:transparent;border:0}
-.hardware-compare-range::-moz-range-track{background:transparent}
+.hardware-compare-range::-webkit-slider-runnable-track{background:transparent}
+.hardware-compare-range::-webkit-slider-thumb{-webkit-appearance:none;width:1px;height:100%;background:transparent;border:0;cursor:ew-resize}
+.hardware-compare-range::-moz-range-track{background:transparent;border:0}
+.hardware-compare-range::-moz-range-thumb{width:1px;height:100%;background:transparent;border:0;cursor:ew-resize}
 .hardware-compare-range:focus-visible{outline:0}
 .hardware-compare-line{position:absolute;top:0;bottom:0;left:var(--pos);z-index:3;width:2px;translate:-50% 0;background:rgba(255,255,255,.85);box-shadow:0 0 12px rgba(0,0,0,.4);pointer-events:none}
 .hardware-compare-handle{position:absolute;top:50%;left:var(--pos);z-index:4;width:44px;height:44px;translate:-50% -50%;display:grid;place-items:center;border-radius:50%;background:white;box-shadow:0 8px 20px rgba(0,10,26,.5);pointer-events:none;transition:outline-color .2s}
