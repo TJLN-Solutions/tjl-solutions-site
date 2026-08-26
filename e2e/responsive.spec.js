@@ -111,10 +111,15 @@ test('movimento cinematográfico fica restrito às telas grandes', async ({ page
       core: Number(element.style.getPropertyValue('--core')),
       data: Number(element.style.getPropertyValue('--data')),
       final: Number(element.style.getPropertyValue('--final')),
+      gpuFrame: Number(element.dataset.gpuFrame),
     }))
   }
+  const gpuAssembled = await phaseAt(.01)
+  const gpuDisassembled = await phaseAt(.2)
+  const gpuReassembled = await phaseAt(.04)
+  expect(gpuDisassembled.gpuFrame).toBeGreaterThan(gpuAssembled.gpuFrame)
+  expect(gpuReassembled.gpuFrame).toBeLessThan(gpuDisassembled.gpuFrame)
   expect((await phaseAt(.05)).matter).toBeGreaterThan(.7)
-  await expect.poll(async () => Number(await page.locator('.matter-object').evaluate(element => getComputedStyle(element.querySelector('.piece-board')).opacity))).toBeGreaterThan(0)
   expect((await phaseAt(.45)).core).toBeGreaterThan(.9)
   expect((await phaseAt(.7)).data).toBeGreaterThan(.9)
   expect((await phaseAt(.96)).final).toBeGreaterThan(.9)
@@ -299,8 +304,14 @@ test('novos visuais da narrativa carregam com proporção preservada', async ({ 
   for (const viewport of [{ width: 390, height: 844 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport)
     await page.goto('/#transformacao')
-    for (const selector of ['.matter-object .hardware-complete', '.data-visual .scene-asset']) {
-      const image = page.locator(selector)
+    const assets = [
+      viewport.width > 1100
+        ? { selector: '.matter-object .gpu-frame', naturalWidth: 1170, naturalHeight: 600 }
+        : { selector: '.matter-object .gpu-static', naturalWidth: 1400, naturalHeight: 583 },
+      { selector: '.data-visual .scene-asset', naturalWidth: 1280, naturalHeight: 853 },
+    ]
+    for (const asset of assets) {
+      const image = page.locator(asset.selector).first()
       await expect(image).toBeAttached()
       const dimensions = await image.evaluate(element => ({
         complete: element.complete,
@@ -310,11 +321,11 @@ test('novos visuais da narrativa carregam com proporção preservada', async ({ 
         renderedHeight: element.getBoundingClientRect().height,
       }))
       expect(dimensions.complete).toBe(true)
-      expect(dimensions.naturalWidth).toBe(1280)
-      expect(dimensions.naturalHeight).toBe(853)
+      expect(dimensions.naturalWidth).toBe(asset.naturalWidth)
+      expect(dimensions.naturalHeight).toBe(asset.naturalHeight)
       expect(dimensions.renderedWidth).toBeGreaterThan(100)
       expect(dimensions.renderedHeight).toBeGreaterThan(60)
-      expect(dimensions.renderedWidth / dimensions.renderedHeight).toBeCloseTo(1280 / 853, 1)
+      expect(dimensions.renderedWidth / dimensions.renderedHeight).toBeCloseTo(asset.naturalWidth / asset.naturalHeight, 1)
     }
   }
 })

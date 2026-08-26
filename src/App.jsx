@@ -5,6 +5,7 @@ import { capabilities, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
+const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence/frame-${String(index).padStart(2, '0')}.webp`)
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
@@ -17,6 +18,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
 
     const clearMotion = element => {
       for (const property of ['--progress', '--build', '--matter', '--core', '--data', '--energy', '--final', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
+      delete element.dataset.gpuFrame
     }
     const update = () => {
       frame = 0
@@ -28,6 +30,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
         element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
+        element.dataset.gpuFrame = String(Math.round(clamp(progress / .22) * (GPU_FRAMES.length - 1)))
         element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
         element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
         element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
@@ -174,14 +177,8 @@ function TransformationScene() {
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
       <div className="matter-object" aria-hidden="true">
-        <div className="hardware-exploded">
-          <img className="hardware-piece piece-case" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
-          <img className="hardware-piece piece-board" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
-          <img className="hardware-piece piece-cooling" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
-          <img className="hardware-piece piece-graphics" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
-          <img className="hardware-piece piece-power" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
-        </div>
-        <img className="hardware-complete scene-asset" src="/assets/scene/base4-hardware-assembled.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <div className="gpu-sequence">{GPU_FRAMES.map((src, index) => <img className="gpu-frame" src={src} width="1170" height="600" loading="lazy" decoding="async" alt="" key={src} data-frame={index}/>)}</div>
+        <img className="gpu-static scene-asset" src="/assets/scene/base4-gpu-static.webp" width="1400" height="583" loading="lazy" decoding="async" alt=""/>
         <span className="hardware-scan"/>
       </div>
     </article>
