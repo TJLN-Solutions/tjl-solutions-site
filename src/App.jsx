@@ -9,6 +9,41 @@ const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
 
+// Scroll suave feito à mão: o `scroll-behavior: smooth` nativo do navegador é
+// cancelado no meio da animação pelos hooks de scroll desta página (eles fazem
+// getBoundingClientRect a cada frame), o que fazia o clique em links âncora
+// (#menu, #contato...) não rolar a página. Esta versão controla o scroll
+// diretamente, então nada a interrompe.
+function smoothScrollToId(id) {
+  const element = document.getElementById(id)
+  if (!element) return
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { element.scrollIntoView(); return }
+  const startY = window.scrollY
+  const targetY = startY + element.getBoundingClientRect().top
+  const distance = targetY - startY
+  if (Math.abs(distance) < 2) return
+  const duration = Math.min(900, Math.max(320, Math.abs(distance) * .32))
+  const startTime = performance.now()
+  const ease = t => 1 - (1 - t) ** 3
+  const step = now => {
+    const progress = Math.min(1, (now - startTime) / duration)
+    scrollTo(0, startY + distance * ease(progress))
+    if (progress < 1) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+  // Rede de segurança: se o navegador atrasar o rAF (aba em segundo plano etc.),
+  // garante que o destino final seja alcançado mesmo assim.
+  setTimeout(() => { if (Math.abs(window.scrollY - targetY) > 2) scrollTo(0, targetY) }, duration + 150)
+}
+
+function smoothNavigate(event) {
+  const href = event.currentTarget.getAttribute('href')
+  if (!href || href.charAt(0) !== '#' || href.length < 2) return
+  event.preventDefault()
+  smoothScrollToId(href.slice(1))
+  if (history.pushState) history.pushState(null, '', href)
+}
+
 function useScrollProgress(ref) {
   useEffect(() => {
     let frame = 0
@@ -63,7 +98,7 @@ function Arrow() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M
 function Plus() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> }
 
 function Brand({ compact = false, className = '' }) {
-  return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" aria-label="BASE4 SYSTEMS — início">
+  return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" onClick={smoothNavigate} aria-label="BASE4 SYSTEMS — início">
     <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent.png`} alt="" />
     {!compact && <img className="brand-wordmark" src={`${BRAND}base4-wordmark-white.png`} alt="BASE4 SYSTEMS" />}
   </a>
@@ -97,13 +132,13 @@ function Header() {
     document.addEventListener('keydown', handleKey)
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
   }, [open])
-  const links = onClick => NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={onClick}>{label}</a>)
+  const links = onClose => NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={event => { smoothNavigate(event); onClose?.() }}>{label}</a>)
   return <header className="header-shell">
     <Brand />
     <nav className="desktop-nav" aria-label="Navegação principal">{links(undefined)}</nav>
-    <a className="header-contact" href="#contato">Iniciar conversa <Arrow /></a>
+    <a className="header-contact" href="#contato" onClick={smoothNavigate}>Iniciar conversa <Arrow /></a>
     <button ref={menuButton} className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(current => !current)}><span/><span/></button>
-    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{links(closeMenu)}<a className="mobile-menu-cta" href="#contato" onClick={closeMenu}>Iniciar conversa <Arrow/></a></nav></div>}
+    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{links(closeMenu)}<a className="mobile-menu-cta" href="#contato" onClick={event => { smoothNavigate(event); closeMenu() }}>Iniciar conversa <Arrow/></a></nav></div>}
   </header>
 }
 
@@ -255,6 +290,6 @@ function ContactScene() {
   return <section className="contact-scene" id="contato"><div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div><form onSubmit={submit} noValidate data-reveal><fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset><label htmlFor={`${uid}-name`}>Seu nome</label><input id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>{errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}<label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label><textarea id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>{errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}<p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p><button type="submit">Continuar no WhatsApp <Arrow /></button><p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>{fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}</form></section>
 }
 
-function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao">Ecossistema</a><a href="#solucoes">Soluções</a><a href="#charge">Charge</a><a href="#presenca">BASE4</a><a href="#contato">Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
+function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao" onClick={smoothNavigate}>Ecossistema</a><a href="#solucoes" onClick={smoothNavigate}>Soluções</a><a href="#charge" onClick={smoothNavigate}>Charge</a><a href="#presenca" onClick={smoothNavigate}>BASE4</a><a href="#contato" onClick={smoothNavigate}>Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
 
-export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo">Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><PresenceScene/><ContactScene/></main><Footer/></> }
+export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo" onClick={smoothNavigate}>Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><PresenceScene/><ContactScene/></main><Footer/></> }
