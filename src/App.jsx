@@ -387,8 +387,7 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, beforeLabel = 'Antes', afterLa
 
 function HardwareScene() {
   return <section className="hardware-scene" id="hardware"><div className="hardware-heading" data-reveal><p>MANUTENÇÃO DE HARDWARE</p><h2>Antes e depois<br/>da limpeza.</h2><span>Arraste o controle para comparar — poeira acumulada é a inimiga silenciosa de qualquer notebook ou PC.</span></div><div className="hardware-compare-wrap" data-reveal>
-    {/* TODO: substituir pelas fotos reais do caso quando o Nicolas enviar — troque beforeSrc/afterSrc abaixo. */}
-    <BeforeAfterSlider beforeSrc={null} afterSrc={null} />
+    <BeforeAfterSlider beforeSrc="/assets/projects/hardware/pc-antes.png" afterSrc="/assets/projects/hardware/pc-depois.png" />
   </div><div className="hardware-benefits" data-reveal>{HARDWARE_BENEFITS.map(benefit => <div className="hardware-benefit-card" key={benefit.title}><benefit.Icon/><strong>{benefit.title}</strong><p>{benefit.text}</p></div>)}</div></section>
 }
 
