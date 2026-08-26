@@ -114,6 +114,7 @@ test('movimento cinematográfico fica restrito às telas grandes', async ({ page
     }))
   }
   expect((await phaseAt(.05)).matter).toBeGreaterThan(.7)
+  await expect.poll(async () => Number(await page.locator('.matter-object').evaluate(element => getComputedStyle(element.querySelector('.piece-board')).opacity))).toBeGreaterThan(0)
   expect((await phaseAt(.45)).core).toBeGreaterThan(.9)
   expect((await phaseAt(.7)).data).toBeGreaterThan(.9)
   expect((await phaseAt(.96)).final).toBeGreaterThan(.9)
@@ -298,7 +299,7 @@ test('novos visuais da narrativa carregam com proporção preservada', async ({ 
   for (const viewport of [{ width: 390, height: 844 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport)
     await page.goto('/#transformacao')
-    for (const selector of ['.matter-object .scene-asset', '.data-visual .scene-asset']) {
+    for (const selector of ['.matter-object .hardware-complete', '.data-visual .scene-asset']) {
       const image = page.locator(selector)
       await expect(image).toBeAttached()
       const dimensions = await image.evaluate(element => ({

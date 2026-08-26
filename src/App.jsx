@@ -27,9 +27,9 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
-        element.style.setProperty('--build', clamp(progress / .14).toFixed(4))
-        element.style.setProperty('--matter', (1 - clamp((progress - .18) / .13)).toFixed(4))
-        element.style.setProperty('--core', (clamp((progress - .2) / .12) * (1 - clamp((progress - .55) / .13))).toFixed(4))
+        element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
+        element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
+        element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
         element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
         element.style.setProperty('--energy', (clamp((progress - .15) / .17) * (1 - clamp((progress - .72) / .16))).toFixed(4))
         element.style.setProperty('--final', clamp((progress - .82) / .12).toFixed(4))
@@ -174,7 +174,14 @@ function TransformationScene() {
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
       <div className="matter-object" aria-hidden="true">
-        <img className="scene-asset" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <div className="hardware-exploded">
+          <img className="hardware-piece piece-case" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+          <img className="hardware-piece piece-board" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+          <img className="hardware-piece piece-cooling" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+          <img className="hardware-piece piece-graphics" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+          <img className="hardware-piece piece-power" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        </div>
+        <img className="hardware-complete scene-asset" src="/assets/scene/base4-hardware-assembled.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
         <span className="hardware-scan"/>
       </div>
     </article>
