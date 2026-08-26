@@ -5,7 +5,7 @@ import { capabilities, faq, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
-const GPU_FRAMES = Array.from({ length: 60 }, (_, index) => `/assets/scene/gpu-sequence-gemini-60/frame-${String(index).padStart(2, '0')}.webp`)
+const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence-amd-edsr/frame-${String(index).padStart(2, '0')}.webp`)
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
@@ -59,7 +59,6 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       })
       element.querySelector('.gpu-frame[data-frame="0"]')?.classList.add('is-active')
       delete element.dataset.gpuFrame
-      delete element.dataset.gpuBlend
     }
     const update = () => {
       frame = 0
@@ -71,26 +70,14 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
         element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
-        const gpuPosition = clamp(progress / .22) * (GPU_FRAMES.length - 1)
-        const firstFrameIndex = Math.floor(gpuPosition)
-        const secondFrameIndex = Math.min(firstFrameIndex + 1, GPU_FRAMES.length - 1)
-        const frameBlend = gpuPosition - firstFrameIndex
-        const gpuBlend = `${firstFrameIndex}:${secondFrameIndex}:${frameBlend.toFixed(3)}`
-        if (element.dataset.gpuBlend !== gpuBlend) {
+        const gpuFrame = String(Math.round(clamp(progress / .22) * (GPU_FRAMES.length - 1)))
+        if (element.dataset.gpuFrame !== gpuFrame) {
           element.querySelectorAll('.gpu-frame.is-active').forEach(gpuFrame => {
             gpuFrame.classList.remove('is-active')
             gpuFrame.style.removeProperty('opacity')
           })
-          const firstFrame = element.querySelector(`.gpu-frame[data-frame="${firstFrameIndex}"]`)
-          const secondFrame = element.querySelector(`.gpu-frame[data-frame="${secondFrameIndex}"]`)
-          firstFrame?.classList.add('is-active')
-          firstFrame?.style.setProperty('opacity', String(1 - frameBlend))
-          if (secondFrameIndex !== firstFrameIndex) {
-            secondFrame?.classList.add('is-active')
-            secondFrame?.style.setProperty('opacity', String(frameBlend))
-          }
-          element.dataset.gpuFrame = String(Math.round(gpuPosition))
-          element.dataset.gpuBlend = gpuBlend
+          element.querySelector(`.gpu-frame[data-frame="${gpuFrame}"]`)?.classList.add('is-active')
+          element.dataset.gpuFrame = gpuFrame
         }
         element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
         element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
@@ -264,8 +251,8 @@ function TransformationScene() {
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
       <div className="matter-object" aria-hidden="true">
-        <div className="gpu-sequence">{GPU_FRAMES.map((src, index) => <img className={`gpu-frame${index === 0 ? ' is-active' : ''}`} src={src} width="1060" height="660" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" alt="" key={src} data-frame={index}/>)}</div>
-        <img className="gpu-static scene-asset" src="/assets/scene/base4-gpu-static.webp" width="1400" height="583" loading="lazy" decoding="async" alt=""/>
+        <div className="gpu-sequence">{GPU_FRAMES.map((src, index) => <img className={`gpu-frame${index === 0 ? ' is-active' : ''}`} src={src} width="1560" height="800" loading={index === 0 ? 'eager' : 'lazy'} decoding="async" alt="" key={src} data-frame={index}/>)}</div>
+        <img className="gpu-static scene-asset" src="/assets/scene/gpu-sequence-amd-edsr/frame-00.webp" width="1560" height="800" loading="lazy" decoding="async" alt=""/>
         <span className="hardware-scan"/>
       </div>
     </article>
