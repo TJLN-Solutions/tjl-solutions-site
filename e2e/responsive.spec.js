@@ -3,10 +3,11 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 const viewports = [
-  [320, 568], [360, 800], [375, 667], [390, 844], [412, 915],
-  [768, 1024], [820, 1180], [821, 1180], [900, 1180],
-  [980, 768], [981, 768], [1024, 768], [1280, 720],
-  [1366, 768], [1440, 900], [1920, 1080], [667, 375],
+  [320, 568], [360, 800], [375, 667], [390, 844], [412, 915], [430, 932],
+  [600, 960], [768, 1024], [820, 1180], [821, 1180], [900, 1180], [1024, 1366],
+  [980, 768], [1024, 768], [1280, 720], [1366, 768], [1440, 900],
+  [1536, 864], [1920, 1080], [2560, 1440],
+  [667, 375], [844, 390], [915, 412], [1180, 820],
 ]
 
 test('matriz responsiva não cria overflow, saltos ou páginas excessivas', async ({ page }) => {
@@ -37,11 +38,10 @@ test('matriz responsiva não cria overflow, saltos ou páginas excessivas', asyn
     await page.screenshot({ path: path.join(auditDir, `${width}x${height}.png`), fullPage: true })
   }
 
-  const byWidth = new Map(results.map(result => [result.requested.width, result]))
-  for (const [left, right] of [[820, 821], [980, 981]]) {
-    const delta = Math.abs(byWidth.get(left).pageHeight - byWidth.get(right).pageHeight)
-    expect(delta, `salto de layout entre ${left}px e ${right}px`).toBeLessThan(300)
-  }
+  const leftBreakpoint = results.find(result => result.requested.width === 820 && result.requested.height === 1180)
+  const rightBreakpoint = results.find(result => result.requested.width === 821 && result.requested.height === 1180)
+  const breakpointDelta = Math.abs(leftBreakpoint.pageHeight - rightBreakpoint.pageHeight)
+  expect(breakpointDelta, 'salto de layout entre 820px e 821px').toBeLessThan(300)
   await writeFile(path.resolve('test-results', 'responsive-metrics.json'), JSON.stringify(results, null, 2))
 })
 
@@ -65,6 +65,62 @@ test('menu móvel navega e entrega foco ao conteúdo', async ({ page }) => {
   await page.locator('#mobile-navigation a[href="#solucoes"]').click()
   await expect(page.locator('#solucoes')).toBeFocused()
   await expect(page.getByRole('button', { name: 'Abrir menu' })).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('controles interativos mantêm área mínima de toque no celular', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  const undersizedTargets = await page.locator('a, button, input, textarea').evaluateAll(elements => elements
+    .filter(element => {
+      const style = getComputedStyle(element)
+      const box = element.getBoundingClientRect()
+      return style.display !== 'none'
+        && style.visibility !== 'hidden'
+        && box.width > 0
+        && box.height > 0
+        && (box.width < 43.5 || box.height < 43.5)
+    })
+    .map(element => ({
+      label: element.getAttribute('aria-label') || element.textContent?.trim() || element.getAttribute('placeholder'),
+      width: Math.round(element.getBoundingClientRect().width),
+      height: Math.round(element.getBoundingClientRect().height),
+    })))
+
+  expect(undersizedTargets).toEqual([])
+})
+
+test('movimento cinematográfico fica restrito às telas grandes', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/')
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+  await page.mouse.move(1180, 260)
+  await expect.poll(() => page.locator('.hero-scene').evaluate(element => element.style.getPropertyValue('--cursor-x'))).not.toBe('')
+  await expect(page.locator('.hero-mark img')).toHaveCSS('animation-name', /markArrive, markBreathe/)
+
+  await page.locator('.desktop-nav a[href="#transformacao"]').click()
+  await expect.poll(() => page.locator('.transformation-scene').evaluate(element => element.style.getPropertyValue('--progress'))).not.toBe('')
+  await expect(page.locator('.transformation-sticky')).toHaveCSS('position', 'sticky')
+  const phaseAt = async progress => {
+    await page.locator('.transformation-scene').evaluate((element, value) => {
+      const distance = element.offsetHeight - innerHeight
+      scrollTo(0, element.offsetTop + distance * value)
+    }, progress)
+    await page.waitForTimeout(80)
+    return page.locator('.transformation-scene').evaluate(element => ({
+      matter: Number(element.style.getPropertyValue('--matter')),
+      core: Number(element.style.getPropertyValue('--core')),
+      data: Number(element.style.getPropertyValue('--data')),
+    }))
+  }
+  expect((await phaseAt(.05)).matter).toBeGreaterThan(.7)
+  expect((await phaseAt(.45)).core).toBeGreaterThan(.9)
+  expect((await phaseAt(.9)).data).toBeGreaterThan(.9)
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  await expect(page.locator('.hero-mark img')).toHaveCSS('animation-name', 'none')
+  await expect(page.locator('.hero-mark')).toHaveCSS('transform', 'none')
+  expect(await page.locator('.transformation-scene').evaluate(element => element.style.getPropertyValue('--progress'))).toBe('')
+  await expect(page.locator('.transformation-sticky')).toHaveCSS('position', 'relative')
 })
 
 test('formulário move o foco para o primeiro campo inválido', async ({ page }) => {
@@ -341,23 +397,25 @@ test('redimensionamento em tempo real não reaproveita posições do layout ante
       const viewportWidth = innerWidth
       const boxes = [...document.querySelectorAll('.transformation-card')].map(card => {
         const rect = card.getBoundingClientRect()
-        return { left: rect.left, right: rect.right, width: rect.width }
+        return { display: getComputedStyle(card).display, left: rect.left, right: rect.right, width: rect.width }
       })
       const headings = [...document.querySelectorAll('.transformation-card h2')].map(heading => {
         const rect = heading.getBoundingClientRect()
-        return { left: rect.left, right: rect.right, width: rect.width, scrollWidth: heading.scrollWidth }
+        return { opacity: Number(getComputedStyle(heading.closest('.scene-copy')).opacity), left: rect.left, right: rect.right, width: rect.width, scrollWidth: heading.scrollWidth }
       })
       return { viewportWidth, scrollX, pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, boxes, headings }
     })
 
     expect(result.scrollX, `${viewport.width}x${viewport.height}: deslocamento horizontal persistente`).toBe(0)
     expect(result.pageOverflow, `${viewport.width}x${viewport.height}: overflow após redimensionar`).toBeLessThanOrEqual(1)
-    for (const box of result.boxes) {
+    const layoutBoxes = result.boxes.filter(box => box.display !== 'contents')
+    expect(layoutBoxes.length, `${viewport.width}x${viewport.height}: modo narrativo incorreto`).toBe(viewport.width <= 1100 ? 3 : 0)
+    for (const box of layoutBoxes) {
       expect(box.left, `${viewport.width}x${viewport.height}: card fora à esquerda`).toBeGreaterThanOrEqual(0)
       expect(box.right, `${viewport.width}x${viewport.height}: card fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
       expect(box.width, `${viewport.width}x${viewport.height}: card colapsado`).toBeGreaterThan(250)
     }
-    for (const heading of result.headings) {
+    for (const heading of result.headings.filter(item => item.opacity > .05)) {
       expect(heading.left, `${viewport.width}x${viewport.height}: título fora à esquerda`).toBeGreaterThanOrEqual(0)
       expect(heading.right, `${viewport.width}x${viewport.height}: título fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
       expect(heading.scrollWidth, `${viewport.width}x${viewport.height}: título cortado`).toBeLessThanOrEqual(heading.width + 2)

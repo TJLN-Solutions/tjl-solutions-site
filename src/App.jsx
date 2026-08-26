@@ -7,6 +7,59 @@ import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js
 const BRAND = '/assets/brand/'
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+const clamp = value => Math.max(0, Math.min(1, value))
+
+function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
+  useEffect(() => {
+    const desktop = matchMedia('(min-width: 1101px)')
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)')
+    let frame = 0
+
+    const clearMotion = element => {
+      for (const property of ['--progress', '--matter', '--core', '--data', '--energy', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
+    }
+    const update = () => {
+      frame = 0
+      const element = ref.current
+      if (!element) return
+      if (!desktop.matches || reduced.matches) { clearMotion(element); return }
+      const rect = element.getBoundingClientRect()
+      const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
+      element.style.setProperty('--progress', progress.toFixed(4))
+      if (phases) {
+        element.style.setProperty('--matter', (1 - clamp(progress / .3)).toFixed(4))
+        element.style.setProperty('--core', (clamp((progress - .15) / .18) * (1 - clamp((progress - .68) / .14))).toFixed(4))
+        element.style.setProperty('--data', clamp((progress - .57) / .2).toFixed(4))
+        element.style.setProperty('--energy', clamp((progress - .22) / .46).toFixed(4))
+      }
+    }
+    const request = () => { if (!frame) frame = requestAnimationFrame(update) }
+    const move = event => {
+      const element = ref.current
+      if (!pointer || !element || !desktop.matches || reduced.matches) return
+      const rect = element.getBoundingClientRect()
+      if (rect.bottom < 0 || rect.top > innerHeight) return
+      element.style.setProperty('--cursor-x', ((event.clientX / innerWidth) - .5).toFixed(3))
+      element.style.setProperty('--cursor-y', ((event.clientY / innerHeight) - .5).toFixed(3))
+    }
+
+    update()
+    addEventListener('scroll', request, { passive: true })
+    addEventListener('resize', request)
+    if (pointer) addEventListener('pointermove', move, { passive: true })
+    desktop.addEventListener('change', request)
+    reduced.addEventListener('change', request)
+    return () => {
+      removeEventListener('scroll', request)
+      removeEventListener('resize', request)
+      if (pointer) removeEventListener('pointermove', move)
+      desktop.removeEventListener('change', request)
+      reduced.removeEventListener('change', request)
+      cancelAnimationFrame(frame)
+    }
+  }, [phases, pointer, ref])
+}
+
 function useReveals() {
   useEffect(() => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -101,7 +154,9 @@ function Header() {
 function Particles({ count = 18 }) { return <div className="particles" aria-hidden="true">{Array.from({ length: count }, (_, i) => <i key={i} style={/** @type {React.CSSProperties} */ ({ '--i': i, '--x': `${(i * 47) % 100}%`, '--y': `${(i * 29) % 100}%`, '--o': .18 + (i % 4) * .09 })} />)}</div> }
 
 function HeroScene() {
-  return <section className="hero-scene" id="inicio" tabIndex={-1}><div className="hero-sticky">
+  const ref = useRef(/** @type {HTMLElement | null} */ (null))
+  useDesktopSceneMotion(ref, { pointer: true })
+  return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
     <div className="hero-atmosphere"><div className="hero-halo"/><div className="hero-floor"/><Particles count={22}/></div>
     <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/><div className="mark-scan"/></div>
     <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
@@ -111,12 +166,14 @@ function HeroScene() {
 }
 
 function TransformationScene() {
+  const ref = useRef(/** @type {HTMLElement | null} */ (null))
+  useDesktopSceneMotion(ref, { phases: true })
   const hardware = ['Diagnóstico', 'Reparo', 'Upgrade', 'Recuperação']
   const software = ['Sites', 'Sistemas', 'Automações', 'Integrações']
-  return <section className="transformation-scene" id="transformacao" tabIndex={-1}><div className="transformation-sticky">
+  return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
-      <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map(item => <span key={item}>{item}</span>)}</div>
+      <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
       <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
     </article>
     <article className="transformation-card core-card">
@@ -125,9 +182,11 @@ function TransformationScene() {
     </article>
     <article className="transformation-card data-card">
       <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
-      <div className="software-words" aria-label="Serviços de software">{software.map(item => <span key={item}>{item}</span>)}</div>
+      <div className="software-words" aria-label="Serviços de software">{software.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
       <div className="data-visual" aria-hidden="true"><i/><i/><i/><i/><span/></div>
     </article>
+    <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
+    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/></div>
   </div></section>
 }
 
