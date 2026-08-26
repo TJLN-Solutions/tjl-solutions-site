@@ -16,7 +16,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
     let frame = 0
 
     const clearMotion = element => {
-      for (const property of ['--progress', '--matter', '--core', '--data', '--energy', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
+      for (const property of ['--progress', '--build', '--matter', '--core', '--data', '--energy', '--final', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
     }
     const update = () => {
       frame = 0
@@ -27,10 +27,12 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
-        element.style.setProperty('--matter', (1 - clamp(progress / .3)).toFixed(4))
-        element.style.setProperty('--core', (clamp((progress - .15) / .18) * (1 - clamp((progress - .68) / .14))).toFixed(4))
-        element.style.setProperty('--data', clamp((progress - .57) / .2).toFixed(4))
-        element.style.setProperty('--energy', clamp((progress - .22) / .46).toFixed(4))
+        element.style.setProperty('--build', clamp(progress / .14).toFixed(4))
+        element.style.setProperty('--matter', (1 - clamp((progress - .18) / .13)).toFixed(4))
+        element.style.setProperty('--core', (clamp((progress - .2) / .12) * (1 - clamp((progress - .55) / .13))).toFixed(4))
+        element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
+        element.style.setProperty('--energy', (clamp((progress - .15) / .17) * (1 - clamp((progress - .72) / .16))).toFixed(4))
+        element.style.setProperty('--final', clamp((progress - .82) / .12).toFixed(4))
       }
     }
     const request = () => { if (!frame) frame = requestAnimationFrame(update) }
@@ -174,15 +176,20 @@ function TransformationScene() {
       <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
     </article>
     <article className="transformation-card core-card">
-      <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>Estrutura ganha<br/>inteligência.</h2><p>A luz atravessa o físico. O diagnóstico vira direção.</p></div>
+      <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>A base<br/>que conecta.</h2><p>Estrutura e inteligência trabalhando como uma única solução.</p></div>
       <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
     </article>
     <article className="transformation-card data-card">
-      <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
+      <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
       <div className="data-visual" aria-hidden="true"><i/><i/><i/><i/><span/></div>
+      <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
+    </article>
+    <article className="transformation-card final-card">
+      <div className="final-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
+      <div className="final-copy"><span>BASE4 SYSTEMS</span><h2>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></h2><p>Tecnologia de ponta a ponta.</p></div>
     </article>
     <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/></div>
+    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/><i/></div>
   </div></section>
 }
 

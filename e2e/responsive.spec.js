@@ -110,11 +110,14 @@ test('movimento cinematográfico fica restrito às telas grandes', async ({ page
       matter: Number(element.style.getPropertyValue('--matter')),
       core: Number(element.style.getPropertyValue('--core')),
       data: Number(element.style.getPropertyValue('--data')),
+      final: Number(element.style.getPropertyValue('--final')),
     }))
   }
   expect((await phaseAt(.05)).matter).toBeGreaterThan(.7)
   expect((await phaseAt(.45)).core).toBeGreaterThan(.9)
-  expect((await phaseAt(.9)).data).toBeGreaterThan(.9)
+  expect((await phaseAt(.7)).data).toBeGreaterThan(.9)
+  expect((await phaseAt(.96)).final).toBeGreaterThan(.9)
+  await expect(page.locator('.final-copy')).toContainText('Da máquina que sustenta')
 
   await page.setViewportSize({ width: 390, height: 844 })
   await expect(page.locator('.hero-mark img')).toHaveCSS('animation-name', 'none')
@@ -401,21 +404,24 @@ test('redimensionamento em tempo real não reaproveita posições do layout ante
       })
       const headings = [...document.querySelectorAll('.transformation-card h2')].map(heading => {
         const rect = heading.getBoundingClientRect()
-        return { opacity: Number(getComputedStyle(heading.closest('.scene-copy')).opacity), left: rect.left, right: rect.right, width: rect.width, scrollWidth: heading.scrollWidth }
+        const textBlock = heading.closest('.scene-copy,.final-copy')
+        const card = heading.closest('.transformation-card')
+        const opacity = (textBlock ? Number(getComputedStyle(textBlock).opacity) : 0) * (card ? Number(getComputedStyle(card).opacity) : 1)
+        return { visible: rect.width > 0 && rect.height > 0, opacity, left: rect.left, right: rect.right, width: rect.width, scrollWidth: heading.scrollWidth }
       })
       return { viewportWidth, scrollX, pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, boxes, headings }
     })
 
     expect(result.scrollX, `${viewport.width}x${viewport.height}: deslocamento horizontal persistente`).toBe(0)
     expect(result.pageOverflow, `${viewport.width}x${viewport.height}: overflow após redimensionar`).toBeLessThanOrEqual(1)
-    const layoutBoxes = result.boxes.filter(box => box.display !== 'contents')
-    expect(layoutBoxes.length, `${viewport.width}x${viewport.height}: modo narrativo incorreto`).toBe(viewport.width <= 1100 ? 3 : 0)
+    const layoutBoxes = result.boxes.filter(box => box.display !== 'contents' && box.display !== 'none')
+    expect(layoutBoxes.length, `${viewport.width}x${viewport.height}: modo narrativo incorreto`).toBe(viewport.width <= 1100 ? 3 : 1)
     for (const box of layoutBoxes) {
       expect(box.left, `${viewport.width}x${viewport.height}: card fora à esquerda`).toBeGreaterThanOrEqual(0)
       expect(box.right, `${viewport.width}x${viewport.height}: card fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
       expect(box.width, `${viewport.width}x${viewport.height}: card colapsado`).toBeGreaterThan(250)
     }
-    for (const heading of result.headings.filter(item => item.opacity > .05)) {
+    for (const heading of result.headings.filter(item => item.visible && item.opacity > .05)) {
       expect(heading.left, `${viewport.width}x${viewport.height}: título fora à esquerda`).toBeGreaterThanOrEqual(0)
       expect(heading.right, `${viewport.width}x${viewport.height}: título fora à direita`).toBeLessThanOrEqual(result.viewportWidth + 1)
       expect(heading.scrollWidth, `${viewport.width}x${viewport.height}: título cortado`).toBeLessThanOrEqual(heading.width + 2)
