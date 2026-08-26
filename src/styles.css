@@ -462,9 +462,15 @@ button:disabled{cursor:not-allowed;opacity:.52}
 
 /* Large screens keep the original scroll-driven cinematic narrative. */
 @media (min-width:1101px) and (prefers-reduced-motion:no-preference){
-  .hero-scene{--progress:0;--cursor-x:0;--cursor-y:0;height:165svh;min-height:0}
+  /* --mark-top/--mark-size definem a logo (usado por .hero-mark) e são
+     reaproveitados no padding-top de .hero-content pra garantir, por
+     construção, que o texto nunca comece antes da logo terminar — em vez de
+     dois números ajustados "no olho" que só combinavam por acaso em algumas
+     alturas de tela (o texto "BASE4 SYSTEMS" ficava por cima da logo em
+     telas largas e baixas, ex.: 1920×907, a mais comum que existe). */
+  .hero-scene{--progress:0;--cursor-x:0;--cursor-y:0;--mark-top:38vh;--mark-size:clamp(210px, min(24vw,32vh), 400px);height:165svh;min-height:0}
   .hero-sticky{position:sticky;top:0;height:100svh;min-height:680px;display:block;padding:0;overflow:hidden;isolation:isolate}
-  .hero-mark{position:absolute;z-index:2;left:50%;top:42%;width:clamp(280px,34vw,530px);aspect-ratio:1;margin:0;translate:-50% -50%;transform:translate3d(calc(var(--cursor-x) * 18px),calc(var(--cursor-y) * 12px - var(--progress) * 18vh),0) scale(calc(1 - var(--progress) * .28)) rotateY(calc(var(--cursor-x) * 5deg)) rotateX(calc(var(--cursor-y) * -3deg));transform-style:preserve-3d;will-change:transform}
+  .hero-mark{position:absolute;z-index:2;left:50%;top:var(--mark-top);width:var(--mark-size);aspect-ratio:1;margin:0;translate:-50% -50%;transform:translate3d(calc(var(--cursor-x) * 18px),calc(var(--cursor-y) * 12px - var(--progress) * 18vh),0) scale(calc(1 - var(--progress) * .28)) rotateY(calc(var(--cursor-x) * 5deg)) rotateX(calc(var(--cursor-y) * -3deg));transform-style:preserve-3d;will-change:transform}
   .hero-mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;animation:markArrive 1.8s .2s var(--ease) forwards,markBreathe 6s 2.1s ease-in-out infinite;filter:drop-shadow(0 40px 42px rgba(0,0,0,.62)) drop-shadow(0 0 32px rgba(8,120,237,.2))}
   .hero-halo{scale:calc(.86 + var(--progress) * .7);opacity:calc(1 - var(--progress))}
   /* O progresso do scroll chega a 1 exatamente quando o "sticky" da Hero
@@ -474,7 +480,7 @@ button:disabled{cursor:not-allowed;opacity:.52}
      seguinte, que já ia aparecendo por baixo. Aqui ele se apaga suavemente
      nos últimos 30% do progresso, terminando invisível bem quando o scroll
      começa a soltar de verdade — a transição vira um fade, não um corte. */
-  .hero-content{position:absolute;z-index:4;inset:0;width:auto;display:flex;align-items:center;flex-direction:column;justify-content:flex-end;gap:clamp(14px,2.2vh,22px);padding:clamp(360px,49vh,520px) 20px clamp(24px,4vh,46px);opacity:clamp(0, calc(1 - (var(--progress) - .7) / .3), 1)}
+  .hero-content{position:absolute;z-index:4;inset:0;width:auto;display:flex;align-items:center;flex-direction:column;justify-content:flex-start;gap:clamp(14px,2.2vh,22px);padding:calc(var(--mark-top) + var(--mark-size) / 2 + 24px) 20px clamp(24px,4vh,46px);opacity:clamp(0, calc(1 - (var(--progress) - .7) / .3), 1)}
   .hero-copy{position:relative;width:min(1100px,100%)}.hero-actions,.hero-footnote{position:relative}.scroll-mark{display:flex}
 
   .transformation-scene{--progress:0;--build:0;--matter:1;--core:0;--data:0;--energy:0;--final:0;height:300svh;padding:0;overflow:visible;background:linear-gradient(#060a11 0 46%,#0a1422 66%,#edf4fc 100%)}
