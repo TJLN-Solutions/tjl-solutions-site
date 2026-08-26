@@ -134,6 +134,11 @@ function useReveals() {
 function Arrow() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg> }
 function Plus() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> }
 function Check() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l6 6L20 6"/></svg> }
+function SnowflakeIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4.22 6.22l15.56 11.56M19.78 6.22 4.22 17.78M9 4.5 12 2l3 2.5M9 19.5l3 2.5 3-2.5M4.22 6.22l3.6.3M4.22 6.22l1 3.5M19.78 17.78l-3.6-.3M19.78 17.78l-1-3.5M19.78 6.22l-3.6.3M19.78 6.22l-1-3.5M4.22 17.78l3.6-.3M4.22 17.78l1 3.5"/></svg> }
+function BoltIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg> }
+function ShieldIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3Z"/></svg> }
+function DragIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8 4 12l4 4M16 8l4 4-4 4M4 12h16"/></svg> }
+function ImageIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="8" cy="9" r="1.5"/></svg> }
 
 // Revela um título palavra por palavra (borrado → nítido, com leve atraso
 // entre uma palavra e outra). `startIndex` encadeia o atraso entre linhas.
@@ -149,7 +154,15 @@ function Brand({ compact = false, className = '' }) {
   </a>
 }
 
-const NAV_ITEMS = [['Ecossistema', '#transformacao'], ['Soluções', '#solucoes'], ['Charge', '#charge'], ['Capacidade', '#capacidade'], ['BASE4', '#presenca'], ['Sobre', '#sobre'], ['Equipe', '#equipe'], ['FAQ', '#faq']]
+const NAV_ITEMS = [['Ecossistema', '#transformacao'], ['Soluções', '#solucoes'], ['Charge', '#charge'], ['Capacidade', '#capacidade'], ['Hardware', '#hardware'], ['BASE4', '#presenca'], ['Sobre', '#sobre'], ['Equipe', '#equipe'], ['FAQ', '#faq']]
+
+// Benefícios genéricos da limpeza/manutenção — sem números específicos de um
+// caso real (ainda não temos fotos/métricas reais; ver HardwareScene abaixo).
+const HARDWARE_BENEFITS = [
+  { title: 'Refrigeração', text: 'Poeira acumulada é a principal causa de superaquecimento. A limpeza remove esse acúmulo e evita desligamentos inesperados.', Icon: SnowflakeIcon },
+  { title: 'Performance', text: 'Pasta térmica velha faz o processador reduzir a velocidade sozinho para não superaquecer. Trocá-la devolve o desempenho original.', Icon: BoltIcon },
+  { title: 'Vida útil e ruído', text: 'Um cooler sujo trabalha mais forçado — mais barulho, mais desgaste. Limpo, dura mais e roda mais silencioso.', Icon: ShieldIcon },
+]
 
 const ABOUT_POINTS = ['Hardware e software sob o mesmo teto', 'Equipe tecnicamente capacitada', 'Orçamento antes da execução, sem letra miúda']
 
@@ -349,6 +362,36 @@ function CapabilityScene() {
   return <section className="capability-scene" id="capacidade"><div className="capability-intro" data-reveal><p>CAPACIDADE DE DESENVOLVIMENTO</p><h2>Do código à operação.</h2><span>Sites, sistemas e automações construídos em torno da operação de cada cliente.</span></div><div className="capability-stage" data-reveal><div className="capability-list">{capabilities.map((item, index) => <button key={item.label} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><small>{item.label}</small><strong>{item.title}</strong><span>{item.detail}</span><Arrow /></button>)}</div><div className={`capability-visual visual-${capabilities[active].visual}`}><div className="screen screen-back"><span/><span/><span/></div><div className="screen screen-front"><header><i/><i/><i/><span>{headerUrl}</span></header>{active === 0 ? <a className="portfolio-preview" href="https://portfoliosaramarques.vercel.app/" target="_blank" rel="noreferrer" aria-label="Abrir o portfólio de Sara Marques em uma nova aba"><img src="/assets/projects/sara-portfolio-preview.jpg" width="1066" height="1600" loading="lazy" decoding="async" alt="Prévia do portfólio de Sara Marques"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Sara Marques</strong><em>Fotografia e audiovisual</em><b>Visitar site <Arrow/></b></span></a> : active === 1 ? <a className="portfolio-preview" href="https://obsidian-eta-self.vercel.app" target="_blank" rel="noreferrer" aria-label="Abrir o site da Obsidian em uma nova aba"><img src="/assets/projects/obsidian-preview.jpg" width="1568" height="741" loading="lazy" decoding="async" alt="Prévia do site da Obsidian Estética Automotiva"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Obsidian</strong><em>Estética automotiva de alta performance</em><b>Visitar site <Arrow/></b></span></a> : <main><span/><strong/><span/><div><i/><i/><i/></div></main>}</div><div className="visual-label">{active === 0 ? 'Clique para visitar' : active === 1 ? 'Clique para visitar' : capabilities[active].label}</div></div></div></section>
 }
 
+// Comparador antes/depois: um <input type="range"> nativo, esticado por CSS
+// para cobrir toda a área visual (em vez de só a trilha fina padrão), controla
+// um clip-path sobre a foto "antes". Isso dá suporte a teclado/leitor de tela
+// de graça, sem precisar reimplementar drag com pointer events.
+function BeforeAfterSlider({ beforeSrc, afterSrc, beforeLabel = 'Antes', afterLabel = 'Depois' }) {
+  const [value, setValue] = useState(50)
+  return <div className="hardware-compare" style={/** @type {React.CSSProperties} */ ({ '--pos': `${value}%` })}>
+    <div className="hardware-compare-media">
+      <div className="hardware-compare-frame hardware-compare-after">
+        {afterSrc ? <img src={afterSrc} alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
+        <span className="hardware-compare-tag hardware-compare-tag-after">{afterLabel}</span>
+      </div>
+      <div className="hardware-compare-frame hardware-compare-before">
+        {beforeSrc ? <img src={beforeSrc} alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
+        <span className="hardware-compare-tag hardware-compare-tag-before">{beforeLabel}</span>
+      </div>
+    </div>
+    <input className="hardware-compare-range" type="range" min={0} max={100} value={value} onChange={event => setValue(Number(event.target.value))} aria-label="Arraste para comparar antes e depois da limpeza" />
+    <div className="hardware-compare-line" aria-hidden="true"/>
+    <div className="hardware-compare-handle" aria-hidden="true"><DragIcon/></div>
+  </div>
+}
+
+function HardwareScene() {
+  return <section className="hardware-scene" id="hardware"><div className="hardware-heading" data-reveal><p>MANUTENÇÃO DE HARDWARE</p><h2>Antes e depois<br/>da limpeza.</h2><span>Arraste o controle para comparar — poeira acumulada é a inimiga silenciosa de qualquer notebook ou PC.</span></div><div className="hardware-compare-wrap" data-reveal>
+    {/* TODO: substituir pelas fotos reais do caso quando o Nicolas enviar — troque beforeSrc/afterSrc abaixo. */}
+    <BeforeAfterSlider beforeSrc={null} afterSrc={null} />
+  </div><div className="hardware-benefits" data-reveal>{HARDWARE_BENEFITS.map(benefit => <div className="hardware-benefit-card" key={benefit.title}><benefit.Icon/><strong>{benefit.title}</strong><p>{benefit.text}</p></div>)}</div></section>
+}
+
 function PresenceScene() {
   return <section className="presence-scene" id="presenca"><div className="presence-glow"/><div className="presence-heading" data-reveal><p>PRESENÇA</p><h2>Perto na bancada.<br/>Sem fronteiras no código.</h2><span>Você fala com quem entende, executa e acompanha o trabalho.</span></div><div className="presence-content" data-reveal><div className="location-block"><span>Loja física em Bilac</span><h3>Rua XV de Novembro, 283</h3><p>Segunda a sexta · 08h–18h<br/>Sábado · 08h–12h</p><a href="https://www.google.com/maps/dir/?api=1&destination=-21.4055942,-50.4757713" target="_blank" rel="noreferrer">Traçar rota <Arrow /></a><div className="location-line"><i/><span>Atendimento presencial</span><i/></div></div><div className="location-map"><iframe src="https://maps.google.com/maps?q=-21.4055942,-50.4757713&z=16&output=embed" title="Localização da BASE4 SYSTEMS em Bilac, SP" loading="lazy" referrerPolicy="no-referrer-when-downgrade"/></div></div><div className="trust-sentence" data-reveal><span>Orçamento antes da execução</span><i/><span>Garantia</span><i/><span>Código-fonte quando aplicável</span><i/><span>Suporte após a entrega</span></div></section>
 }
@@ -450,4 +493,4 @@ function ContactScene() {
 
 function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao" onClick={smoothNavigate}>Ecossistema</a><a href="#solucoes" onClick={smoothNavigate}>Soluções</a><a href="#charge" onClick={smoothNavigate}>Charge</a><a href="#presenca" onClick={smoothNavigate}>BASE4</a><a href="#sobre" onClick={smoothNavigate}>Sobre</a><a href="#equipe" onClick={smoothNavigate}>Equipe</a><a href="#faq" onClick={smoothNavigate}>FAQ</a><a href="#contato" onClick={smoothNavigate}>Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
 
-export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo" onClick={smoothNavigate}>Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><PresenceScene/><AboutScene/><TeamScene/><FaqScene/><ContactScene/></main><Footer/></> }
+export default function App() { useReveals(); return <><a className="skip-link" href="#conteudo" onClick={smoothNavigate}>Pular para o conteúdo</a><Header/><main id="conteudo"><HeroScene/><TransformationScene/><SolutionsScene/><ChargeScene/><CapabilityScene/><HardwareScene/><PresenceScene/><AboutScene/><TeamScene/><FaqScene/><ContactScene/></main><Footer/></> }
