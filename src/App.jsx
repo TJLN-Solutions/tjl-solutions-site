@@ -5,6 +5,7 @@ import { capabilities, faq, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
+const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence-hq/frame-${String(index).padStart(2, '0')}.webp`)
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
@@ -44,28 +45,59 @@ function smoothNavigate(event) {
   if (history.pushState) history.pushState(null, '', href)
 }
 
-function useScrollProgress(ref) {
+function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
   useEffect(() => {
+    const desktop = matchMedia('(min-width: 1101px)')
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)')
     let frame = 0
+
+    const clearMotion = element => {
+      for (const property of ['--progress', '--build', '--matter', '--core', '--data', '--energy', '--final', '--cursor-x', '--cursor-y']) element.style.removeProperty(property)
+      delete element.dataset.gpuFrame
+    }
     const update = () => {
       frame = 0
       const element = ref.current
       if (!element) return
+      if (!desktop.matches || reduced.matches) { clearMotion(element); return }
       const rect = element.getBoundingClientRect()
-      const distance = Math.max(1, rect.height - innerHeight)
-      const progress = clamp(-rect.top / distance)
+      const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
-      element.style.setProperty('--matter', (1 - clamp(progress / .3)).toFixed(4))
-      element.style.setProperty('--core', (clamp((progress - .15) / .18) * (1 - clamp((progress - .68) / .14))).toFixed(4))
-      element.style.setProperty('--data', clamp((progress - .57) / .2).toFixed(4))
-      element.style.setProperty('--energy', clamp((progress - .22) / .46).toFixed(4))
+      if (phases) {
+        element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
+        element.dataset.gpuFrame = String(Math.round(clamp(progress / .22) * (GPU_FRAMES.length - 1)))
+        element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
+        element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
+        element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
+        element.style.setProperty('--energy', (clamp((progress - .15) / .17) * (1 - clamp((progress - .72) / .16))).toFixed(4))
+        element.style.setProperty('--final', clamp((progress - .82) / .12).toFixed(4))
+      }
     }
     const request = () => { if (!frame) frame = requestAnimationFrame(update) }
+    const move = event => {
+      const element = ref.current
+      if (!pointer || !element || !desktop.matches || reduced.matches) return
+      const rect = element.getBoundingClientRect()
+      if (rect.bottom < 0 || rect.top > innerHeight) return
+      element.style.setProperty('--cursor-x', ((event.clientX / innerWidth) - .5).toFixed(3))
+      element.style.setProperty('--cursor-y', ((event.clientY / innerHeight) - .5).toFixed(3))
+    }
+
     update()
     addEventListener('scroll', request, { passive: true })
     addEventListener('resize', request)
-    return () => { removeEventListener('scroll', request); removeEventListener('resize', request); cancelAnimationFrame(frame) }
-  }, [ref])
+    if (pointer) addEventListener('pointermove', move, { passive: true })
+    desktop.addEventListener('change', request)
+    reduced.addEventListener('change', request)
+    return () => {
+      removeEventListener('scroll', request)
+      removeEventListener('resize', request)
+      if (pointer) removeEventListener('pointermove', move)
+      desktop.removeEventListener('change', request)
+      reduced.removeEventListener('change', request)
+      cancelAnimationFrame(frame)
+    }
+  }, [phases, pointer, ref])
 }
 
 function useReveals() {
@@ -107,8 +139,8 @@ function RevealWords({ text, startIndex = 0 }) {
 
 function Brand({ compact = false, className = '' }) {
   return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" onClick={smoothNavigate} aria-label="BASE4 SYSTEMS — início">
-    <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent.png`} alt="" />
-    {!compact && <img className="brand-wordmark" src={`${BRAND}base4-wordmark-white.png`} alt="BASE4 SYSTEMS" />}
+    <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" decoding="async" alt="" />
+    {!compact && <img className="brand-wordmark" src={`${BRAND}base4-wordmark-white.png`} width="1010" height="99" decoding="async" alt="BASE4 SYSTEMS" />}
   </a>
 }
 
@@ -119,17 +151,40 @@ const ABOUT_POINTS = ['Hardware e software sob o mesmo teto', 'Equipe tecnicamen
 // TODO: números reais a substituir — Nicolas vai passar os valores certos depois.
 const ABOUT_STATS = [
   { value: '2026', label: 'Ano de fundação' },
-  { value: '150+', label: 'Equipamentos atendidos' },
-  { value: '12+', label: 'Projetos entregues' },
+  { value: '50+', label: 'Equipamentos atendidos' },
+  { value: '5+', label: 'Projetos entregues' },
 ]
 
 function Header() {
   const [open, setOpen] = useState(false)
   const menuButton = useRef(null)
   const menuPanel = useRef(null)
-  const closeMenu = () => setOpen(false)
+  const closeReason = useRef('cancel')
+  const closeMenu = () => { closeReason.current = 'cancel'; setOpen(false) }
+  const focusTarget = href => {
+    window.setTimeout(() => {
+      const target = document.querySelector(href)
+      if (!target) return
+      target.setAttribute('tabindex', '-1')
+      target.focus({ preventScroll: true })
+    }, 0)
+  }
+  const navigate = event => {
+    const href = event.currentTarget.getAttribute('href')
+    smoothNavigate(event)
+    if (href) focusTarget(href)
+  }
+  const navigateMenu = event => {
+    const href = event.currentTarget.getAttribute('href')
+    if (!href) return
+    smoothNavigate(event)
+    closeReason.current = 'navigate'
+    setOpen(false)
+    focusTarget(href)
+  }
   useEffect(() => {
     if (!open) return undefined
+    closeReason.current = 'cancel'
     const trigger = menuButton.current
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -147,15 +202,18 @@ function Header() {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
     document.addEventListener('keydown', handleKey)
-    return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKey)
+      if (closeReason.current !== 'navigate') trigger?.focus()
+    }
   }, [open])
-  const links = onClose => NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={event => { smoothNavigate(event); onClose?.() }}>{label}</a>)
   return <header className="header-shell">
     <Brand />
-    <nav className="desktop-nav" aria-label="Navegação principal">{links(undefined)}</nav>
-    <a className="header-contact" href="#contato" onClick={smoothNavigate}>Iniciar conversa <Arrow /></a>
+    <nav className="desktop-nav" aria-label="Navegação principal">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={navigate}>{label}</a>)}</nav>
+    <a className="header-contact" href="#contato" onClick={navigate}>Iniciar conversa <Arrow /></a>
     <button ref={menuButton} className="menu-button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(current => !current)}><span/><span/></button>
-    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{links(closeMenu)}<a className="mobile-menu-cta" href="#contato" onClick={event => { smoothNavigate(event); closeMenu() }}>Iniciar conversa <Arrow/></a></nav></div>}
+    {open && <div className="mobile-menu-layer" onMouseDown={event => { if (event.target === event.currentTarget) closeMenu() }}><nav id="mobile-navigation" ref={menuPanel} aria-label="Navegação móvel">{NAV_ITEMS.map(([label, href]) => <a key={href} href={href} onClick={navigateMenu}>{label}</a>)}<a className="mobile-menu-cta" href="#contato" onClick={navigateMenu}>Iniciar conversa <Arrow/></a></nav></div>}
   </header>
 }
 
@@ -163,42 +221,46 @@ function Particles({ count = 18 }) { return <div className="particles" aria-hidd
 
 function HeroScene() {
   const ref = useRef(/** @type {HTMLElement | null} */ (null))
-  useScrollProgress(ref)
-  useEffect(() => {
-    const element = ref.current
-    if (!element) return
-    const move = event => {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      element.style.setProperty('--cursor-x', ((event.clientX / innerWidth) - .5).toFixed(3))
-      element.style.setProperty('--cursor-y', ((event.clientY / innerHeight) - .5).toFixed(3))
-    }
-    addEventListener('pointermove', move)
-    return () => removeEventListener('pointermove', move)
-  }, [])
-  return <section className="hero-scene" id="inicio" ref={ref}><div className="hero-sticky">
+  useDesktopSceneMotion(ref, { pointer: true })
+  return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
     <div className="hero-atmosphere"><div className="hero-halo"/><div className="hero-floor"/><Particles count={22}/></div>
-    <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} alt=""/><div className="mark-scan"/></div>
-    <div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
+    <div className="hero-mark" aria-hidden="true"><div className="mark-echo echo-one"/><div className="mark-echo echo-two"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/><div className="mark-scan"/></div>
+    <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
     <div className="hero-actions"><a className="action action-solid" href={wa(CONTACTS.hardware, 'Olá! Preciso de assistência para meu equipamento.')} target="_blank" rel="noreferrer">Preciso de assistência <Arrow /></a><a className="action action-ghost" href={wa(CONTACTS.software, 'Olá! Quero desenvolver um projeto com a BASE4.')} target="_blank" rel="noreferrer">Quero desenvolver um projeto <Arrow /></a></div>
-    <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p><div className="scroll-mark"><i/><span>Continue</span></div>
+    <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p></div><div className="scroll-mark"><i/><span>Continue</span></div>
   </div></section>
 }
 
 function TransformationScene() {
   const ref = useRef(/** @type {HTMLElement | null} */ (null))
-  useScrollProgress(ref)
-  const hardware = ['Diagnóstico', 'Reparo', 'Upgrade', 'Recuperação']
-  const software = ['Sites', 'Sistemas', 'Automações', 'Integrações']
-  return <section className="transformation-scene" id="transformacao" ref={ref}><div className="transformation-sticky">
-    <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
-    <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>Estrutura ganha<br/>inteligência.</h2><p>A luz atravessa o físico. O diagnóstico vira direção.</p></div>
-    <div className="scene-copy scene-copy-data"><span>DADOS</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações passam a mover o negócio.</p></div>
-    <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
-    <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} alt=""/></div>
+  useDesktopSceneMotion(ref, { phases: true })
+  return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
+    <article className="transformation-card matter-card">
+      <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
+      <div className="matter-object" aria-hidden="true">
+        <div className="gpu-sequence">{GPU_FRAMES.map((src, index) => <img className="gpu-frame" src={src} width="1170" height="600" loading="lazy" decoding="async" alt="" key={src} data-frame={index}/>)}</div>
+        <img className="gpu-static scene-asset" src="/assets/scene/base4-gpu-static.webp" width="1400" height="583" loading="lazy" decoding="async" alt=""/>
+        <span className="hardware-scan"/>
+      </div>
+    </article>
+    <article className="transformation-card core-card">
+      <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>A base<br/>que conecta.</h2><p>Estrutura e inteligência trabalhando como uma única solução.</p></div>
+      <div className="transform-core" aria-hidden="true"><div className="core-light"/><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
+    </article>
+    <article className="transformation-card data-card">
+      <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
+      <div className="data-visual" aria-hidden="true">
+        <img className="scene-asset" src="/assets/scene/base4-digital-interface.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <span className="data-pulse"/>
+      </div>
+      <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
+    </article>
+    <article className="transformation-card final-card">
+      <div className="final-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" loading="lazy" decoding="async" alt=""/></div>
+      <div className="final-copy"><span>BASE4 SYSTEMS</span><h2>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></h2><p>Tecnologia de ponta a ponta.</p></div>
+    </article>
     <div className="energy-line" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-    <div className="hardware-words" aria-label="Serviços de hardware">{hardware.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
-    <div className="software-words" aria-label="Serviços de software">{software.map((item, index) => <span key={item} style={/** @type {React.CSSProperties} */ ({ '--i': index })}>{item}</span>)}</div>
-    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/></div>
+    <div className="scene-timeline" aria-hidden="true"><span/><i/><i/><i/><i/></div>
   </div></section>
 }
 
@@ -218,7 +280,7 @@ function SolutionsScene() {
     changeField(fields[next])
     tabRefs.current[next]?.focus()
   }
-  return <section className="solutions-scene" id="solucoes">
+  return <section className="solutions-scene" id="solucoes" tabIndex={-1}>
     <div className="scene-heading" data-reveal><p>O QUE RESOLVEMOS</p><h2>Tecnologia começa<br/>com um problema real.</h2></div>
     <div className="solution-switch" role="tablist" aria-label="Área de solução" data-reveal>{fields.map((value, index) => <button key={value} ref={element => { tabRefs.current[index] = element }} id={`${tabsId}-${value}-tab`} role="tab" aria-selected={field === value} aria-controls={`${tabsId}-panel`} tabIndex={field === value ? 0 : -1} onKeyDown={event => moveTab(event, index)} onClick={() => changeField(value)}>{value === 'hardware' ? 'Hardware' : 'Software'}</button>)}<i className={field}/></div>
     <div className={`problem-stage ${field}`} data-reveal><div className="problem-list" id={`${tabsId}-panel`} role="tabpanel" aria-labelledby={`${tabsId}-${field}-tab`} tabIndex={0}>{items.map((item, index) => <button key={item.problem} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><span>{item.problem}</span><Plus /></button>)}</div><div className="answer-stage" aria-live="polite"><span>O caminho BASE4</span><h3 key={`${field}-${active}`}>{items[active].answer}</h3><p>{field === 'hardware' ? 'Atendimento presencial, diagnóstico transparente e orçamento antes da execução.' : 'Descoberta, prototipação e desenvolvimento próximo até a entrega.'}</p><div className="answer-orbit"><i/><i/><i/><span>{field === 'hardware' ? 'Estrutura' : 'Evolução'}</span></div></div></div>
@@ -253,6 +315,7 @@ function ChargeScene() {
   const opener = useRef(null)
   const dialog = useRef(null)
   const closeButton = useRef(null)
+  const openDemo = event => { opener.current = event.currentTarget; setExpanded(true) }
   useEffect(() => {
     if (!expanded) return undefined
     const trigger = opener.current
@@ -272,13 +335,13 @@ function ChargeScene() {
     document.addEventListener('keydown', handleKey)
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
   }, [expanded])
-  return <section className="charge-scene" id="charge"><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button ref={opener} type="button" onClick={() => setExpanded(true)}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
+  return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
 }
 
 function CapabilityScene() {
   const [active, setActive] = useState(0)
   const headerUrl = active === 0 ? 'portfoliosaramarques.vercel.app' : active === 1 ? 'obsidian-eta-self.vercel.app' : 'base4.systems / projeto'
-  return <section className="capability-scene" id="capacidade"><div className="capability-intro" data-reveal><p>CAPACIDADE DE DESENVOLVIMENTO</p><h2>Do código à operação.</h2><span>Sites, sistemas e automações construídos em torno da operação de cada cliente.</span></div><div className="capability-stage" data-reveal><div className="capability-list">{capabilities.map((item, index) => <button key={item.label} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><small>{item.label}</small><strong>{item.title}</strong><span>{item.detail}</span><Arrow /></button>)}</div><div className={`capability-visual visual-${capabilities[active].visual}`}><div className="screen screen-back"><span/><span/><span/></div><div className="screen screen-front"><header><i/><i/><i/><span>{headerUrl}</span></header>{active === 0 ? <a className="portfolio-preview" href="https://portfoliosaramarques.vercel.app/" target="_blank" rel="noreferrer" aria-label="Abrir o portfólio de Sara Marques em uma nova aba"><img src="/assets/projects/sara-portfolio-preview.png" alt="Prévia do portfólio de Sara Marques"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Sara Marques</strong><em>Fotografia e audiovisual</em><b>Visitar site <Arrow/></b></span></a> : active === 1 ? <a className="portfolio-preview" href="https://obsidian-eta-self.vercel.app" target="_blank" rel="noreferrer" aria-label="Abrir o site da Obsidian em uma nova aba"><img src="/assets/projects/obsidian-preview.jpg" alt="Prévia do site da Obsidian Estética Automotiva"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Obsidian</strong><em>Estética automotiva de alta performance</em><b>Visitar site <Arrow/></b></span></a> : <main><span/><strong/><span/><div><i/><i/><i/></div></main>}</div><div className="visual-label">{active === 0 ? 'Clique para visitar' : active === 1 ? 'Clique para visitar' : capabilities[active].label}</div></div></div></section>
+  return <section className="capability-scene" id="capacidade"><div className="capability-intro" data-reveal><p>CAPACIDADE DE DESENVOLVIMENTO</p><h2>Do código à operação.</h2><span>Sites, sistemas e automações construídos em torno da operação de cada cliente.</span></div><div className="capability-stage" data-reveal><div className="capability-list">{capabilities.map((item, index) => <button key={item.label} className={active === index ? 'active' : ''} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)}><small>{item.label}</small><strong>{item.title}</strong><span>{item.detail}</span><Arrow /></button>)}</div><div className={`capability-visual visual-${capabilities[active].visual}`}><div className="screen screen-back"><span/><span/><span/></div><div className="screen screen-front"><header><i/><i/><i/><span>{headerUrl}</span></header>{active === 0 ? <a className="portfolio-preview" href="https://portfoliosaramarques.vercel.app/" target="_blank" rel="noreferrer" aria-label="Abrir o portfólio de Sara Marques em uma nova aba"><img src="/assets/projects/sara-portfolio-preview.jpg" width="1066" height="1600" loading="lazy" decoding="async" alt="Prévia do portfólio de Sara Marques"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Sara Marques</strong><em>Fotografia e audiovisual</em><b>Visitar site <Arrow/></b></span></a> : active === 1 ? <a className="portfolio-preview" href="https://obsidian-eta-self.vercel.app" target="_blank" rel="noreferrer" aria-label="Abrir o site da Obsidian em uma nova aba"><img src="/assets/projects/obsidian-preview.jpg" width="1568" height="741" loading="lazy" decoding="async" alt="Prévia do site da Obsidian Estética Automotiva"/><span className="portfolio-shade"/><span className="portfolio-copy"><small>PROJETO EM DESTAQUE</small><strong>Obsidian</strong><em>Estética automotiva de alta performance</em><b>Visitar site <Arrow/></b></span></a> : <main><span/><strong/><span/><div><i/><i/><i/></div></main>}</div><div className="visual-label">{active === 0 ? 'Clique para visitar' : active === 1 ? 'Clique para visitar' : capabilities[active].label}</div></div></div></section>
 }
 
 function PresenceScene() {
@@ -344,19 +407,40 @@ function ContactScene() {
   const [feedback, setFeedback] = useState('')
   const [fallbackUrl, setFallbackUrl] = useState('')
   const uid = useId()
+  const nameInput = useRef(null)
+  const detailInput = useRef(null)
   const submit = event => {
     event.preventDefault()
     const nextErrors = validateContact(values)
     setErrors({ name: nextErrors.name || '', detail: nextErrors.detail || '' })
-    if (Object.keys(nextErrors).length) { setFeedback('Revise os campos indicados antes de continuar.'); return }
+    if (Object.keys(nextErrors).length) {
+      setFeedback('Revise os campos indicados antes de continuar.')
+      window.requestAnimationFrame(() => (nextErrors.name ? nameInput : detailInput).current?.focus())
+      return
+    }
     const url = buildWhatsAppUrl(field, values.name, values.detail)
     setFallbackUrl(url)
     const popup = window.open(url, '_blank', 'noopener,noreferrer')
     setFeedback(popup ? 'Mensagem preparada. Conclua o envio no WhatsApp.' : 'O navegador bloqueou a nova janela. Use o link abaixo para continuar sem perder seus dados.')
   }
-  const update = event => { setValues(current => ({ ...current, [event.target.name]: event.target.value })); setErrors(current => ({ ...current, [event.target.name]: undefined })); setFeedback(''); setFallbackUrl('') }
+  const update = event => { setValues(current => ({ ...current, [event.target.name]: event.target.value })); setErrors(current => ({ ...current, [event.target.name]: '' })); setFeedback(''); setFallbackUrl('') }
   const switchField = value => { setField(value); setErrors({ name: '', detail: '' }); setFeedback(''); setFallbackUrl('') }
-  return <section className="contact-scene" id="contato"><div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div><form onSubmit={submit} noValidate data-reveal><fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset><label htmlFor={`${uid}-name`}>Seu nome</label><input id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>{errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}<label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label><textarea id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>{errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}<p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p><button type="submit">Continuar no WhatsApp <Arrow /></button><p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>{fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}</form></section>
+  return <section className="contact-scene" id="contato">
+    <div className="contact-intro" data-reveal><Brand compact/><p>UMA ÚNICA BASE PARA TODA A SUA TECNOLOGIA.</p><h2>Qual é o seu<br/>próximo passo?</h2></div>
+    <form onSubmit={submit} noValidate data-reveal>
+      <fieldset><legend>Escolha uma entrada</legend><div className="contact-choice"><label className={field === 'hardware' ? 'active' : ''}><input type="radio" name="field" value="hardware" checked={field === 'hardware'} onChange={() => switchField('hardware')}/><span>Manutenção de equipamento</span></label><label className={field === 'software' ? 'active' : ''}><input type="radio" name="field" value="software" checked={field === 'software'} onChange={() => switchField('software')}/><span>Desenvolvimento de software</span></label></div></fieldset>
+      <label htmlFor={`${uid}-name`}>Seu nome</label>
+      <input ref={nameInput} id={`${uid}-name`} name="name" autoComplete="name" value={values.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${uid}-name-error` : undefined} placeholder="Como podemos chamar você?"/>
+      {errors.name && <p className="field-error" id={`${uid}-name-error`} role="alert">{errors.name}</p>}
+      <label htmlFor={`${uid}-detail`}>{field === 'hardware' ? 'O que está acontecendo com o equipamento?' : 'O que você quer construir ou melhorar?'}</label>
+      <textarea ref={detailInput} id={`${uid}-detail`} name="detail" rows={3} value={values.detail} onChange={update} aria-invalid={Boolean(errors.detail)} aria-describedby={errors.detail ? `${uid}-detail-error` : undefined} placeholder={field === 'hardware' ? 'Conte o modelo e o problema...' : 'Conte o objetivo do projeto...'}/>
+      {errors.detail && <p className="field-error" id={`${uid}-detail-error`} role="alert">{errors.detail}</p>}
+      <p className="contact-disclosure">Ao continuar, uma mensagem será preparada no WhatsApp. Nada é enviado automaticamente.</p>
+      <button type="submit">Continuar no WhatsApp <Arrow /></button>
+      <p className={feedback ? 'form-feedback visible' : 'form-feedback'} role="status">{feedback}</p>
+      {fallbackUrl && <a className="whatsapp-fallback" href={fallbackUrl} target="_blank" rel="noreferrer">Abrir conversa manualmente <Arrow/></a>}
+    </form>
+  </section>
 }
 
 function Footer() { return <footer className="site-footer"><Brand/><p>Do componente ao código.</p><nav aria-label="Navegação do rodapé"><a href="#transformacao" onClick={smoothNavigate}>Ecossistema</a><a href="#solucoes" onClick={smoothNavigate}>Soluções</a><a href="#charge" onClick={smoothNavigate}>Charge</a><a href="#presenca" onClick={smoothNavigate}>BASE4</a><a href="#sobre" onClick={smoothNavigate}>Sobre</a><a href="#equipe" onClick={smoothNavigate}>Equipe</a><a href="#faq" onClick={smoothNavigate}>FAQ</a><a href="#contato" onClick={smoothNavigate}>Contato</a></nav><div><span>Rua XV de Novembro, 283 · Bilac, SP</span><span>© 2026 BASE4 SYSTEMS</span></div></footer> }
