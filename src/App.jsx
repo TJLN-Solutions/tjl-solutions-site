@@ -9,13 +9,78 @@ const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
 
-function seekScrollSvg(object, progress) {
-  if (!(object instanceof HTMLElement)) return
+function seekScrollSvg(object, progress, immediate = false) {
+  if (!(object instanceof HTMLElement)) return false
   const svg = object.querySelector('svg')
   const duration = Number(object.dataset.duration)
-  if (!(svg instanceof SVGSVGElement) || typeof svg.setCurrentTime !== 'function' || !Number.isFinite(duration)) return
+  if (!(svg instanceof SVGSVGElement) || typeof svg.setCurrentTime !== 'function' || typeof svg.getCurrentTime !== 'function' || !Number.isFinite(duration)) return false
   svg.pauseAnimations?.()
-  svg.setCurrentTime(clamp(progress) * Math.max(0, duration - 1 / 60))
+  const target = clamp(progress) * Math.max(0, duration - 1 / 60)
+  const current = svg.getCurrentTime()
+  const difference = target - current
+  svg.setCurrentTime(immediate || Math.abs(difference) < .012 ? target : current + difference * .16)
+  return !immediate && Math.abs(difference) >= .012
+}
+
+function hardwareScrollTimeline(progress) {
+  const local = clamp(progress)
+  if (local < .2) return local / .2 * .22
+  if (local < .45) return .22 + (local - .2) / .25 * .53
+  return .75 + (local - .45) / .55 * .23
+}
+
+const SOFTWARE_PALETTE = new Map([
+  ['#ed509e', '#1685f5'], ['#ff3d9e', '#2b99ff'], ['#ff8ac4', '#69b9ff'],
+  ['#ff8e3a', '#0878ed'], ['#e07624', '#075fbf'], ['#ef8534', '#0b6fd8'],
+  ['#e37e31', '#0b72dd'], ['#fb7b18', '#0878ed'], ['#ff8324', '#1388f2'],
+  ['#ff9442', '#339df4'], ['#e5863e', '#237fc8'], ['#f5954d', '#1685f5'],
+  ['#d18347', '#0b6fd8'], ['#cf6f26', '#075fbf'], ['#b26d38', '#164f8d'],
+  ['#91582b', '#123f6b'],
+  ['#510ee1', '#0878ed'], ['#561cd4', '#096ccb'], ['#6228e2', '#1685f5'],
+  ['#551dcd', '#075fbf'], ['#5631a5', '#164f8d'], ['#6320f3', '#1488f5'],
+  ['#783bfc', '#329cff'], ['#8d58fd', '#4ba8f8'], ['#9c71f9', '#62b4fa'],
+  ['#9c73f8', '#68b7f7'], ['#5e4b86', '#345777'], ['#5c4195', '#28577f'],
+  ['#4d22aa', '#0c4f91'], ['#4b2a92', '#174d7c'], ['#6b51a4', '#3d6d98'],
+  ['#5f4d84', '#395c7c'], ['#e0d1ff', '#c7e3fb'], ['#e7dbff', '#d2e9fb'],
+  ['#c19aad', '#6f8faa'], ['#757647', '#526477'], ['#676756', '#4b5968'],
+  ['#3d3e00', '#182330'], ['#474739', '#303d4b'], ['#4e4e41', '#394654'],
+  ['#5b5b57', '#465565'], ['#23231f', '#172330'], ['#000000', '#0a1018'],
+  ['#ffffff', '#21384b'], ['#fafafa', '#29445a'], ['#ece6f9', '#34526a'],
+  ['#f2f2f3', '#c5d3df'], ['#f2f2f2', '#cbd8e3'], ['#eae9ed', '#9eb1c1'],
+  ['#f2eefc', '#afc4d5'], ['#e8e7e9', '#9eb1c1'], ['#d5d3da', '#8fa5b7'],
+  ['#bfbdc1', '#71889b'], ['#8464c9', '#248eea']
+])
+
+const SOFTWARE_ORIGINAL_COLOR_GROUPS = new Set(['i0', 'i3', 'i6', 'i22', 'i24', 'i25', 'i26', 'i27'])
+
+function softwareTopLevelGroupId(node, svg) {
+  let group = node
+  while (group?.parentElement && group.parentElement !== svg) group = group.parentElement
+  return group?.tagName?.toLowerCase() === 'g' ? group.id : ''
+}
+
+function polishSoftwareSvg(svg) {
+  const pale = new Set(['#ffffff', '#f2f2f3', '#f2f2f2', '#fafafa', '#ece6f9', '#eae9ed', '#f2eefc', '#e8e7e9'])
+  svg.querySelectorAll('[fill]').forEach(node => {
+    if (SOFTWARE_ORIGINAL_COLOR_GROUPS.has(softwareTopLevelGroupId(node, svg))) return
+    const fill = node.getAttribute('fill')?.toLowerCase()
+    if (!fill) return
+    if (pale.has(fill) && node instanceof SVGGraphicsElement) {
+      const box = node.getBBox()
+      if (box.width >= 18 && box.width <= 72 && box.height >= 18 && box.height <= 72) {
+        node.setAttribute('fill', 'none')
+        return
+      }
+    }
+    const replacement = SOFTWARE_PALETTE.get(fill)
+    if (replacement) node.setAttribute('fill', replacement)
+  })
+  svg.querySelectorAll('[stop-color]').forEach(node => {
+    if (SOFTWARE_ORIGINAL_COLOR_GROUPS.has(softwareTopLevelGroupId(node, svg))) return
+    const color = node.getAttribute('stop-color')?.toLowerCase()
+    const replacement = color && SOFTWARE_PALETTE.get(color)
+    if (replacement) node.setAttribute('stop-color', replacement)
+  })
 }
 
 function ScrollSvg({ src, role, duration, className }) {
@@ -51,9 +116,11 @@ function ScrollSvg({ src, role, duration, className }) {
   useEffect(() => {
     const svg = container.current?.querySelector('svg')
     if (!(svg instanceof SVGSVGElement)) return
+    if (role === 'software') polishSoftwareSvg(svg)
     svg.pauseAnimations?.()
     svg.setCurrentTime?.(0)
-  }, [markup])
+    container.current?.dispatchEvent(new Event('svgready'))
+  }, [markup, role])
 
   return <div ref={container} className={className} data-scroll-svg={role} data-duration={duration} dangerouslySetInnerHTML={{ __html: markup }}/>
 }
@@ -106,17 +173,19 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       const hardwareAnimation = element.querySelector('[data-scroll-svg="hardware"]')
       const softwareAnimation = element.querySelector('[data-scroll-svg="software"]')
       if (isDesktop) {
-        seekScrollSvg(hardwareAnimation, progress / .22)
-        seekScrollSvg(softwareAnimation, (progress - .51) / .28)
-        return
+        const hardwareSeeking = seekScrollSvg(hardwareAnimation, hardwareScrollTimeline(progress / .3))
+        const softwareSeeking = seekScrollSvg(softwareAnimation, (progress - .62) / .29)
+        return hardwareSeeking || softwareSeeking
       }
+      let seeking = false
       for (const animation of [hardwareAnimation, softwareAnimation]) {
         if (!animation) continue
         const card = animation.closest('.transformation-card')
         if (!card) continue
         const cardRect = card.getBoundingClientRect()
-        seekScrollSvg(animation, (innerHeight - cardRect.top) / Math.max(1, innerHeight + cardRect.height))
+        seeking = seekScrollSvg(animation, (innerHeight - cardRect.top) / Math.max(1, innerHeight + cardRect.height)) || seeking
       }
+      return seeking
     }
     const update = () => {
       frame = 0
@@ -124,25 +193,27 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       if (!element) return
       if (reduced.matches) {
         clearMotion(element)
-        element.querySelectorAll('[data-scroll-svg]').forEach(animation => seekScrollSvg(animation, 0))
+        element.querySelectorAll('[data-scroll-svg]').forEach(animation => seekScrollSvg(animation, 0, true))
         return
       }
       if (!desktop.matches) {
         clearMotion(element)
-        if (phases) syncAnimations(element, 0, false)
+        const seeking = phases && syncAnimations(element, 0, false)
+        if (seeking && !frame) frame = requestAnimationFrame(update)
         return
       }
       const rect = element.getBoundingClientRect()
       const progress = clamp(-rect.top / Math.max(1, rect.height - innerHeight))
       element.style.setProperty('--progress', progress.toFixed(4))
       if (phases) {
-        element.style.setProperty('--build', clamp(progress / .22).toFixed(4))
-        syncAnimations(element, progress, true)
-        element.style.setProperty('--matter', (1 - clamp((progress - .23) / .12)).toFixed(4))
-        element.style.setProperty('--core', (clamp((progress - .25) / .1) * (1 - clamp((progress - .55) / .13))).toFixed(4))
-        element.style.setProperty('--data', (clamp((progress - .51) / .13) * (1 - clamp((progress - .79) / .11))).toFixed(4))
-        element.style.setProperty('--energy', (clamp((progress - .15) / .17) * (1 - clamp((progress - .72) / .16))).toFixed(4))
-        element.style.setProperty('--final', clamp((progress - .82) / .12).toFixed(4))
+        element.style.setProperty('--build', clamp(progress / .3).toFixed(4))
+        const seeking = syncAnimations(element, progress, true)
+        element.style.setProperty('--matter', (1 - clamp((progress - .28) / .1)).toFixed(4))
+        element.style.setProperty('--core', (clamp((progress - .3) / .1) * (1 - clamp((progress - .62) / .1))).toFixed(4))
+        element.style.setProperty('--data', (clamp((progress - .62) / .1) * (1 - clamp((progress - .91) / .07))).toFixed(4))
+        element.style.setProperty('--energy', (clamp((progress - .16) / .18) * (1 - clamp((progress - .84) / .1))).toFixed(4))
+        element.style.setProperty('--final', clamp((progress - .94) / .05).toFixed(4))
+        if (seeking && !frame) frame = requestAnimationFrame(update)
       }
     }
     const request = () => { if (!frame) frame = requestAnimationFrame(update) }
@@ -157,7 +228,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
 
     update()
     const animations = ref.current?.querySelectorAll('[data-scroll-svg]') ?? []
-    animations.forEach(animation => animation.addEventListener('load', request))
+    animations.forEach(animation => animation.addEventListener('svgready', request))
     addEventListener('scroll', request, { passive: true })
     addEventListener('resize', request)
     if (pointer) addEventListener('pointermove', move, { passive: true })
@@ -169,7 +240,7 @@ function useDesktopSceneMotion(ref, { pointer = false, phases = false } = {}) {
       if (pointer) removeEventListener('pointermove', move)
       desktop.removeEventListener('change', request)
       reduced.removeEventListener('change', request)
-      animations.forEach(animation => animation.removeEventListener('load', request))
+      animations.forEach(animation => animation.removeEventListener('svgready', request))
       cancelAnimationFrame(frame)
     }
   }, [phases, pointer, ref])
@@ -338,7 +409,6 @@ function TransformationScene() {
       <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
       <div className="data-visual" aria-hidden="true">
         <ScrollSvg className="scene-motion software-motion" src="/assets/scene/coding.svg" role="software" duration="7"/>
-        <span className="data-pulse"/>
       </div>
       <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
     </article>
