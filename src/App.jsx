@@ -5,7 +5,7 @@ import { capabilities, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
 
 const BRAND = '/assets/brand/'
-const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence/frame-${String(index).padStart(2, '0')}.webp`)
+const GPU_FRAMES = Array.from({ length: 15 }, (_, index) => `/assets/scene/gpu-sequence-hq/frame-${String(index).padStart(2, '0')}.webp`)
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
