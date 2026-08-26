@@ -173,7 +173,10 @@ function TransformationScene() {
   return <section className="transformation-scene" id="transformacao" ref={ref} tabIndex={-1}><div className="transformation-sticky">
     <article className="transformation-card matter-card">
       <div className="scene-copy scene-copy-matter"><span>MATÉRIA</span><h2>A estrutura<br/>que funciona.</h2><p>Componentes, máquinas e infraestrutura tratados com precisão.</p></div>
-      <div className="matter-object" aria-hidden="true"><div className="metal-column column-a"/><div className="metal-column column-b"/><div className="metal-column column-c"/><div className="metal-base"/></div>
+      <div className="matter-object" aria-hidden="true">
+        <img className="scene-asset" src="/assets/scene/base4-hardware-assembly.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <span className="hardware-scan"/>
+      </div>
     </article>
     <article className="transformation-card core-card">
       <div className="scene-copy scene-copy-core"><span>UMA ÚNICA BASE</span><h2>A base<br/>que conecta.</h2><p>Estrutura e inteligência trabalhando como uma única solução.</p></div>
@@ -181,7 +184,10 @@ function TransformationScene() {
     </article>
     <article className="transformation-card data-card">
       <div className="scene-copy scene-copy-data"><span>INTELIGÊNCIA</span><h2>A inteligência<br/>que evolui.</h2><p>Sistemas e automações que transformam tecnologia em resultado.</p></div>
-      <div className="data-visual" aria-hidden="true"><i/><i/><i/><i/><span/></div>
+      <div className="data-visual" aria-hidden="true">
+        <img className="scene-asset" src="/assets/scene/base4-digital-interface.webp" width="1280" height="853" loading="lazy" decoding="async" alt=""/>
+        <span className="data-pulse"/>
+      </div>
       <div className="mobile-final"><span>BASE4 SYSTEMS</span><strong>Da máquina que sustenta<br/><em>ao sistema que impulsiona.</em></strong><small>Tecnologia de ponta a ponta.</small></div>
     </article>
     <article className="transformation-card final-card">

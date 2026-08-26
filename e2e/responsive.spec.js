@@ -294,6 +294,30 @@ test('imagens, recursos e textos permanecem íntegros em todos os formatos', asy
   expect(failedResources, 'recursos locais com erro HTTP').toEqual([])
 })
 
+test('novos visuais da narrativa carregam com proporção preservada', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport)
+    await page.goto('/#transformacao')
+    for (const selector of ['.matter-object .scene-asset', '.data-visual .scene-asset']) {
+      const image = page.locator(selector)
+      await expect(image).toBeAttached()
+      const dimensions = await image.evaluate(element => ({
+        complete: element.complete,
+        naturalWidth: element.naturalWidth,
+        naturalHeight: element.naturalHeight,
+        renderedWidth: element.getBoundingClientRect().width,
+        renderedHeight: element.getBoundingClientRect().height,
+      }))
+      expect(dimensions.complete).toBe(true)
+      expect(dimensions.naturalWidth).toBe(1280)
+      expect(dimensions.naturalHeight).toBe(853)
+      expect(dimensions.renderedWidth).toBeGreaterThan(100)
+      expect(dimensions.renderedHeight).toBeGreaterThan(60)
+      expect(dimensions.renderedWidth / dimensions.renderedHeight).toBeCloseTo(1280 / 853, 1)
+    }
+  }
+})
+
 test('âncoras mantêm os títulos abaixo do cabeçalho fixo', async ({ page }) => {
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 667, height: 375 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]) {
     await page.setViewportSize(viewport)
