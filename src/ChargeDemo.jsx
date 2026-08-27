@@ -29,7 +29,7 @@ function DemoNav({ view, setView }) {
   }, [view])
   const renderButton = item => <button ref={element => { if (element) itemRefs.current.set(item.id, element) }} type="button" key={item.id} className={view === item.id ? 'active' : ''} aria-current={view === item.id ? 'page' : undefined} onClick={() => setView(item.id)} title={item.label}><i aria-hidden="true">{item.icon}</i><span>{item.label}</span></button>
   return <aside className="demo-sidebar" aria-label="Navegação da demonstração">
-    <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent.png" width="1090" height="1067" loading="lazy" decoding="async" alt=""/><b>CHARGE</b></div>
+    <div className="demo-app-mark"><img src="/assets/brand/base4-symbol-transparent-sm.webp" width="240" height="234" loading="lazy" decoding="async" alt=""/><b>CHARGE</b></div>
     {renderButton(views[0])}
     <p>CARTEIRA</p>
     {views.filter(item => item.group === 'CARTEIRA').map(renderButton)}
