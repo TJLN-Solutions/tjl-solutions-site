@@ -505,3 +505,14 @@ button:disabled{cursor:not-allowed;opacity:.52}
 @media (orientation:landscape) and (max-height:650px) and (max-width:980px){
   .hero-sticky{min-height:480px;display:grid;grid-template-columns:minmax(110px,.5fr) minmax(0,1.5fr);gap:22px;padding:82px 24px 28px}.hero-mark{grid-column:1;width:min(150px,24vw);justify-self:end}.hero-content{grid-column:2;align-items:flex-start;gap:12px}.hero-copy{text-align:left}.hero-copy h1{font-size:clamp(31px,5.4vw,46px)}.hero-subtitle{margin-inline:0}.hero-actions{width:100%;grid-template-columns:1fr 1fr}.hero-footnote{justify-content:flex-start;text-align:left}
 }
+
+/* Error boundary — cobre exceções de runtime em qualquer seção da página. */
+.error-fallback { min-height: 100svh; display: grid; place-items: center; padding: 32px; background: var(--ink); }
+.error-fallback-card { max-width: 460px; text-align: center; }
+.error-fallback-kicker { margin: 0 0 14px; color: var(--soft); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.error-fallback-card h1 { margin: 0 0 14px; font-size: clamp(24px, 4vw, 32px); line-height: 1.2; letter-spacing: -.02em; }
+.error-fallback-card p { margin: 0 0 26px; color: var(--soft); font-size: 14px; line-height: 1.6; }
+.error-fallback-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.error-fallback-actions button, .error-fallback-actions a { min-height: 48px; display: inline-flex; align-items: center; padding: 0 20px; border-radius: 9px; border: 1px solid var(--line); font-size: 12px; font-weight: 700; cursor: pointer; }
+.error-fallback-actions button { background: var(--blue); border-color: var(--blue); color: white; }
+.error-fallback-actions a { background: transparent; color: var(--white); }

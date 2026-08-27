@@ -666,11 +666,11 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, beforeLabel = 'Antes', afterLa
   return <div className="hardware-compare" style={/** @type {React.CSSProperties} */ ({ '--pos': `${value}%` })}>
     <div className="hardware-compare-media">
       <div className="hardware-compare-frame hardware-compare-after">
-        {afterSrc ? <img src={afterSrc} alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
+        {afterSrc ? <img src={afterSrc} width="1280" height="720" loading="lazy" decoding="async" alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
         <span className="hardware-compare-tag hardware-compare-tag-after">{afterLabel}</span>
       </div>
       <div className="hardware-compare-frame hardware-compare-before">
-        {beforeSrc ? <img src={beforeSrc} alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
+        {beforeSrc ? <img src={beforeSrc} width="1280" height="720" loading="lazy" decoding="async" alt="" /> : <div className="hardware-compare-placeholder"><ImageIcon/><span>Foto em breve</span></div>}
         <span className="hardware-compare-tag hardware-compare-tag-before">{beforeLabel}</span>
       </div>
     </div>
@@ -682,7 +682,7 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, beforeLabel = 'Antes', afterLa
 
 function HardwareScene() {
   return <section className="hardware-scene" id="hardware"><div className="hardware-heading" data-reveal><p>MANUTENÇÃO DE HARDWARE</p><h2>Antes e depois<br/>da limpeza.</h2><span>Arraste o controle para comparar — poeira acumulada é a inimiga silenciosa de qualquer notebook ou PC.</span></div><div className="hardware-compare-wrap" data-reveal>
-    <BeforeAfterSlider beforeSrc="/assets/projects/hardware/pc-antes.png" afterSrc="/assets/projects/hardware/pc-depois.png" />
+    <BeforeAfterSlider beforeSrc="/assets/projects/hardware/pc-antes.webp" afterSrc="/assets/projects/hardware/pc-depois.webp" />
   </div><div className="hardware-benefits" data-reveal>{HARDWARE_BENEFITS.map(benefit => <div className="hardware-benefit-card" key={benefit.title}><benefit.Icon/><strong>{benefit.title}</strong><p>{benefit.text}</p></div>)}</div></section>
 }
 
