@@ -708,7 +708,7 @@ function MemberCard({ person, index }) {
   const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase()
   return <div className="member-card-wrap" data-reveal style={/** @type {React.CSSProperties} */ ({ '--i': index })}>
     <div className="member-card">
-      <button className="member-mail" type="button" aria-label={`E-mail de ${person.name} (em breve)`}><MailIcon/></button>
+      <button className="member-mail" type="button" disabled aria-label={`E-mail de ${person.name} (em breve)`} title="E-mail em breve"><MailIcon/></button>
       <div className="member-photo">{person.photo ? <img src={person.photo} alt="" /> : <b aria-hidden="true">{initials}</b>}</div>
       <div className="member-bottom">
         <div className="member-content">
@@ -719,8 +719,8 @@ function MemberCard({ person, index }) {
         <div className="member-footer">
           <div className="member-socials">
             <a href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer" aria-label={`WhatsApp de ${person.name}`}><WhatsAppIcon/></a>
-            <span aria-hidden="true" title="LinkedIn (em breve)"><LinkedInIcon/></span>
-            <span aria-hidden="true" title="GitHub (em breve)"><GithubIcon/></span>
+            <span className="member-social-soon" aria-hidden="true" title="LinkedIn (em breve)"><LinkedInIcon/></span>
+            <span className="member-social-soon" aria-hidden="true" title="GitHub (em breve)"><GithubIcon/></span>
           </div>
           <a className="member-button" href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer">Falar</a>
         </div>
