@@ -75,6 +75,13 @@ def main() -> None:
 
     save(full, "base4-logo-transparent.png")
     save(symbol, "base4-symbol-transparent.png")
+    # WebP do símbolo: full-size pro hero (grande, precisa de nitidez) e uma
+    # variante pequena pro header/rodapé/ChargeDemo, onde o PNG original
+    # (232 KB pra caber em ~40px de largura) é desperdício de banda.
+    symbol.save(BRAND / "base4-symbol-transparent.webp", quality=92, method=6)
+    symbol_small = symbol.copy()
+    symbol_small.thumbnail((240, 240), Image.Resampling.LANCZOS)
+    symbol_small.save(BRAND / "base4-symbol-transparent-sm.webp", quality=92, method=6)
     save(wordmark, "base4-wordmark-transparent.png")
     save(wordmark_dark, "base4-wordmark-white.png")
     save(contain(symbol, (512, 512), padding=22), "base4-symbol-512.png")

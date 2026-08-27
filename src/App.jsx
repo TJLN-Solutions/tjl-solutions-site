@@ -1,5 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
-import ChargeDemo from './ChargeDemo.jsx'
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react'
 import { chargeRevealAt } from './chargeDemoData.js'
 import { capabilities, faq, people, problemsByField } from './data.js'
 import { buildWhatsAppUrl, contactPhones, validateContact } from './formLogic.js'
@@ -8,6 +7,29 @@ const BRAND = '/assets/brand/'
 const CONTACTS = contactPhones
 const wa = (phone, text) => `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
 const clamp = value => Math.max(0, Math.min(1, value))
+
+// A demo do B4 Charge é um produto inteiro embutido (7 telas, gráfico em
+// canvas) só para servir de teaser — separada em chunk próprio pra não pesar
+// no bundle inicial de quem nunca chega a rolar até a seção Charge.
+const ChargeDemo = lazy(() => import('./ChargeDemo.jsx'))
+
+// Adia a primeira renderização (e, portanto, o download do chunk) até o
+// elemento chegar perto da viewport, em vez de baixar assim que a página
+// carrega só porque a seção existe no fluxo da página.
+function useVisibleOnce(ref) {
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    if (visible) return undefined
+    const element = ref.current
+    if (!element || typeof IntersectionObserver === 'undefined') { setVisible(true); return undefined }
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) setVisible(true)
+    }, { rootMargin: '600px 0px' })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [ref, visible])
+  return visible
+}
 
 function seekScrollSvg(object, progress, immediate = false) {
   if (!(object instanceof HTMLElement)) return false
@@ -291,7 +313,7 @@ function RevealWords({ text, startIndex = 0 }) {
 
 function Brand({ compact = false, className = '' }) {
   return <a className={`brand ${compact ? 'brand-compact' : ''} ${className}`} href="#inicio" onClick={smoothNavigate} aria-label="BASE4 SYSTEMS — início">
-    <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" decoding="async" alt="" />
+    <img className="brand-symbol" src={`${BRAND}base4-symbol-transparent-sm.webp`} width="240" height="234" decoding="async" alt="" />
     {!compact && <img className="brand-wordmark" src={`${BRAND}base4-wordmark-white.png`} width="1010" height="99" decoding="async" alt="BASE4 SYSTEMS" />}
   </a>
 }
@@ -512,7 +534,7 @@ function HeroScene() {
   useDesktopSceneMotion(ref, { pointer: true })
   return <section className="hero-scene" id="inicio" ref={ref} tabIndex={-1}><div className="hero-sticky">
     <div className="hero-atmosphere"><ConstellationField/></div>
-    <div className="hero-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.png`} width="1090" height="1067" fetchPriority="high" alt=""/></div>
+    <div className="hero-mark" aria-hidden="true"><img src={`${BRAND}base4-symbol-transparent.webp`} width="1090" height="1067" fetchPriority="high" alt=""/></div>
     <div className="hero-content"><div className="hero-copy"><p className="hero-kicker">BASE4 SYSTEMS</p><h1><span><i>DO HARDWARE</i></span><span><i>AO SOFTWARE.</i></span></h1><p className="hero-subtitle">Estrutura, inteligência e tecnologia conectadas por uma única base.</p></div>
     <div className="hero-actions"><a className="action action-solid" href={wa(CONTACTS.hardware, 'Olá! Preciso de assistência para meu equipamento.')} target="_blank" rel="noreferrer">Preciso de assistência <Arrow /></a><a className="action action-ghost" href={wa(CONTACTS.software, 'Olá! Quero desenvolver um projeto com a BASE4.')} target="_blank" rel="noreferrer">Quero desenvolver um projeto <Arrow /></a></div>
     <p className="hero-footnote">Assistência local em Bilac e região <span/> Desenvolvimento para qualquer lugar</p></div><div className="scroll-mark"><i/><span>Continue</span></div>
@@ -600,11 +622,17 @@ function ChargeCountdown() {
   </div>
 }
 
+function ChargeDemoFallback() {
+  return <div className="charge-device-loading" aria-hidden="true"><i/><span>Carregando demonstração…</span></div>
+}
+
 function ChargeScene() {
   const [expanded, setExpanded] = useState(false)
   const opener = useRef(null)
   const dialog = useRef(null)
   const closeButton = useRef(null)
+  const section = useRef(null)
+  const demoVisible = useVisibleOnce(section)
   const openDemo = event => { opener.current = event.currentTarget; setExpanded(true) }
   useEffect(() => {
     if (!expanded) return undefined
@@ -625,7 +653,7 @@ function ChargeScene() {
     document.addEventListener('keydown', handleKey)
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener('keydown', handleKey); trigger?.focus() }
   }, [expanded])
-  return <section className="charge-scene" id="charge" tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device"><ChargeDemo/></div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><ChargeDemo/></div></div></div>}</section>
+  return <section className="charge-scene" id="charge" ref={section} tabIndex={-1}><div className="charge-heading" data-reveal><span>PRODUTO BASE4 · EM DESENVOLVIMENTO</span><h2><RevealWords text="O próximo fluxo"/><br/><RevealWords text="está chegando." startIndex={3}/></h2><p>Uma nova forma de organizar cobranças está sendo construída. Enquanto a versão completa não é revelada, explore uma amostra navegável do que vem por aí.</p><ChargeCountdown/><a className="action action-dark" href={wa(CONTACTS.hardware, 'Olá! Quero saber quando o B4 Charge for lançado.')} target="_blank" rel="noreferrer">Quero acompanhar <Arrow /></a></div><div className="charge-object" data-reveal><div className="charge-preview-label"><i/> ACESSO ANTECIPADO · WIREFRAME</div><div className="charge-device">{demoVisible ? <Suspense fallback={<ChargeDemoFallback/>}><ChargeDemo/></Suspense> : <ChargeDemoFallback/>}</div><button className="charge-expand-button" type="button" onClick={openDemo}>Ampliar demonstração <Arrow/></button><div className="charge-mobile-card"><span>WIREFRAME NAVEGÁVEL</span><strong>Explore o B4 Charge</strong><p>Abra uma demonstração funcional, navegue pelos módulos e alterne o tema.</p><button type="button" onClick={openDemo}>Abrir demonstração <Arrow/></button></div><div className="device-shadow"/></div>{expanded && <div className="charge-modal" onMouseDown={event => { if (event.target === event.currentTarget) setExpanded(false) }}><div ref={dialog} className="charge-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="charge-modal-title"><header className="charge-modal-header"><div><small>DEMONSTRAÇÃO INTERATIVA</small><strong id="charge-modal-title">B4 Charge</strong></div><button ref={closeButton} type="button" onClick={() => setExpanded(false)} aria-label="Fechar demonstração">Fechar <span aria-hidden="true">×</span></button></header><div className="charge-modal-content"><Suspense fallback={<ChargeDemoFallback/>}><ChargeDemo/></Suspense></div></div></div>}</section>
 }
 
 function CapabilityVisual({ index, inline = false }) {
