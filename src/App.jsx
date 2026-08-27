@@ -734,6 +734,7 @@ function GithubIcon() { return <svg viewBox="0 0 496 512" aria-hidden="true"><pa
 // pro número real; LinkedIn e GitHub ficam sem link até termos os perfis.
 function MemberCard({ person, index }) {
   const initials = person.name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase()
+  const contactHref = wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)
   return <div className="member-card-wrap" data-reveal style={/** @type {React.CSSProperties} */ ({ '--i': index })}>
     <div className="member-card">
       <button className="member-mail" type="button" disabled aria-label={`E-mail de ${person.name} (em breve)`} title="E-mail em breve"><MailIcon/></button>
@@ -746,11 +747,11 @@ function MemberCard({ person, index }) {
         </div>
         <div className="member-footer">
           <div className="member-socials">
-            <a href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer" aria-label={`WhatsApp de ${person.name}`}><WhatsAppIcon/></a>
+            <a href={contactHref} target="_blank" rel="noreferrer" aria-label={`WhatsApp de ${person.name}`}><WhatsAppIcon/></a>
             <span className="member-social-soon" aria-hidden="true" title="LinkedIn (em breve)"><LinkedInIcon/></span>
             <span className="member-social-soon" aria-hidden="true" title="GitHub (em breve)"><GithubIcon/></span>
           </div>
-          <a className="member-button" href={wa(person.phone, `Olá, ${person.name}! Encontrei seu contato no site da BASE4.`)} target="_blank" rel="noreferrer">Falar</a>
+          <a className="member-button" href={contactHref} target="_blank" rel="noreferrer">Falar</a>
         </div>
       </div>
     </div>
